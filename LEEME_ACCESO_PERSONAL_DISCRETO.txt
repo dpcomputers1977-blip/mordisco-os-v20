@@ -1,0 +1,28 @@
+MORDISCO OS — ACCESO DEL PERSONAL DISCRETO
+
+NUEVO
+- Enlace pequeño “Acceso del personal” en el pie de la página.
+- Abre: https://mordiscofastfood.com/staff
+- Color tenue para no distraer a los clientes.
+- En móviles queda visible sin interferir con la barra inferior.
+
+NO SE MODIFICA
+- Productos
+- Categorías
+- Pedidos
+- Inventario
+- Empleados
+- Caja
+- Contabilidad
+- Diseño principal
+
+PUBLICAR
+1. Extrae este ZIP.
+2. Copia todo dentro de Documentos\GitHub\mordisco-os-v20.
+3. Reemplaza los archivos.
+4. GitHub Desktop:
+   Summary: Añadir acceso discreto del personal
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Abre la página y baja hasta el pie.

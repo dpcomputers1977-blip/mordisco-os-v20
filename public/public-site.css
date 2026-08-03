@@ -865,3 +865,31 @@ footer{background:#080808;color:#aaa;padding:45px 5vw;display:grid;grid-template
   min-height:50px;
   margin-top:10px;
 }
+
+/* ACCESO DISCRETO DEL PERSONAL */
+.staff-access-footer{
+  width:100%;
+  margin-top:18px;
+  padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.08);
+  text-align:center;
+}
+.staff-access-footer a{
+  color:rgba(255,255,255,.34);
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.04em;
+  text-decoration:none;
+  transition:color .2s ease;
+}
+.staff-access-footer a:hover,
+.staff-access-footer a:focus{
+  color:rgba(255,196,0,.9);
+  text-decoration:underline;
+}
+@media(max-width:700px){
+  .staff-access-footer{
+    margin-top:14px;
+    padding-bottom:76px;
+  }
+}
