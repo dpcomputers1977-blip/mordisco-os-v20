@@ -1320,3 +1320,9 @@ button:disabled{
 /* SEGURIDAD DE CUENTA */
 .passwordPanel{margin-bottom:20px}
 .passwordPanel .formGrid{margin-top:14px}
+
+/* PERMISOS ESTRICTOS PARA EMPLEADOS */
+body.employeeMode .sidebar [data-tab].roleRestricted,
+body.employeeMode .sidebar [data-tab][hidden]{
+  display:none!important;
+}

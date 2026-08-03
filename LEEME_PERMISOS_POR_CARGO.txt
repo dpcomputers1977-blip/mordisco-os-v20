@@ -1,0 +1,20 @@
+MORDISCO OS — PERMISOS ESTRICTOS POR CARGO
+
+- Administrador: acceso completo.
+- Cajero: únicamente POS / Caja.
+- Cocina: únicamente pantalla Cocina.
+- Mesero: únicamente Comandas en /comandas.
+
+Las secciones no autorizadas desaparecen y también se bloquean si intentan abrirse manualmente.
+
+PUBLICAR
+1. Extrae el ZIP.
+2. Copia todo en Documentos\GitHub\mordisco-os-v20.
+3. Reemplaza archivos.
+4. GitHub Desktop: Restringir accesos por cargo
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Cada empleado debe cerrar sesión y volver a entrar desde /staff.
+
+No se modifican productos, ventas, inventario, empleados ni contabilidad.

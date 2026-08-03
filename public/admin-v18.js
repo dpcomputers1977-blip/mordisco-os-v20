@@ -163,9 +163,15 @@ async function init(){
       return;
     }
 
+    if(savedEmployee.role==='waiter'){
+      location.replace('/comandas');
+      return;
+    }
+
     currentEmployee=savedEmployee;
     isAdminSession=false;
     document.body.classList.add('employeeMode');
+    document.body.dataset.employeeRole=savedEmployee.role;
     $('#loginModal').classList.add('hidden');
     showAdmin();
 
@@ -177,7 +183,7 @@ async function init(){
       waiter:['tables','orders'],
       cashier:['pos','orders','tables','shifts'],
       kitchen:['kitchen'],
-      admin:['dashboard','products','categories','orders','kitchen','pos','inventory','tables','shifts','finance','customers','promotions','pages','staff','settings']
+      admin:['dashboard','products','categories','orders','kitchen','pos','inventory','tables','shifts','finance','customers','promotions','pages','staff','extras','settings']
     }[savedEmployee.role]||[];
 
     const target=allowed.includes(requestedTab)?requestedTab:allowed[0];
@@ -1439,7 +1445,16 @@ function fillEmployeeLogin(){
   $('#employeeLoginStaff').innerHTML=staffMembers.filter(s=>s.active).map(s=>`<option value="${s.id}">${esc(s.name)} — ${staffRoleLabel(s.role)}</option>`).join('');
 }
 function applyEmployeePermissions(employee){
-  currentEmployee=employee;localStorage.setItem('mordisco_employee',JSON.stringify(employee));
+  currentEmployee=employee;
+  localStorage.setItem('mordisco_employee',JSON.stringify(employee));
+  document.body.classList.add('employeeMode');
+  document.body.dataset.employeeRole=employee.role;
+
+  if(employee.role==='waiter'){
+    location.replace('/comandas');
+    return;
+  }
+
   if(employee.role==='cashier'){
     setTimeout(()=>{
       if($('#posCashier')){
@@ -1452,10 +1467,32 @@ function applyEmployeePermissions(employee){
     if($('#posCashier'))$('#posCashier').disabled=false;
     if($('#activeCashierName'))$('#activeCashierName').textContent='Sin seleccionar';
   }
-  const allowed={waiter:['tables','orders'],cashier:['pos','orders','tables','shifts'],kitchen:['kitchen'],admin:['dashboard','products','categories','orders','kitchen','pos','inventory','tables','shifts','finance','customers','promotions','pages','staff','settings']}[employee.role]||[];
-  $$('.sidebar [data-tab]').forEach(b=>b.classList.toggle('roleRestricted',!allowed.includes(b.dataset.tab)));
+
+  const allowed={
+    cashier:['pos'],
+    kitchen:['kitchen'],
+    admin:['dashboard','products','categories','orders','kitchen','pos','inventory','tables','shifts','finance','customers','promotions','pages','staff','extras','settings']
+  }[employee.role]||[];
+
+  $$('.sidebar [data-tab]').forEach(button=>{
+    const permitted=allowed.includes(button.dataset.tab);
+    button.classList.toggle('roleRestricted',!permitted);
+    button.hidden=!permitted;
+    button.setAttribute('aria-hidden',String(!permitted));
+    if(!permitted)button.tabIndex=-1;
+  });
+
+  $$('#adminView .tab').forEach(section=>{
+    const tabName=section.id?.replace(/^tab-/,'');
+    if(tabName&&!allowed.includes(tabName)){
+      section.classList.add('hidden');
+      section.setAttribute('aria-hidden','true');
+    }
+  });
+
   $('#logoutBtn').textContent='Cerrar turno';
-  const first=$(`.sidebar [data-tab="${allowed[0]}"]`);if(first)first.click();
+  const first=$(`.sidebar [data-tab="${allowed[0]}"]`);
+  if(first)first.click();
 }
 async function loginEmployee(){
   const id=$('#employeeLoginStaff').value,pin=$('#employeeLoginPin').value.trim();
@@ -2313,3 +2350,26 @@ document.querySelector('#changeAdminPasswordForm')?.addEventListener('submit',as
   event.target.reset();
   toast('Contraseña actualizada correctamente');
 });
+
+
+/* ===== BLOQUEO ESTRICTO POR CARGO ===== */
+document.addEventListener('click',event=>{
+  const button=event.target.closest?.('.sidebar [data-tab]');
+  if(!button||!document.body.classList.contains('employeeMode'))return;
+
+  let employee=null;
+  try{employee=JSON.parse(localStorage.getItem('mordisco_employee')||'null')}catch{}
+  if(!employee?.role)return;
+
+  const allowed={
+    cashier:['pos'],
+    kitchen:['kitchen'],
+    admin:['dashboard','products','categories','orders','kitchen','pos','inventory','tables','shifts','finance','customers','promotions','pages','staff','extras','settings']
+  }[employee.role]||[];
+
+  if(!allowed.includes(button.dataset.tab)){
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    toast('No tienes permiso para abrir esta sección');
+  }
+},true);
