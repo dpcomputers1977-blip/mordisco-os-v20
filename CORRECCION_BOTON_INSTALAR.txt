@@ -1,0 +1,21 @@
+CORRECCIÓN BOTÓN INSTALAR APP
+
+Problema corregido:
+El archivo JavaScript se cargaba antes de que existiera el botón,
+por lo que el botón aparecía pero no recibía el evento de clic.
+
+PUBLICAR:
+1. Copia todo dentro de Documentos\GitHub\mordisco-os-v20.
+2. Reemplaza archivos.
+3. GitHub Desktop:
+   Summary: Corregir botón instalar app
+4. Commit to main.
+5. Push origin.
+6. Espera Vercel Ready.
+7. En Chrome del teléfono:
+   - cierra la pestaña;
+   - vuelve a abrir mordiscofastfood.com;
+   - pulsa Instalar app.
+
+Si Chrome todavía no ofrece la instalación automática, el botón mostrará
+las instrucciones exactas para instalar desde el menú ⋮.

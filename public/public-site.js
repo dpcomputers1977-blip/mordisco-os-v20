@@ -191,42 +191,83 @@ document.addEventListener('DOMContentLoaded',loadPublicBusinessHours);
 
 /* ===== INSTALACIÓN DE LA APP MORDISCO ===== */
 let mordiscoInstallPrompt=null;
-const installButton=document.querySelector('#installMordiscoApp');
 
 window.addEventListener('beforeinstallprompt',event=>{
   event.preventDefault();
   mordiscoInstallPrompt=event;
-  installButton?.classList.remove('hidden');
+  const button=document.querySelector('#installMordiscoApp');
+  button?.classList.remove('hidden');
 });
 
-installButton?.addEventListener('click',async()=>{
-  if(!mordiscoInstallPrompt){
-    const isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);
-    const isAndroid=/android/i.test(navigator.userAgent);
-    alert(isIos
-      ? 'Para instalar Mordisco en iPhone: abre esta página en Safari, pulsa Compartir y luego “Agregar a pantalla de inicio”.'
-      : isAndroid
-        ? 'Para instalar Mordisco: pulsa el menú ⋮ de Chrome y elige “Instalar aplicación” o “Agregar a pantalla principal”.'
-        : 'Abre el menú del navegador y selecciona “Instalar aplicación”.'
-    );
+function mordiscoIsInstalled(){
+  return window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
+}
+
+function showInstallInstructions(){
+  const isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isAndroid=/android/i.test(navigator.userAgent);
+
+  const message=isIos
+    ? 'Para instalar Mordisco en iPhone:\n\n1. Abre esta página en Safari.\n2. Pulsa Compartir.\n3. Selecciona “Agregar a pantalla de inicio”.'
+    : isAndroid
+      ? 'Chrome todavía no habilitó la ventana automática.\n\nPulsa el menú ⋮ de Chrome y selecciona “Instalar aplicación” o “Agregar a pantalla principal”.'
+      : 'Abre el menú del navegador y selecciona “Instalar aplicación”.';
+
+  alert(message);
+}
+
+async function installMordiscoApp(){
+  if(mordiscoIsInstalled()){
+    alert('Mordisco ya está instalado en este dispositivo.');
+    document.querySelector('#installMordiscoApp')?.classList.add('hidden');
     return;
   }
 
-  mordiscoInstallPrompt.prompt();
-  const result=await mordiscoInstallPrompt.userChoice;
-  if(result.outcome==='accepted'){
-    installButton.classList.add('hidden');
+  if(!mordiscoInstallPrompt){
+    showInstallInstructions();
+    return;
   }
+
+  try{
+    await mordiscoInstallPrompt.prompt();
+    const choice=await mordiscoInstallPrompt.userChoice;
+
+    if(choice.outcome==='accepted'){
+      document.querySelector('#installMordiscoApp')?.classList.add('hidden');
+    }
+  }catch(error){
+    console.error('No se pudo abrir el instalador:',error);
+    showInstallInstructions();
+  }finally{
+    mordiscoInstallPrompt=null;
+  }
+}
+
+function initializeMordiscoInstallButton(){
+  const button=document.querySelector('#installMordiscoApp');
+  if(!button)return;
+
+  button.addEventListener('click',installMordiscoApp);
+
+  if(mordiscoIsInstalled()){
+    button.classList.add('hidden');
+  }else{
+    button.classList.remove('hidden');
+  }
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',initializeMordiscoInstallButton,{once:true});
+}else{
+  initializeMordiscoInstallButton();
+}
+
+window.addEventListener('appinstalled',()=>{
+  document.querySelector('#installMordiscoApp')?.classList.add('hidden');
   mordiscoInstallPrompt=null;
 });
 
-window.addEventListener('appinstalled',()=>{
-  installButton?.classList.add('hidden');
-});
-
-if(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone){
-  installButton?.classList.add('hidden');
-}
 
 /* Resaltar navegación móvil según sección */
 const mobileNavLinks=[...document.querySelectorAll('.mobile-bottom-nav a')];
