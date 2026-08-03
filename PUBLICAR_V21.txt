@@ -1,0 +1,29 @@
+MORDISCO OS V21 ULTIMATE
+
+Esta versión conserva la estructura estable de V20 y moderniza la web pública.
+
+PUBLICAR CON GITHUB DESKTOP
+1. Extrae este ZIP.
+2. Copia TODO su contenido dentro de:
+   Documentos\GitHub\mordisco-os-v20
+3. Reemplaza los archivos cuando Windows lo solicite.
+4. Abre GitHub Desktop.
+5. Summary:
+   Mordisco OS V21 Ultimate
+6. Commit to main.
+7. Push origin.
+8. Espera el despliegue automático en Vercel.
+
+ANTES DE MOVER EL DOMINIO
+Comprueba:
+- /
+- /pedir
+- /promociones
+- /admin
+- /staff
+- /comandas
+
+IMPORTANTE
+El botón de WhatsApp usa un número provisional:
+593999999999
+Cámbialo por el número real en public/index.html.

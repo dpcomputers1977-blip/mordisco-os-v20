@@ -1,6 +1,6 @@
 {
-  "name": "mordisco-os-v20",
-  "version": "20.0.0",
+  "name": "mordisco-os-v21",
+  "version": "21.0.0",
   "private": true,
   "type": "module",
   "scripts": {

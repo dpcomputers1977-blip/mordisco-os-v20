@@ -1,34 +1,12 @@
-# Mordisco OS V20
+# Mordisco OS V21 Ultimate
 
-Versión consolidada y limpia para GitHub, Vercel y Supabase.
+Versión consolidada basada en la V20 estable.
 
-## Incluye
-- Sitio público premium y móvil
-- Pedidos en línea
-- Promociones con imágenes
-- Panel administrativo
-- Caja/POS con descuentos
-- Cocina
-- Productos, categorías e inventario
-- Clientes, personal, mesas y turnos
-- Contabilidad
-- Comandas
-- PWA para instalar en Android
-
-## Rutas
-- `/`
-- `/pedir`
-- `/promociones`
-- `/admin`
-- `/staff`
-- `/comandas`
-
-## Estructura
-- `public/`: aplicación web
-- `scripts/build.mjs`: compilación
-- `supabase/`: SQL de instalación y respaldo
-- `vercel.json`: configuración de despliegue
-
-
-## V20.1
-Portada profesional reconstruida: EL SABOR QUE TE HACE VOLVER.
+## Mejoras V21
+- Portada premium y animada
+- Menú dinámico y filtros visuales
+- Promociones destacadas
+- Testimonios
+- WhatsApp flotante
+- Responsive para móvil, tableta y PC
+- Conserva Administración, Caja, Cocina, Pedidos, Promociones y Comandas
