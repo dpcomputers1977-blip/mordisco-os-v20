@@ -1,0 +1,32 @@
+CORRECCIÓN FINAL DE EXTRAS
+
+CAUSA CORREGIDA
+- El JavaScript usaba tres nombres internos incorrectos.
+- Por eso se detenía en “Cargando opciones…”.
+
+AHORA
+- Aparecen Extra queso, Extra jalapeños y Caja térmica.
+- El total cambia al seleccionar opciones.
+- El precio adicional se guarda realmente en el pedido.
+- Los extras aparecen en las notas para Caja y Cocina.
+
+PUBLICAR
+1. Copia el proyecto dentro de Documentos\GitHub\mordisco-os-v20.
+2. Reemplaza los archivos.
+3. GitHub Desktop:
+   Summary: Corregir extras en pedidos
+4. Commit to main.
+5. Push origin.
+6. Espera Vercel Ready.
+
+SUPABASE
+1. SQL Editor.
+2. Abre 07_CORREGIR_EXTRAS_EN_PEDIDOS.sql.
+3. Copia todo y pulsa Run una sola vez.
+
+NO SE TOCAN
+- Productos
+- Inventario
+- Empleados
+- Ventas anteriores
+- Configuración

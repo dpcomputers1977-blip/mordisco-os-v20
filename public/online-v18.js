@@ -2,7 +2,7 @@ const SUPABASE_URL="https://nmmjthqflxwucpmmmrks.supabase.co";
 const SUPABASE_KEY="sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let products=[],categories=[],cart=[],category="Todos",search="";
+let products=[],categories=[],cart=[],category="Todos",search="",onlineExtraOptions=[];
 const money=n=>new Intl.NumberFormat("es-EC",{style:"currency",currency:"USD"}).format(Number(n||0));
 const esc=s=>String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 
@@ -83,11 +83,12 @@ function renderCart(){
     renderCart();
   });
 
-  const total=cart.reduce((sum,item)=>{
+  const productsTotal=cart.reduce((sum,item)=>{
     const p=products.find(product=>String(product.id)===String(item.id));
     return sum+Number(p.price)*item.qty;
   },0);
-  document.querySelector("#onlineTotal").textContent=money(total);
+  const extrasTotal=typeof onlineExtrasTotal==="function" ? onlineExtrasTotal() : 0;
+  document.querySelector("#onlineTotal").textContent=money(productsTotal+extrasTotal);
 }
 
 document.querySelector("#onlineSearch").oninput=event=>{
@@ -130,7 +131,8 @@ document.querySelector("#onlineOrderForm").onsubmit=async event=>{
     p_order_type:type,
     p_notes:document.querySelector("#onlineNotes").value.trim(),
     p_items:items,
-    p_payment_method:document.querySelector("#onlinePaymentMethod").value
+    p_payment_method:document.querySelector("#onlinePaymentMethod").value,
+    p_extras:selectedOnlineExtras().map(extra=>({extra_id:extra.id}))
   });
 
   button.disabled=false;
@@ -140,6 +142,7 @@ document.querySelector("#onlineOrderForm").onsubmit=async event=>{
 
   const orderNumber=Array.isArray(data)?data[0]?.order_number:data?.order_number;
   cart=[];
+  document.querySelectorAll("[data-extra-option]:checked").forEach(input=>input.checked=false);
   renderCart();
   event.target.reset();
   document.querySelector("#onlineAddressWrap").classList.add("hidden");
@@ -311,11 +314,11 @@ function renderOnlineExtraOptions(){
             type="checkbox"
             data-extra-option="${option.id}"
             data-extra-price="${Number(option.price||0)}"
-            data-extra-name="${safe(option.name)}"
+            data-extra-name="${esc(option.name)}"
           >
           <span>
-            <strong>${safe(option.name)}</strong>
-            <small>${safe(option.description||'')}</small>
+            <strong>${esc(option.name)}</strong>
+            <small>${esc(option.description||'')}</small>
           </span>
           <span class="onlineExtraPrice">+${money(option.price)}</span>
         </label>
@@ -340,25 +343,15 @@ function onlineExtrasTotal(){
   return selectedOnlineExtras().reduce((sum,item)=>sum+item.price,0);
 }
 
-/* Integrar extras al total existente */
-const _originalCartTotal=cartTotal;
-cartTotal=function(){
-  return _originalCartTotal()+onlineExtrasTotal();
-};
+/* El total se integra directamente dentro de renderCart().
+   Los extras se envían mediante p_extras en create_web_order(). */
 
-/* Integrar extras al pedido enviado */
-const _originalOnlineSubmit=document.querySelector("#onlineForm")?.onsubmit;
-if(_originalOnlineSubmit){
-  document.querySelector("#onlineForm").onsubmit=async function(event){
-    const extras=selectedOnlineExtras();
-    const notes=document.querySelector("#onlineNotes");
-    if(extras.length && notes){
-      const extraText='Extras seleccionados: '+extras.map(x=>`${x.name} (+$${x.price.toFixed(2)})`).join(', ');
-      const original=notes.value.trim();
-      notes.value=original ? `${original}\n${extraText}` : extraText;
-    }
-    return _originalOnlineSubmit.call(this,event);
-  };
+function initializeOnlineExtras(){
+  loadOnlineExtraOptions();
 }
 
-document.addEventListener('DOMContentLoaded',loadOnlineExtraOptions);
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',initializeOnlineExtras,{once:true});
+}else{
+  initializeOnlineExtras();
+}
