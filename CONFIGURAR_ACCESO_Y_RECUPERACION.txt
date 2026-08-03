@@ -1,0 +1,41 @@
+MORDISCO OS — ACCESO Y RECUPERACIÓN DEFINITIVOS
+
+PROBLEMA CORREGIDO
+El enlace de recuperación llegaba al dominio, pero la ruta /reset-password
+no estaba registrada en los redireccionamientos del proyecto.
+
+PUBLICAR
+1. Extrae este ZIP.
+2. Copia todo dentro de:
+   Documentos\GitHub\mordisco-os-v20
+3. Reemplaza los archivos.
+4. GitHub Desktop:
+   Summary: Corregir acceso y recuperación de contraseña
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+
+CONFIGURAR UNA SOLA VEZ EN SUPABASE
+1. Abre Supabase.
+2. Authentication.
+3. URL Configuration.
+4. Site URL:
+   https://mordiscofastfood.com
+5. En Redirect URLs agrega estas dos direcciones:
+   https://mordiscofastfood.com/reset-password
+   https://mordiscofastfood.com/admin
+6. Guarda los cambios.
+
+PROBAR
+1. Abre:
+   https://mordiscofastfood.com/acceso-admin
+2. Pulsa Crear una contraseña nueva.
+3. Abre el correo MÁS RECIENTE recibido.
+4. Debe abrir /reset-password.
+5. Escribe y confirma la nueva contraseña.
+6. El sistema abrirá el administrador automáticamente.
+
+IMPORTANTE
+- Los enlaces antiguos pueden estar vencidos.
+- Usa siempre el correo de recuperación más reciente.
+- No se modifican productos, ventas, inventario, empleados ni configuración.

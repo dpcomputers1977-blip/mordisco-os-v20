@@ -51,7 +51,11 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const client = supabase.createClient('https://nmmjthqflxwucpmmmrks.supabase.co','sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0');
+    const client = supabase.createClient(
+      'https://nmmjthqflxwucpmmmrks.supabase.co',
+      'sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0',
+      { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, flowType:'pkce' } }
+    );
     const email = document.querySelector('#email');
     const password = document.querySelector('#password');
     const message = document.querySelector('#message');
@@ -110,7 +114,7 @@
         email:email.value.trim(),
         options:{
           shouldCreateUser:false,
-          emailRedirectTo:location.origin + '/admin'
+          emailRedirectTo:'https://mordiscofastfood.com/admin'
         }
       });
       if(error) return show(error.message,'error');
@@ -120,7 +124,7 @@
     document.querySelector('#resetButton').addEventListener('click', async () => {
       show('Enviando enlace para crear una contraseña nueva…');
       const {error} = await client.auth.resetPasswordForEmail(email.value.trim(),{
-        redirectTo:location.origin + '/reset-password'
+        redirectTo:'https://mordiscofastfood.com/reset-password'
       });
       if(error) return show(error.message,'error');
       show('Revisa Gmail. Te enviamos un enlace para crear una contraseña nueva.','success');

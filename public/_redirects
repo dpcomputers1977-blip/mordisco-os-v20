@@ -5,3 +5,6 @@
 /app /pedir.html 200
 /promociones /promociones.html 200
 /pagina/* /page.html 200
+
+/reset-password /reset-password.html 200
+/acceso-admin /acceso-admin.html 200
