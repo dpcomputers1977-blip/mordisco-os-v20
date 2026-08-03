@@ -1,7 +1,7 @@
 {
   "name": "Mordisco Fast Food",
   "short_name": "Mordisco",
-  "description": "Menú, promociones, horarios y pedidos en línea de Mordisco Fast Food.",
+  "description": "Aplicación oficial de Mordisco Fast Food para consultar el menú y realizar pedidos.",
   "id": "/",
   "start_url": "/?source=app",
   "scope": "/",
@@ -69,5 +69,6 @@
         }
       ]
     }
-  ]
+  ],
+  "version": "1.0.0"
 }

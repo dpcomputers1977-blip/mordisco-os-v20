@@ -202,9 +202,12 @@ window.addEventListener('beforeinstallprompt',event=>{
 installButton?.addEventListener('click',async()=>{
   if(!mordiscoInstallPrompt){
     const isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isAndroid=/android/i.test(navigator.userAgent);
     alert(isIos
-      ? 'En iPhone: pulsa Compartir y luego “Agregar a pantalla de inicio”.'
-      : 'Abre el menú del navegador y selecciona “Instalar aplicación” o “Agregar a pantalla principal”.'
+      ? 'Para instalar Mordisco en iPhone: abre esta página en Safari, pulsa Compartir y luego “Agregar a pantalla de inicio”.'
+      : isAndroid
+        ? 'Para instalar Mordisco: pulsa el menú ⋮ de Chrome y elige “Instalar aplicación” o “Agregar a pantalla principal”.'
+        : 'Abre el menú del navegador y selecciona “Instalar aplicación”.'
     );
     return;
   }

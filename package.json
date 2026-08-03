@@ -1,6 +1,6 @@
 {
-  "name": "mordisco-os-profesional-definitivo",
-  "version": "22.0.0",
+  "name": "mordisco-os-production",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {

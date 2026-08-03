@@ -1,8 +1,8 @@
-const CACHE_NAME='mordisco-orange-premium-v1';
+const CACHE_NAME='mordisco-production-1-0-0';
 const STATIC_ASSETS=[
   '/',
-  '/public-site.css?v=orange-premium-1',
-  '/public-site.js?v=mobile-app-final',
+  '/public-site.css?v=production-1',
+  '/public-site.js?v=production-1',
   '/mordisco-logo.png',
   '/icon-192.png',
   '/icon-512.png',

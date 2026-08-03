@@ -700,3 +700,18 @@ footer{background:#080808;color:#aaa;padding:45px 5vw;display:grid;grid-template
     border-top-color:rgba(255,122,0,.28);
   }
 }
+
+/* MORDISCO OS 1.0 PRODUCCIÓN */
+@media(max-width:800px){
+  .install-app-button{
+    display:flex!important;
+    animation:installPulse 2.4s ease-in-out infinite;
+  }
+  .install-app-button.hidden{
+    display:none!important;
+  }
+}
+@keyframes installPulse{
+  0%,100%{transform:translateY(0);box-shadow:0 16px 38px rgba(255,122,0,.24)}
+  50%{transform:translateY(-3px);box-shadow:0 20px 44px rgba(255,122,0,.38)}
+}

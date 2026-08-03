@@ -1,27 +1,16 @@
-# Mordisco OS Profesional Definitivo
+# Mordisco OS 1.0 — Edición Producción
 
-Versión final consolidada para Mordisco Fast Food.
+Versión oficial lista para operación diaria.
 
-## Web pública
-- Portada premium
-- Hamburguesa protagonista
-- Diseño negro, amarillo y rojo
-- Animaciones suaves
-- Menú visual
-- Promociones
-- Testimonios
-- WhatsApp
-- Responsive
+Incluye:
+- Web profesional naranja premium
+- Experiencia móvil tipo aplicación
+- Instalación PWA visible
+- Pedidos en línea
+- Horarios y bloqueo automático
+- Administración, Caja, Cocina e Inventario
+- Contabilidad y cuentas por cobrar/pagar
+- Scripts seguros para verificar y limpiar datos de prueba
 
-## Sistema interno conservado
-- Administración
-- Caja
-- Cocina
-- Pedidos
-- Promociones
-- Productos
-- Inventario
-- Clientes
-- Personal
-- Supabase
-- Acceso administrativo seguro
+La limpieza conserva el menú, empleados, usuarios, promociones,
+horarios, mesas y configuración del negocio.

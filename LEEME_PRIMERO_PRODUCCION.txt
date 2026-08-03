@@ -1,0 +1,60 @@
+MORDISCO OS 1.0 — EDICIÓN PRODUCCIÓN
+
+ORDEN EXACTO PARA COMENZAR HOY
+
+A. PUBLICAR LA VERSIÓN FINAL
+1. Extrae este ZIP.
+2. Copia todo dentro de:
+   Documentos\GitHub\mordisco-os-v20
+3. Reemplaza los archivos.
+4. Abre GitHub Desktop.
+5. Summary:
+   Mordisco OS 1.0 Producción
+6. Pulsa Commit to main.
+7. Pulsa Push origin.
+8. Espera que Vercel muestre Ready.
+9. Actualiza mordiscofastfood.com con Ctrl + F5.
+
+B. REVISAR ANTES DE BORRAR
+1. En Supabase abre SQL Editor.
+2. Abre 04A_VERIFICAR_DATOS_DE_PRUEBA.sql.
+3. Copia TODO su contenido.
+4. Pégalo y pulsa Run.
+5. Revisa los conteos.
+
+C. LIMPIAR PARA PRODUCCIÓN
+1. Abre 04B_LIMPIAR_Y_EMPEZAR_PRODUCCION.sql.
+2. Copia TODO su contenido.
+3. Pégalo en una consulta nueva.
+4. Pulsa Run UNA SOLA VEZ.
+5. El resultado final debe mostrar cero registros.
+
+SE CONSERVAN
+- Productos y categorías
+- Recetas e ingredientes
+- Empleados, PIN y roles
+- Administradores y usuarios
+- Mesas
+- Promociones y páginas
+- Horarios
+- Configuración del negocio
+- Logo e imágenes
+
+SE REINICIA EN CERO
+- Órdenes y ventas
+- Pedidos web y comandas
+- Cocina
+- Caja y turnos
+- Clientes
+- Movimientos de inventario
+- Existencias actuales de ingredientes
+- Ingresos y egresos
+- Cuentas por cobrar y pagar
+
+INSTALAR APP
+- El botón Instalar app queda visible en teléfonos.
+- Android: también Chrome > menú ⋮ > Instalar aplicación.
+- iPhone: Safari > Compartir > Agregar a pantalla de inicio.
+
+IMPORTANTE
+Antes de vender, registra el inventario inicial real desde Inventario.
