@@ -24,14 +24,17 @@
     .home{display:block;text-align:center;margin-top:18px;color:#6a5a3a;font-size:12px;font-weight:700}
     #message{display:none;margin-top:12px;padding:12px;border-radius:10px;font-size:13px;font-weight:700;line-height:1.45}
     .note{margin-top:15px;padding:12px;border-radius:10px;background:#fff7da;color:#665000;font-size:12px;line-height:1.45}
-  </style>
+  
+    button:disabled{opacity:.55;cursor:not-allowed}
+    .message.info{background:#eef5ff;color:#194f8a}
+    </style>
 </head>
 <body>
   <main class="card">
     <img class="logo" src="/mordisco-logo.png" alt="Mordisco">
     <span class="eyebrow">MORDISCO OS</span>
     <h1>Acceso de administrador</h1>
-    <p class="intro">Usa tu correo administrativo. Si la contraseña no coincide, entra mediante el enlace enviado a Gmail.</p>
+    <p class="intro">Ingresa con tu correo y contraseña. Usa la recuperación por correo únicamente si olvidaste la contraseña.</p>
 
     <form id="loginForm">
       <label for="email">Correo</label>
@@ -51,6 +54,57 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+
+    const MAIL_COOLDOWN_MS = 15 * 60 * 1000;
+    const MAIL_COOLDOWN_KEY = 'mordisco_mail_cooldown_until';
+
+    function friendlyAuthError(error){
+      const raw = String(error?.message || error || '').toLowerCase();
+
+      if(raw.includes('email rate limit exceeded')){
+        return 'Se alcanzó temporalmente el límite de correos. Espera unos minutos y usa el ingreso con contraseña.';
+      }
+      if(raw.includes('invalid login credentials')){
+        return 'El correo o la contraseña no coinciden.';
+      }
+      if(raw.includes('email not confirmed')){
+        return 'El correo todavía no está confirmado.';
+      }
+      if(raw.includes('user not found')){
+        return 'No existe un usuario con ese correo.';
+      }
+      return error?.message || 'No se pudo completar la operación.';
+    }
+
+    function setMailCooldown(){
+      const until = Date.now() + MAIL_COOLDOWN_MS;
+      localStorage.setItem(MAIL_COOLDOWN_KEY, String(until));
+      updateMailCooldown();
+    }
+
+    function updateMailCooldown(){
+      const until = Number(localStorage.getItem(MAIL_COOLDOWN_KEY) || 0);
+      const remaining = until - Date.now();
+      const buttons = [document.querySelector('#magicButton'), document.querySelector('#resetButton')];
+      const notice = document.querySelector('#mailCooldownNotice');
+
+      if(remaining <= 0){
+        localStorage.removeItem(MAIL_COOLDOWN_KEY);
+        buttons.forEach(button => { if(button) button.disabled = false; });
+        notice?.classList.add('hidden');
+        return;
+      }
+
+      const minutes = Math.ceil(remaining / 60000);
+      buttons.forEach(button => { if(button) button.disabled = true; });
+      if(notice){
+        notice.textContent = `Para proteger tu cuenta, podrás solicitar otro correo en aproximadamente ${minutes} minuto${minutes === 1 ? '' : 's'}. Mientras tanto, puedes entrar con tu contraseña.`;
+        notice.classList.remove('hidden');
+      }
+    }
+
+    updateMailCooldown();
+    setInterval(updateMailCooldown, 30000);
     const client = supabase.createClient(
       'https://nmmjthqflxwucpmmmrks.supabase.co',
       'sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0',

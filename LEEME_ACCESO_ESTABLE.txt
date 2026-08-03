@@ -1,0 +1,41 @@
+MORDISCO OS — ACCESO ESTABLE
+
+CAMBIOS
+- El ingreso diario usa correo y contraseña.
+- Los botones de correo se bloquean 15 minutos después de usarlos.
+- Esto evita superar repetidamente el límite de Supabase.
+- Los errores aparecen en español.
+- La recuperación de contraseña sigue disponible.
+- No se modifican productos, ventas, inventario, empleados ni pedidos.
+
+IMPORTANTE
+Un código de 6 dígitos también necesita que Supabase envíe un correo,
+por lo que no elimina el límite de correos. Esta solución evita el problema
+usando contraseña para el trabajo diario y correo solo para recuperación.
+
+PUBLICAR
+1. Extrae este ZIP.
+2. Copia todo dentro de:
+   Documentos\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Acceso estable sin correos repetidos
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+
+CONFIGURACIÓN SUPABASE
+Authentication > URL Configuration
+
+Site URL:
+https://mordiscofastfood.com
+
+Redirect URLs:
+https://mordiscofastfood.com/reset-password
+https://mordiscofastfood.com/admin
+
+USO DIARIO
+- Escribe el correo.
+- Escribe la contraseña.
+- Pulsa Ingresar con contraseña.
+- Usa “Olvidé mi contraseña” solamente cuando sea necesario.
