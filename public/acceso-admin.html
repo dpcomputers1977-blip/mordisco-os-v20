@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#151412">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Acceso de administrador | Mordisco OS</title>
   <style>
     *{box-sizing:border-box}
@@ -36,10 +39,12 @@
       border:0!important;
       background:transparent!important;
       color:#735a22!important;
-      text-decoration:underline;
+      text-decoration:none;
       font-size:12px!important;
-      box-shadow:none!important
+      box-shadow:none!important;
+      outline:none!important
     }
+    .recovery-link:hover{color:#b87900!important;text-decoration:underline}
     .secondary-button{
       margin-top:8px;
       background:#fff!important;
@@ -52,6 +57,8 @@
       text-align:center;
       margin:10px 0 0
     }
+    
+    .hidden{display:none!important}
     </style>
 </head>
 <body>
@@ -84,111 +91,172 @@
     (() => {
       'use strict';
 
-      const client = supabase.createClient(
+      const loginForm = document.getElementById('loginForm');
+      const emailInput = document.getElementById('email');
+      const passwordInput = document.getElementById('password');
+      const loginButton = loginForm.querySelector('button[type="submit"]');
+      const messageBox = document.getElementById('message');
+      const recoveryToggle = document.getElementById('showRecoveryButton');
+      const recoveryPanel = document.getElementById('recoveryPanel');
+      const recoveryButton = document.getElementById('requestRecoveryButton');
+
+      function showMessage(text, type = 'info') {
+        messageBox.textContent = text;
+        messageBox.style.display = 'block';
+        messageBox.style.background =
+          type === 'error' ? '#ffe0dc' :
+          type === 'success' ? '#def7e7' : '#fff4c7';
+        messageBox.style.color =
+          type === 'error' ? '#8b1f17' :
+          type === 'success' ? '#11652d' : '#654d00';
+      }
+
+      function friendlyError(error) {
+        const value = String(error?.message || error || '').toLowerCase();
+        if (value.includes('invalid login credentials')) {
+          return 'El correo o la contraseña no coinciden.';
+        }
+        if (value.includes('failed to fetch') || value.includes('network')) {
+          return 'No se pudo conectar con Supabase. Revisa tu conexión e inténtalo nuevamente.';
+        }
+        if (value.includes('email rate limit exceeded')) {
+          return 'Los correos están temporalmente limitados. Ingresa con tu contraseña.';
+        }
+        return error?.message || 'No se pudo completar la operación.';
+      }
+
+      function withTimeout(promise, milliseconds = 15000) {
+        return Promise.race([
+          promise,
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Tiempo de conexión agotado')), milliseconds)
+          )
+        ]);
+      }
+
+      if (!window.supabase?.createClient) {
+        showMessage('No se pudo cargar la conexión de acceso. Actualiza la página e inténtalo nuevamente.', 'error');
+        loginButton.disabled = true;
+        return;
+      }
+
+      const client = window.supabase.createClient(
         'https://nmmjthqflxwucpmmmrks.supabase.co',
         'sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0',
-        { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, flowType:'pkce' } }
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+            flowType: 'pkce'
+          }
+        }
       );
 
-      const form = document.querySelector('#loginForm');
-      const email = document.querySelector('#email');
-      const password = document.querySelector('#password');
-      const message = document.querySelector('#message');
-      const submit = form?.querySelector('button[type="submit"]');
-      const showRecovery = document.querySelector('#showRecoveryButton');
-      const recoveryPanel = document.querySelector('#recoveryPanel');
-      const requestRecovery = document.querySelector('#requestRecoveryButton');
+      async function openAdmin() {
+        const { data: userData, error: userError } =
+          await withTimeout(client.auth.getUser());
 
-      function show(text,type='info'){
-        if(!message)return;
-        message.textContent=text;
-        message.style.display='block';
-        message.style.background=type==='error'?'#ffe0dc':type==='success'?'#def7e7':'#fff4c7';
-        message.style.color=type==='error'?'#8b1f17':type==='success'?'#11652d':'#654d00';
-      }
-
-      function friendly(error){
-        const text=String(error?.message||'').toLowerCase();
-        if(text.includes('invalid login credentials'))return 'El correo o la contraseña no coinciden.';
-        if(text.includes('email rate limit exceeded'))return 'El envío de correos está limitado temporalmente. Ingresa con tu contraseña.';
-        return error?.message||'No se pudo iniciar sesión.';
-      }
-
-      async function enterAdmin(){
-        const {data:{user}}=await client.auth.getUser();
-        if(!user)return false;
-
-        const {data,error}=await client
-          .from('admin_users')
-          .select('active')
-          .eq('user_id',user.id)
-          .eq('active',true)
-          .maybeSingle();
-
-        if(error||!data){
-          await client.auth.signOut();
-          show('Esta cuenta no tiene acceso de administrador activo.','error');
-          return false;
+        if (userError || !userData?.user) {
+          throw userError || new Error('No se pudo validar la sesión.');
         }
 
-        sessionStorage.setItem('mordisco_admin_verified','1');
-        window.location.replace('/admin?session=ok');
-        return true;
+        const { data: adminData, error: adminError } =
+          await withTimeout(
+            client
+              .from('admin_users')
+              .select('active')
+              .eq('user_id', userData.user.id)
+              .eq('active', true)
+              .maybeSingle()
+          );
+
+        if (adminError) throw adminError;
+        if (!adminData) {
+          await client.auth.signOut();
+          throw new Error('Esta cuenta no tiene acceso de administrador activo.');
+        }
+
+        sessionStorage.setItem('mordisco_admin_verified', '1');
+        window.location.assign('/admin?session=ok');
       }
 
-      form?.addEventListener('submit',async event=>{
+      loginForm.addEventListener('submit', async event => {
         event.preventDefault();
 
-        const emailValue=email.value.trim().toLowerCase();
-        const passwordValue=password.value;
+        const email = emailInput.value.trim().toLowerCase();
+        const password = passwordInput.value;
 
-        if(!emailValue||!passwordValue)return show('Escribe el correo y la contraseña.','error');
-
-        submit.disabled=true;
-        submit.textContent='Ingresando…';
-        show('Validando acceso…');
-
-        const {error}=await client.auth.signInWithPassword({email:emailValue,password:passwordValue});
-
-        if(error){
-          submit.disabled=false;
-          submit.textContent='Ingresar con contraseña';
-          return show(friendly(error),'error');
+        if (!email || !password) {
+          showMessage('Escribe el correo y la contraseña.', 'error');
+          passwordInput.focus();
+          return;
         }
 
-        const entered=await enterAdmin();
-        if(!entered){
-          submit.disabled=false;
-          submit.textContent='Ingresar con contraseña';
+        loginButton.disabled = true;
+        loginButton.textContent = 'Ingresando…';
+        showMessage('Validando tu acceso…');
+
+        try {
+          const { error } = await withTimeout(
+            client.auth.signInWithPassword({ email, password })
+          );
+
+          if (error) throw error;
+
+          showMessage('Acceso correcto. Abriendo el administrador…', 'success');
+          await openAdmin();
+        } catch (error) {
+          console.error('Acceso Mordisco:', error);
+          showMessage(friendlyError(error), 'error');
+          loginButton.disabled = false;
+          loginButton.textContent = 'Ingresar con contraseña';
+        }
+      });
+
+      recoveryToggle.addEventListener('click', () => {
+        const isHidden = recoveryPanel.classList.toggle('hidden');
+        recoveryToggle.textContent = isHidden
+          ? '¿Olvidaste tu contraseña?'
+          : 'Ocultar recuperación';
+      });
+
+      recoveryButton.addEventListener('click', async () => {
+        const email = emailInput.value.trim().toLowerCase();
+
+        if (!email) {
+          showMessage('Escribe primero tu correo administrativo.', 'error');
+          emailInput.focus();
+          return;
+        }
+
+        recoveryButton.disabled = true;
+        recoveryButton.textContent = 'Enviando…';
+
+        try {
+          const { error } = await withTimeout(
+            client.auth.resetPasswordForEmail(email, {
+              redirectTo: 'https://mordiscofastfood.com/reset-password'
+            })
+          );
+
+          if (error) throw error;
+
+          showMessage('Correo enviado. Usa únicamente el mensaje más reciente.', 'success');
+        } catch (error) {
+          showMessage(friendlyError(error), 'error');
+        } finally {
+          recoveryButton.disabled = false;
+          recoveryButton.textContent = 'Enviar correo de recuperación';
         }
       });
 
-      showRecovery?.addEventListener('click',()=>recoveryPanel?.classList.toggle('hidden'));
-
-      requestRecovery?.addEventListener('click',async()=>{
-        const emailValue=email.value.trim().toLowerCase();
-        if(!emailValue)return show('Escribe primero tu correo.','error');
-
-        requestRecovery.disabled=true;
-        requestRecovery.textContent='Enviando…';
-
-        const {error}=await client.auth.resetPasswordForEmail(emailValue,{
-          redirectTo:'https://mordiscofastfood.com/reset-password'
-        });
-
-        requestRecovery.disabled=false;
-        requestRecovery.textContent='Enviar correo de recuperación';
-
-        if(error)return show(friendly(error),'error');
-        show('Correo enviado. Usa únicamente el mensaje más reciente.','success');
-      });
-
-      client.auth.getSession().then(({data})=>{
-        if(data?.session?.user){
-          show('Sesión activa. Abriendo el administrador…','success');
-          enterAdmin();
+      client.auth.getSession().then(({ data }) => {
+        if (data?.session?.user) {
+          showMessage('Ya existe una sesión. Abriendo el administrador…', 'success');
+          openAdmin().catch(error => showMessage(friendlyError(error), 'error'));
         }
-      });
+      }).catch(() => {});
     })();
 </script>
 </body>

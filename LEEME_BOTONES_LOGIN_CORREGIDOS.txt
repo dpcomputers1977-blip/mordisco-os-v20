@@ -1,0 +1,22 @@
+MORDISCO OS — BOTONES DE LOGIN CORREGIDOS
+
+CORREGIDO
+- Ingresar con contraseña responde y muestra mensajes.
+- ¿Olvidaste tu contraseña? abre y cierra el panel.
+- El panel inicia oculto.
+- Se agregó control de conexión y tiempo de espera.
+- Se desactivó la caché de esta pantalla.
+
+PUBLICAR
+1. Extrae el ZIP.
+2. Copia todo en Documentos\GitHub\mordisco-os-v20.
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Corregir botones de acceso
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Abre:
+   https://mordiscofastfood.com/acceso-admin?v=2
+
+No se modifican productos, ventas, inventario ni empleados.
