@@ -69,11 +69,13 @@
       <button class="primary" type="submit">Ingresar con contraseña</button>
     </form>
 
-    <button class="secondary" id="magicButton" type="button">Enviar enlace de acceso a Gmail</button>
-    <button class="secondary" id="resetButton" type="button">Crear una contraseña nueva</button>
-
     <div id="message" role="status"></div>
-    <div class="note">El enlace puede tardar unos segundos. Revisa también la carpeta Spam o Correo no deseado.</div>
+    <button id="showRecoveryButton" class="recovery-link" type="button">¿Olvidaste tu contraseña?</button>
+    <div id="recoveryPanel" class="hidden">
+      <p class="recovery-note">Úsalo solo si realmente olvidaste la contraseña.</p>
+      <button id="requestRecoveryButton" class="secondary recovery-button" type="button">Enviar correo de recuperación</button>
+    </div>
+
     <a class="home" href="/">← Volver a la página principal</a>
   </main>
 
@@ -82,44 +84,37 @@
     (() => {
       'use strict';
 
-      const SUPABASE_URL='https://nmmjthqflxwucpmmmrks.supabase.co';
-      const SUPABASE_KEY='sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0';
+      const client = supabase.createClient(
+        'https://nmmjthqflxwucpmmmrks.supabase.co',
+        'sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0',
+        { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, flowType:'pkce' } }
+      );
 
-      const client=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
-        auth:{
-          persistSession:true,
-          autoRefreshToken:true,
-          detectSessionInUrl:true,
-          flowType:'pkce'
-        }
-      });
+      const form = document.querySelector('#loginForm');
+      const email = document.querySelector('#email');
+      const password = document.querySelector('#password');
+      const message = document.querySelector('#message');
+      const submit = form?.querySelector('button[type="submit"]');
+      const showRecovery = document.querySelector('#showRecoveryButton');
+      const recoveryPanel = document.querySelector('#recoveryPanel');
+      const requestRecovery = document.querySelector('#requestRecoveryButton');
 
-      const form=document.querySelector('#loginForm');
-      const emailInput=document.querySelector('#email');
-      const passwordInput=document.querySelector('#password');
-      const submitButton=form?.querySelector('button[type="submit"]');
-      const message=document.querySelector('#message');
-      const recoveryPanel=document.querySelector('#recoveryPanel');
-      const showRecoveryButton=document.querySelector('#showRecoveryButton');
-      const requestRecoveryButton=document.querySelector('#requestRecoveryButton');
-
-      function showMessage(text,type='info'){
+      function show(text,type='info'){
         if(!message)return;
         message.textContent=text;
-        message.className='message';
+        message.style.display='block';
         message.style.background=type==='error'?'#ffe0dc':type==='success'?'#def7e7':'#fff4c7';
         message.style.color=type==='error'?'#8b1f17':type==='success'?'#11652d':'#654d00';
       }
 
-      function friendlyError(error){
-        const text=String(error?.message||error||'').toLowerCase();
-        if(text.includes('invalid login credentials')) return 'El correo o la contraseña no coinciden.';
-        if(text.includes('email rate limit exceeded')) return 'Supabase bloqueó temporalmente los correos. Ingresa con tu contraseña.';
-        if(text.includes('email not confirmed')) return 'El correo todavía no está confirmado.';
+      function friendly(error){
+        const text=String(error?.message||'').toLowerCase();
+        if(text.includes('invalid login credentials'))return 'El correo o la contraseña no coinciden.';
+        if(text.includes('email rate limit exceeded'))return 'El envío de correos está limitado temporalmente. Ingresa con tu contraseña.';
         return error?.message||'No se pudo iniciar sesión.';
       }
 
-      async function validateAdminAndEnter(){
+      async function enterAdmin(){
         const {data:{user}}=await client.auth.getUser();
         if(!user)return false;
 
@@ -132,7 +127,7 @@
 
         if(error||!data){
           await client.auth.signOut();
-          showMessage('Esta cuenta no tiene acceso de administrador activo.','error');
+          show('Esta cuenta no tiene acceso de administrador activo.','error');
           return false;
         }
 
@@ -141,72 +136,59 @@
         return true;
       }
 
-      async function restoreSession(){
-        const {data:{session}}=await client.auth.getSession();
-        if(session?.user){
-          showMessage('Sesión encontrada. Abriendo el administrador…','success');
-          await validateAdminAndEnter();
-        }
-      }
-
       form?.addEventListener('submit',async event=>{
         event.preventDefault();
 
-        const email=emailInput.value.trim().toLowerCase();
-        const password=passwordInput.value;
+        const emailValue=email.value.trim().toLowerCase();
+        const passwordValue=password.value;
 
-        if(!email||!password){
-          return showMessage('Escribe el correo y la contraseña.','error');
-        }
+        if(!emailValue||!passwordValue)return show('Escribe el correo y la contraseña.','error');
 
-        submitButton.disabled=true;
-        submitButton.textContent='Ingresando…';
-        showMessage('Validando acceso…');
+        submit.disabled=true;
+        submit.textContent='Ingresando…';
+        show('Validando acceso…');
 
-        const {error}=await client.auth.signInWithPassword({email,password});
+        const {error}=await client.auth.signInWithPassword({email:emailValue,password:passwordValue});
 
         if(error){
-          submitButton.disabled=false;
-          submitButton.textContent='Ingresar con contraseña';
-          return showMessage(friendlyError(error),'error');
+          submit.disabled=false;
+          submit.textContent='Ingresar con contraseña';
+          return show(friendly(error),'error');
         }
 
-        const entered=await validateAdminAndEnter();
+        const entered=await enterAdmin();
         if(!entered){
-          submitButton.disabled=false;
-          submitButton.textContent='Ingresar con contraseña';
+          submit.disabled=false;
+          submit.textContent='Ingresar con contraseña';
         }
       });
 
-      showRecoveryButton?.addEventListener('click',()=>{
-        recoveryPanel?.classList.toggle('hidden');
-      });
+      showRecovery?.addEventListener('click',()=>recoveryPanel?.classList.toggle('hidden'));
 
-      requestRecoveryButton?.addEventListener('click',async()=>{
-        const email=emailInput.value.trim().toLowerCase();
-        if(!email)return showMessage('Escribe primero tu correo administrativo.','error');
+      requestRecovery?.addEventListener('click',async()=>{
+        const emailValue=email.value.trim().toLowerCase();
+        if(!emailValue)return show('Escribe primero tu correo.','error');
 
-        requestRecoveryButton.disabled=true;
-        requestRecoveryButton.textContent='Enviando…';
+        requestRecovery.disabled=true;
+        requestRecovery.textContent='Enviando…';
 
-        const {error}=await client.auth.resetPasswordForEmail(email,{
+        const {error}=await client.auth.resetPasswordForEmail(emailValue,{
           redirectTo:'https://mordiscofastfood.com/reset-password'
         });
 
-        if(error){
-          requestRecoveryButton.disabled=false;
-          requestRecoveryButton.textContent='Enviar un correo de recuperación';
-          return showMessage(friendlyError(error),'error');
-        }
+        requestRecovery.disabled=false;
+        requestRecovery.textContent='Enviar correo de recuperación';
 
-        showMessage('Correo enviado. Usa únicamente el mensaje más reciente.','success');
-        setTimeout(()=>{
-          requestRecoveryButton.disabled=false;
-          requestRecoveryButton.textContent='Enviar un correo de recuperación';
-        },60000);
+        if(error)return show(friendly(error),'error');
+        show('Correo enviado. Usa únicamente el mensaje más reciente.','success');
       });
 
-      restoreSession();
+      client.auth.getSession().then(({data})=>{
+        if(data?.session?.user){
+          show('Sesión activa. Abriendo el administrador…','success');
+          enterAdmin();
+        }
+      });
     })();
 </script>
 </body>

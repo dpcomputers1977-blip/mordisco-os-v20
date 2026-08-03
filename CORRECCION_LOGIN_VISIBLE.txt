@@ -1,0 +1,21 @@
+CORRECCIÓN VERIFICADA
+
+La pantalla muestra:
+- Correo
+- Contraseña
+- Ingresar con contraseña
+- ¿Olvidaste tu contraseña? (enlace pequeño)
+
+Se eliminaron:
+- Enviar enlace de acceso a Gmail
+- Crear una contraseña nueva
+
+PUBLICAR
+1. Copia todo en Documentos\GitHub\mordisco-os-v20.
+2. Reemplaza archivos.
+3. GitHub Desktop:
+   Corregir pantalla de login definitivamente
+4. Commit to main.
+5. Push origin.
+6. Espera Vercel Ready.
+7. Comprueba en ventana de incógnito.
