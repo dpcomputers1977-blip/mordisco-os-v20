@@ -1,0 +1,43 @@
+MORDISCO OS PROFESIONAL DEFINITIVO
+
+Esta versión une:
+
+- Portada profesional premium
+- Hamburguesa grande protagonista
+- Fondo negro, círculo amarillo y animaciones
+- Menú visual
+- Promociones
+- Testimonios
+- WhatsApp flotante
+- Diseño móvil, tableta y computadora
+- Acceso administrativo ya funcionando
+- Supabase ya conectado
+- Caja, Cocina, Pedidos, Promociones y Administración existentes
+
+PUBLICACIÓN
+
+1. Extrae este ZIP.
+2. Copia todo dentro de:
+   Documentos\GitHub\mordisco-os-v20
+3. Reemplaza los archivos.
+4. Abre GitHub Desktop.
+5. Summary:
+   Mordisco OS profesional definitivo
+6. Commit to main.
+7. Push origin.
+8. Espera que Vercel muestre Ready.
+9. Abre mordiscofastfood.com y recarga con Ctrl + F5.
+
+IMPORTANTE
+
+Esta versión NO modifica:
+- Supabase
+- Caja
+- Cocina
+- Pedidos
+- Productos
+- Inventario
+- Contabilidad
+- Login administrativo
+
+Solo moderniza la web pública y mantiene el acceso seguro.

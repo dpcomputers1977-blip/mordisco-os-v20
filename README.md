@@ -1,20 +1,27 @@
-# Mordisco OS Final Único
+# Mordisco OS Profesional Definitivo
 
-Versión final consolidada sobre la página profesional aprobada.
+Versión final consolidada para Mordisco Fast Food.
 
-## Acceso definitivo
-- Login con contraseña
-- Enlace de acceso por correo
-- Recuperación de contraseña
-- Página para crear una contraseña nueva
-- Validación contra `admin_users`
-
-## Se conserva
-- Página pública profesional
-- Pedidos
+## Web pública
+- Portada premium
+- Hamburguesa protagonista
+- Diseño negro, amarillo y rojo
+- Animaciones suaves
+- Menú visual
 - Promociones
+- Testimonios
+- WhatsApp
+- Responsive
+
+## Sistema interno conservado
+- Administración
 - Caja
 - Cocina
-- Comandas
-- Administración
-- Supabase existente
+- Pedidos
+- Promociones
+- Productos
+- Inventario
+- Clientes
+- Personal
+- Supabase
+- Acceso administrativo seguro
