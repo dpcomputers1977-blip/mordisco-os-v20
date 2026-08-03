@@ -2287,3 +2287,29 @@ loadCategories=async function(){
 };
 
 document.addEventListener('DOMContentLoaded',loadExtraOptions);
+
+
+/* ===== CAMBIO DE CONTRASEÑA DEL ADMINISTRADOR ===== */
+document.querySelector('#changeAdminPasswordForm')?.addEventListener('submit',async event=>{
+  event.preventDefault();
+
+  const password=document.querySelector('#newAdminPassword').value;
+  const confirm=document.querySelector('#confirmAdminPassword').value;
+  const button=document.querySelector('#changeAdminPasswordButton');
+
+  if(password.length<8)return toast('La contraseña debe tener al menos 8 caracteres');
+  if(password!==confirm)return toast('Las contraseñas no coinciden');
+
+  button.disabled=true;
+  button.textContent='Guardando…';
+
+  const {error}=await db.auth.updateUser({password});
+
+  button.disabled=false;
+  button.textContent='Cambiar mi contraseña';
+
+  if(error)return toast(error.message||'No se pudo cambiar la contraseña');
+
+  event.target.reset();
+  toast('Contraseña actualizada correctamente');
+});

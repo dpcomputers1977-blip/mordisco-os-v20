@@ -27,6 +27,31 @@
   
     button:disabled{opacity:.55;cursor:not-allowed}
     .message.info{background:#eef5ff;color:#194f8a}
+    
+    .recovery-link{
+      width:auto!important;
+      display:block;
+      margin:14px auto 0;
+      padding:4px 0!important;
+      border:0!important;
+      background:transparent!important;
+      color:#735a22!important;
+      text-decoration:underline;
+      font-size:12px!important;
+      box-shadow:none!important
+    }
+    .secondary-button{
+      margin-top:8px;
+      background:#fff!important;
+      border:1px solid #d8c4a0!important
+    }
+    .small-help{
+      font-size:12px;
+      line-height:1.45;
+      color:#6e6049;
+      text-align:center;
+      margin:10px 0 0
+    }
     </style>
 </head>
 <body>
@@ -34,7 +59,7 @@
     <img class="logo" src="/mordisco-logo.png" alt="Mordisco">
     <span class="eyebrow">MORDISCO OS</span>
     <h1>Acceso de administrador</h1>
-    <p class="intro">Ingresa con tu correo y contraseña. Usa la recuperación por correo únicamente si olvidaste la contraseña.</p>
+    <p class="intro">Ingresa con tu correo administrativo y contraseña.</p>
 
     <form id="loginForm">
       <label for="email">Correo</label>
@@ -54,142 +79,135 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    (() => {
+      'use strict';
 
-    const MAIL_COOLDOWN_MS = 15 * 60 * 1000;
-    const MAIL_COOLDOWN_KEY = 'mordisco_mail_cooldown_until';
+      const SUPABASE_URL='https://nmmjthqflxwucpmmmrks.supabase.co';
+      const SUPABASE_KEY='sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0';
 
-    function friendlyAuthError(error){
-      const raw = String(error?.message || error || '').toLowerCase();
-
-      if(raw.includes('email rate limit exceeded')){
-        return 'Se alcanzó temporalmente el límite de correos. Espera unos minutos y usa el ingreso con contraseña.';
-      }
-      if(raw.includes('invalid login credentials')){
-        return 'El correo o la contraseña no coinciden.';
-      }
-      if(raw.includes('email not confirmed')){
-        return 'El correo todavía no está confirmado.';
-      }
-      if(raw.includes('user not found')){
-        return 'No existe un usuario con ese correo.';
-      }
-      return error?.message || 'No se pudo completar la operación.';
-    }
-
-    function setMailCooldown(){
-      const until = Date.now() + MAIL_COOLDOWN_MS;
-      localStorage.setItem(MAIL_COOLDOWN_KEY, String(until));
-      updateMailCooldown();
-    }
-
-    function updateMailCooldown(){
-      const until = Number(localStorage.getItem(MAIL_COOLDOWN_KEY) || 0);
-      const remaining = until - Date.now();
-      const buttons = [document.querySelector('#magicButton'), document.querySelector('#resetButton')];
-      const notice = document.querySelector('#mailCooldownNotice');
-
-      if(remaining <= 0){
-        localStorage.removeItem(MAIL_COOLDOWN_KEY);
-        buttons.forEach(button => { if(button) button.disabled = false; });
-        notice?.classList.add('hidden');
-        return;
-      }
-
-      const minutes = Math.ceil(remaining / 60000);
-      buttons.forEach(button => { if(button) button.disabled = true; });
-      if(notice){
-        notice.textContent = `Para proteger tu cuenta, podrás solicitar otro correo en aproximadamente ${minutes} minuto${minutes === 1 ? '' : 's'}. Mientras tanto, puedes entrar con tu contraseña.`;
-        notice.classList.remove('hidden');
-      }
-    }
-
-    updateMailCooldown();
-    setInterval(updateMailCooldown, 30000);
-    const client = supabase.createClient(
-      'https://nmmjthqflxwucpmmmrks.supabase.co',
-      'sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0',
-      { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, flowType:'pkce' } }
-    );
-    const email = document.querySelector('#email');
-    const password = document.querySelector('#password');
-    const message = document.querySelector('#message');
-
-    function show(text, type='info') {
-      const colors = {
-        info:['#fff4c7','#654d00'],
-        error:['#ffe1dd','#8b1f17'],
-        success:['#def7e7','#11652d']
-      };
-      const [background,color] = colors[type] || colors.info;
-      message.style.display='block';
-      message.style.background=background;
-      message.style.color=color;
-      message.textContent=text;
-    }
-
-    async function verifyAndOpen(session) {
-      const {data,error} = await client
-        .from('admin_users')
-        .select('user_id,active')
-        .eq('user_id',session.user.id)
-        .eq('active',true)
-        .maybeSingle();
-
-      if(error) throw new Error('No se pudo comprobar el permiso de administrador.');
-      if(!data) {
-        await client.auth.signOut();
-        throw new Error('Este usuario no está autorizado como administrador.');
-      }
-      sessionStorage.setItem('mordisco_admin_verified','1');
-      location.replace('/admin?session=ok');
-    }
-
-    document.querySelector('#loginForm').addEventListener('submit', async event => {
-      event.preventDefault();
-      if(!password.value) return show('Escribe la contraseña o usa el enlace por correo.','error');
-      show('Verificando acceso…');
-      const {data,error} = await client.auth.signInWithPassword({
-        email:email.value.trim(),
-        password:password.value
-      });
-      if(error) return show(
-        /invalid login credentials/i.test(error.message)
-          ? 'La contraseña no coincide. Pulsa “Enviar enlace de acceso a Gmail”.'
-          : error.message,
-        'error'
-      );
-      try { await verifyAndOpen(data.session); }
-      catch(error) { show(error.message,'error'); }
-    });
-
-    document.querySelector('#magicButton').addEventListener('click', async () => {
-      show('Enviando enlace de acceso…');
-      const {error} = await client.auth.signInWithOtp({
-        email:email.value.trim(),
-        options:{
-          shouldCreateUser:false,
-          emailRedirectTo:'https://mordiscofastfood.com/admin'
+      const client=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
+        auth:{
+          persistSession:true,
+          autoRefreshToken:true,
+          detectSessionInUrl:true,
+          flowType:'pkce'
         }
       });
-      if(error) return show(error.message,'error');
-      show('Enlace enviado. Abre Gmail y pulsa el enlace para entrar.','success');
-    });
 
-    document.querySelector('#resetButton').addEventListener('click', async () => {
-      show('Enviando enlace para crear una contraseña nueva…');
-      const {error} = await client.auth.resetPasswordForEmail(email.value.trim(),{
-        redirectTo:'https://mordiscofastfood.com/reset-password'
-      });
-      if(error) return show(error.message,'error');
-      show('Revisa Gmail. Te enviamos un enlace para crear una contraseña nueva.','success');
-    });
+      const form=document.querySelector('#loginForm');
+      const emailInput=document.querySelector('#email');
+      const passwordInput=document.querySelector('#password');
+      const submitButton=form?.querySelector('button[type="submit"]');
+      const message=document.querySelector('#message');
+      const recoveryPanel=document.querySelector('#recoveryPanel');
+      const showRecoveryButton=document.querySelector('#showRecoveryButton');
+      const requestRecoveryButton=document.querySelector('#requestRecoveryButton');
 
-    client.auth.getSession().then(async ({data}) => {
-      if(data.session) {
-        try { await verifyAndOpen(data.session); }
-        catch(error) { show(error.message,'error'); }
+      function showMessage(text,type='info'){
+        if(!message)return;
+        message.textContent=text;
+        message.className='message';
+        message.style.background=type==='error'?'#ffe0dc':type==='success'?'#def7e7':'#fff4c7';
+        message.style.color=type==='error'?'#8b1f17':type==='success'?'#11652d':'#654d00';
       }
-    });
-  </script>
+
+      function friendlyError(error){
+        const text=String(error?.message||error||'').toLowerCase();
+        if(text.includes('invalid login credentials')) return 'El correo o la contraseña no coinciden.';
+        if(text.includes('email rate limit exceeded')) return 'Supabase bloqueó temporalmente los correos. Ingresa con tu contraseña.';
+        if(text.includes('email not confirmed')) return 'El correo todavía no está confirmado.';
+        return error?.message||'No se pudo iniciar sesión.';
+      }
+
+      async function validateAdminAndEnter(){
+        const {data:{user}}=await client.auth.getUser();
+        if(!user)return false;
+
+        const {data,error}=await client
+          .from('admin_users')
+          .select('active')
+          .eq('user_id',user.id)
+          .eq('active',true)
+          .maybeSingle();
+
+        if(error||!data){
+          await client.auth.signOut();
+          showMessage('Esta cuenta no tiene acceso de administrador activo.','error');
+          return false;
+        }
+
+        sessionStorage.setItem('mordisco_admin_verified','1');
+        window.location.replace('/admin?session=ok');
+        return true;
+      }
+
+      async function restoreSession(){
+        const {data:{session}}=await client.auth.getSession();
+        if(session?.user){
+          showMessage('Sesión encontrada. Abriendo el administrador…','success');
+          await validateAdminAndEnter();
+        }
+      }
+
+      form?.addEventListener('submit',async event=>{
+        event.preventDefault();
+
+        const email=emailInput.value.trim().toLowerCase();
+        const password=passwordInput.value;
+
+        if(!email||!password){
+          return showMessage('Escribe el correo y la contraseña.','error');
+        }
+
+        submitButton.disabled=true;
+        submitButton.textContent='Ingresando…';
+        showMessage('Validando acceso…');
+
+        const {error}=await client.auth.signInWithPassword({email,password});
+
+        if(error){
+          submitButton.disabled=false;
+          submitButton.textContent='Ingresar con contraseña';
+          return showMessage(friendlyError(error),'error');
+        }
+
+        const entered=await validateAdminAndEnter();
+        if(!entered){
+          submitButton.disabled=false;
+          submitButton.textContent='Ingresar con contraseña';
+        }
+      });
+
+      showRecoveryButton?.addEventListener('click',()=>{
+        recoveryPanel?.classList.toggle('hidden');
+      });
+
+      requestRecoveryButton?.addEventListener('click',async()=>{
+        const email=emailInput.value.trim().toLowerCase();
+        if(!email)return showMessage('Escribe primero tu correo administrativo.','error');
+
+        requestRecoveryButton.disabled=true;
+        requestRecoveryButton.textContent='Enviando…';
+
+        const {error}=await client.auth.resetPasswordForEmail(email,{
+          redirectTo:'https://mordiscofastfood.com/reset-password'
+        });
+
+        if(error){
+          requestRecoveryButton.disabled=false;
+          requestRecoveryButton.textContent='Enviar un correo de recuperación';
+          return showMessage(friendlyError(error),'error');
+        }
+
+        showMessage('Correo enviado. Usa únicamente el mensaje más reciente.','success');
+        setTimeout(()=>{
+          requestRecoveryButton.disabled=false;
+          requestRecoveryButton.textContent='Enviar un correo de recuperación';
+        },60000);
+      });
+
+      restoreSession();
+    })();
+</script>
 </body>
 </html>

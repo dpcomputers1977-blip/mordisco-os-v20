@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=extras-packaging-1">
+<link rel="stylesheet" href="/admin-v18.css?v=login-simple-final-1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 </head>
@@ -787,6 +787,27 @@
 </section>
 
 <section id="tab-settings" class="tab hidden">
+
+<section class="panel passwordPanel">
+  <div class="panelTitle">
+    <div>
+      <h3>Seguridad de mi cuenta</h3>
+      <small>Cambia tu contraseña sin enviar correos.</small>
+    </div>
+  </div>
+  <form id="changeAdminPasswordForm" class="formGrid">
+    <label>Nueva contraseña
+      <input id="newAdminPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Mínimo 8 caracteres" required>
+    </label>
+    <label>Confirmar contraseña
+      <input id="confirmAdminPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Repite la contraseña" required>
+    </label>
+    <div class="wide">
+      <button id="changeAdminPasswordButton" class="primary" type="submit">Cambiar mi contraseña</button>
+    </div>
+  </form>
+</section>
+
   <div class="dashboardGrid settingsGrid">
     <form id="settingsForm" class="panel formGrid">
       <h3 class="wide">Información del negocio</h3>
@@ -930,7 +951,7 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=extras-packaging-1"></script>
+<script src="/admin-v18.js?v=login-simple-final-1"></script>
 
 
 

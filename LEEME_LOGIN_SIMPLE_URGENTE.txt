@@ -1,0 +1,31 @@
+MORDISCO OS — LOGIN SIMPLE URGENTE
+
+CAMBIOS
+- Acceso diario solo con correo y contraseña.
+- Si existe una sesión guardada, entra automáticamente.
+- Recuperación por correo queda oculta como respaldo.
+- Nuevo módulo en Administrador > Negocio:
+  Seguridad de mi cuenta > Cambiar mi contraseña.
+- No se modifican productos, ventas, inventario, empleados ni pedidos.
+
+PUBLICAR
+1. Extrae este ZIP.
+2. Copia todo dentro de Documentos\GitHub\mordisco-os-v20.
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Restaurar login simple y cambio de contraseña
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+
+USAR
+1. Abre https://mordiscofastfood.com/acceso-admin
+2. Escribe el correo y contraseña.
+3. Una vez dentro:
+   Negocio > Seguridad de mi cuenta
+4. Cambia la contraseña desde ahí cuando lo necesites.
+
+IMPORTANTE
+Para establecer una contraseña por primera vez todavía se necesita
+un enlace de recuperación válido. Una vez establecida, ya no dependerás
+del correo para el uso diario.

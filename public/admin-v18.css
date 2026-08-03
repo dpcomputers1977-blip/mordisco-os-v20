@@ -1316,3 +1316,7 @@ button:disabled{
   .extraOptionCard{grid-template-columns:1fr}
   .extraOptionActions{justify-content:flex-start}
 }
+
+/* SEGURIDAD DE CUENTA */
+.passwordPanel{margin-bottom:20px}
+.passwordPanel .formGrid{margin-top:14px}
