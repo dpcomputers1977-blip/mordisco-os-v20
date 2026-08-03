@@ -1,0 +1,29 @@
+MORDISCO OS — PAGOS, HORARIOS Y CUENTAS
+
+PUBLICAR
+1. Extrae el ZIP.
+2. Copia todo dentro de:
+   Documentos\GitHub\mordisco-os-v20
+3. Reemplaza los archivos.
+4. GitHub Desktop:
+   Summary: Pagos horarios y cuentas contables
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+
+ACTIVAR EN SUPABASE
+1. Supabase > SQL Editor.
+2. Abre 03_PAGOS_HORARIOS_CUENTAS.sql.
+3. Copia TODO el contenido.
+4. Pégalo y pulsa Run una sola vez.
+
+NUEVAS FUNCIONES
+- Pedir en línea: efectivo, transferencia y tarjeta.
+- Negocio: horarios configurables por día.
+- Contabilidad: cuentas por cobrar y cuentas por pagar.
+- Estados: pendiente, parcial, pagada y vencida.
+
+NOTA SOBRE TARJETAS
+La opción registra que el cliente desea pagar con tarjeta.
+Para cobrar automáticamente dentro de la web se necesita contratar y conectar
+una pasarela de pagos específica.

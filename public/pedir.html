@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#11100e">
   <title>Pedir | Mordisco Fast Food</title>
-  <link rel="stylesheet" href="/online-v18.css?v=20.0.0">
+  <link rel="stylesheet" href="/online-v18.css?v=payments-1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -19,7 +19,7 @@
     <div class="orderHeading">
       <span>PEDIDO EN LÍNEA</span>
       <h1>Arma tu próximo Mordisco</h1>
-      <p>Selecciona los productos y envía tu pedido. El pago se coordina al recibirlo o retirarlo.</p>
+      <p>Selecciona los productos, elige cómo pagar y envía tu pedido.</p>
     </div>
     <div class="orderSearch"><input id="onlineSearch" placeholder="Buscar productos…"></div>
     <div id="onlineCategories" class="onlineCategories"></div>
@@ -41,14 +41,30 @@
         </select>
       </label>
       <label id="onlineAddressWrap" class="hidden">Dirección<input id="onlineAddress"></label>
-      <label>Notas<textarea id="onlineNotes" placeholder="Sin cebolla, punto de referencia…"></textarea></label>
+
+      <label>Método de pago
+        <select id="onlinePaymentMethod">
+          <option value="cash">Efectivo al recibir o retirar</option>
+          <option value="transfer">Transferencia bancaria</option>
+          <option value="card">Tarjeta</option>
+        </select>
+      </label>
+      <div id="onlineTransferInfo" class="onlinePaymentInfo hidden">
+        <b>Transferencia bancaria</b>
+        <p>Realiza la transferencia y escribe el número de comprobante en las notas. El negocio confirmará el pago.</p>
+      </div>
+      <div id="onlineCardInfo" class="onlinePaymentInfo hidden">
+        <b>Pago con tarjeta</b>
+        <p>Tu pedido quedará registrado con pago por tarjeta. El negocio te enviará el enlace o realizará el cobro al confirmar.</p>
+      </div>
+      <label>Notas<textarea id="onlineNotes" placeholder="Sin cebolla, punto de referencia, número de comprobante…"></textarea></label>
       <button id="sendOnlineOrder" type="submit">Enviar pedido</button>
-      <p class="onlineNotice">El pago se realiza al recibir o retirar el pedido.</p>
+      <p class="onlineNotice" id="onlinePaymentNotice">Selecciona el método de pago que prefieras.</p>
     </form>
   </aside>
 </main>
 
 <div id="onlineToast" class="onlineToast"></div>
-<script src="/online-v18.js?v=20.0.0"></script>
+<script src="/online-v18.js?v=payments-1"></script>
 </body>
 </html>

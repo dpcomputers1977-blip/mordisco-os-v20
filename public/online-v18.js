@@ -95,6 +95,17 @@ document.querySelector("#onlineSearch").oninput=event=>{
   renderProducts();
 };
 
+document.querySelector("#onlinePaymentMethod").onchange=event=>{
+  const method=event.target.value;
+  document.querySelector("#onlineTransferInfo").classList.toggle("hidden",method!=="transfer");
+  document.querySelector("#onlineCardInfo").classList.toggle("hidden",method!=="card");
+  document.querySelector("#onlinePaymentNotice").textContent={
+    cash:"Pagarás en efectivo al recibir o retirar el pedido.",
+    transfer:"El pedido quedará pendiente hasta confirmar la transferencia.",
+    card:"El negocio confirmará el cobro o te enviará un enlace de pago."
+  }[method];
+};
+
 document.querySelector("#onlineType").onchange=event=>{
   document.querySelector("#onlineAddressWrap").classList.toggle("hidden",event.target.value!=="delivery");
 };
@@ -118,7 +129,8 @@ document.querySelector("#onlineOrderForm").onsubmit=async event=>{
     p_customer_address:address,
     p_order_type:type,
     p_notes:document.querySelector("#onlineNotes").value.trim(),
-    p_items:items
+    p_items:items,
+    p_payment_method:document.querySelector("#onlinePaymentMethod").value
   });
 
   button.disabled=false;

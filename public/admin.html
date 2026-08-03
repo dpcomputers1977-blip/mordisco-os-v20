@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=pages-upload-1">
+<link rel="stylesheet" href="/admin-v18.css?v=finance-hours-1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 </head>
@@ -497,6 +497,73 @@
       </table></div>
     </section>
   </div>
+
+  <div class="accountsHeader">
+    <div class="tablesStats">
+      <div><span>Por cobrar</span><strong id="accountsReceivableTotal">$0.00</strong></div>
+      <div><span>Por pagar</span><strong id="accountsPayableTotal">$0.00</strong></div>
+      <div><span>Vencidas</span><strong id="accountsOverdueCount">0</strong></div>
+    </div>
+  </div>
+
+  <div class="dashboardGrid accountsGrid">
+    <form id="financeAccountForm" class="panel formGrid">
+      <input type="hidden" id="financeAccountId">
+      <h3 class="wide">Nueva cuenta</h3>
+      <label>Tipo
+        <select id="financeAccountKind">
+          <option value="receivable">Cuenta por cobrar</option>
+          <option value="payable">Cuenta por pagar</option>
+        </select>
+      </label>
+      <label>Cliente / Proveedor<input id="financeAccountParty" required></label>
+      <label>Monto total<input id="financeAccountAmount" type="number" min="0.01" step="0.01" required></label>
+      <label>Fecha de vencimiento<input id="financeAccountDue" type="date" required></label>
+      <label>Estado
+        <select id="financeAccountStatus">
+          <option value="pending">Pendiente</option>
+          <option value="partial">Pago parcial</option>
+          <option value="paid">Pagada</option>
+        </select>
+      </label>
+      <label>Monto pagado<input id="financeAccountPaid" type="number" min="0" step="0.01" value="0"></label>
+      <label>Método
+        <select id="financeAccountMethod">
+          <option value="cash">Efectivo</option>
+          <option value="transfer">Transferencia</option>
+          <option value="card">Tarjeta</option>
+          <option value="other">Otro</option>
+        </select>
+      </label>
+      <label>Referencia<input id="financeAccountReference" placeholder="Factura, comprobante..."></label>
+      <label class="wide">Descripción<textarea id="financeAccountDescription" required></textarea></label>
+      <div class="wide">
+        <button class="primary">Guardar cuenta</button>
+        <button type="button" class="dark" id="clearFinanceAccount">Limpiar</button>
+      </div>
+    </form>
+
+    <section class="panel">
+      <div class="panelTitle">
+        <h3>Cuentas pendientes</h3>
+        <select id="financeAccountFilter">
+          <option value="all">Todas</option>
+          <option value="receivable">Por cobrar</option>
+          <option value="payable">Por pagar</option>
+          <option value="overdue">Vencidas</option>
+          <option value="paid">Pagadas</option>
+        </select>
+      </div>
+      <div class="tableWrap">
+        <table class="dataTable">
+          <thead>
+            <tr><th>Vence</th><th>Tipo</th><th>Cliente / Proveedor</th><th>Descripción</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th></th></tr>
+          </thead>
+          <tbody id="financeAccountsBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
 </section>
 
 <section id="tab-customers" class="tab hidden">
@@ -654,7 +721,30 @@
       </div>
     </section>
 
-   <section id="tab-settings" class="tab hidden"><form id="settingsForm" class="panel formGrid"><label>Nombre<input id="sName"></label><label>WhatsApp<input id="sWhatsapp" placeholder="593999999999"></label><label class="wide">Descripción<textarea id="sDescription"></textarea></label><label>Dirección<input id="sAddress"></label><label>Horario<input id="sSchedule"></label><label>Costo delivery<input id="sDelivery" type="number" min="0" step="0.01"></label><label>Pedido mínimo<input id="sMinimum" type="number" min="0" step="0.01"></label><label class="check"><input id="sAccepting" type="checkbox"> Recibir pedidos</label><div class="wide"><button class="primary">Guardar cambios</button></div></form></section>
+   <section id="tab-settings" class="tab hidden">
+  <div class="dashboardGrid settingsGrid">
+    <form id="settingsForm" class="panel formGrid">
+      <h3 class="wide">Información del negocio</h3>
+      <label>Nombre<input id="sName"></label>
+      <label>WhatsApp<input id="sWhatsapp" placeholder="593999999999"></label>
+      <label class="wide">Descripción<textarea id="sDescription"></textarea></label>
+      <label>Dirección<input id="sAddress"></label>
+      <label>Resumen del horario<input id="sSchedule" placeholder="Se genera automáticamente"></label>
+      <label>Costo delivery<input id="sDelivery" type="number" min="0" step="0.01"></label>
+      <label>Pedido mínimo<input id="sMinimum" type="number" min="0" step="0.01"></label>
+      <label class="check"><input id="sAccepting" type="checkbox"> Recibir pedidos</label>
+      <div class="wide"><button class="primary">Guardar cambios</button></div>
+    </form>
+
+    <section class="panel">
+      <div class="panelTitle">
+        <div><h3>Horarios de atención</h3><small>Configura cada día de la semana.</small></div>
+        <button class="primary" type="button" id="saveBusinessHours">Guardar horarios</button>
+      </div>
+      <div id="businessHoursEditor" class="businessHoursEditor"></div>
+    </section>
+  </div>
+</section>
  </div>
 </section>
 
@@ -775,7 +865,7 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=pages-upload-1"></script>
+<script src="/admin-v18.js?v=finance-hours-1"></script>
 
 
 

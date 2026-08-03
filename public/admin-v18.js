@@ -13,7 +13,7 @@ const SUPABASE_URL='https://nmmjthqflxwucpmmmrks.supabase.co';
 const SUPABASE_KEY='sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0';
 const db=window.mordiscoSupabaseClient||window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 window.mordiscoSupabaseClient=db;
-let products=[],categories=[],settings={},orders=[],cart=[],posCart=[],ingredients=[],inventoryMovements=[],recipes=[],staffMembers=[],tables=[],tableCart=[],currentTable=null,currentEmployee=null,currentShift=null,shifts=[],financeMovements=[],customers=[],promotions=[],contentPages=[],isAdminSession=false,shiftAction='start',selectedCategory='Todos',editingImage='',adminProductQuery='',adminProductFilter='all',orderStatusFilter='all',ordersChannel=null,lastKnownOrderIds=new Set(),kitchenTimerHandle=null,lastReceiptOrder=null,paymentOrderId=null,posDiscountType='none',posDiscountValue=0;
+let products=[],categories=[],settings={},orders=[],cart=[],posCart=[],ingredients=[],inventoryMovements=[],recipes=[],staffMembers=[],tables=[],tableCart=[],currentTable=null,currentEmployee=null,currentShift=null,shifts=[],financeMovements=[],financeAccounts=[],businessHours=[],customers=[],promotions=[],contentPages=[],isAdminSession=false,shiftAction='start',selectedCategory='Todos',editingImage='',adminProductQuery='',adminProductFilter='all',orderStatusFilter='all',ordersChannel=null,lastKnownOrderIds=new Set(),kitchenTimerHandle=null,lastReceiptOrder=null,paymentOrderId=null,posDiscountType='none',posDiscountValue=0;
 const $$=s=>[...document.querySelectorAll(s)];
 const missingElementProxy=new Proxy({},{
   get(_target,property){
@@ -1916,3 +1916,228 @@ $$('[data-close="tableOrderModal"]').forEach(b=>b.onclick=()=>$('#tableOrderModa
     setup();
   }
 })();
+
+
+/* ===== HORARIOS DE ATENCIÓN ===== */
+const WEEK_DAYS=[
+  {day:1,label:'Lunes'},{day:2,label:'Martes'},{day:3,label:'Miércoles'},
+  {day:4,label:'Jueves'},{day:5,label:'Viernes'},{day:6,label:'Sábado'},
+  {day:0,label:'Domingo'}
+];
+
+async function loadBusinessHours(){
+  const {data,error}=await db.from('business_hours').select('*').order('sort_order');
+  if(error){
+    console.warn('Horarios:',error.message);
+    businessHours=[];
+  }else{
+    businessHours=data||[];
+  }
+  renderBusinessHours();
+}
+
+function renderBusinessHours(){
+  const node=$('#businessHoursEditor');
+  if(!node)return;
+  node.innerHTML=WEEK_DAYS.map((item,index)=>{
+    const row=businessHours.find(x=>Number(x.day_of_week)===item.day)||{
+      day_of_week:item.day,closed:false,opens_at:'11:00',closes_at:'22:00'
+    };
+    return `<div class="businessHourRow" data-hour-day="${item.day}">
+      <strong>${item.label}</strong>
+      <label><input type="checkbox" class="hourClosed" ${row.closed?'checked':''}> Cerrado</label>
+      <input type="time" class="hourOpen" value="${String(row.opens_at||'11:00').slice(0,5)}" ${row.closed?'disabled':''}>
+      <span>—</span>
+      <input type="time" class="hourClose" value="${String(row.closes_at||'22:00').slice(0,5)}" ${row.closed?'disabled':''}>
+    </div>`;
+  }).join('');
+
+  $$('.hourClosed').forEach(input=>input.onchange=()=>{
+    const row=input.closest('.businessHourRow');
+    row.querySelector('.hourOpen').disabled=input.checked;
+    row.querySelector('.hourClose').disabled=input.checked;
+  });
+}
+
+function buildScheduleSummary(rows){
+  const openRows=rows.filter(x=>!x.closed);
+  if(!openRows.length)return 'Cerrado toda la semana';
+  const grouped=[];
+  for(const row of openRows){
+    const label=WEEK_DAYS.find(x=>x.day===row.day_of_week)?.label||'Día';
+    grouped.push(`${label}: ${String(row.opens_at).slice(0,5)}–${String(row.closes_at).slice(0,5)}`);
+  }
+  return grouped.join(' · ');
+}
+
+async function saveBusinessHours(){
+  const rows=$$('[data-hour-day]').map((node,index)=>({
+    day_of_week:Number(node.dataset.hourDay),
+    closed:node.querySelector('.hourClosed').checked,
+    opens_at:node.querySelector('.hourOpen').value||'11:00',
+    closes_at:node.querySelector('.hourClose').value||'22:00',
+    sort_order:index
+  }));
+  const {error}=await db.from('business_hours').upsert(rows,{onConflict:'day_of_week'});
+  if(error)return toast('No se guardaron los horarios: '+error.message);
+  businessHours=rows;
+  const summary=buildScheduleSummary(rows);
+  if($('#sSchedule'))$('#sSchedule').value=summary;
+  const settingsRow={...settings,id:1,schedule:summary};
+  const {error:settingsError}=await db.from('business_settings').upsert(settingsRow);
+  if(settingsError)return toast('Horarios guardados, pero no se actualizó el resumen: '+settingsError.message);
+  settings=settingsRow;
+  applySettings();
+  toast('Horarios de atención guardados');
+}
+$('#saveBusinessHours')?.addEventListener('click',saveBusinessHours);
+
+/* ===== CUENTAS POR COBRAR Y PAGAR ===== */
+async function loadFinanceAccounts(){
+  const {data,error}=await db.from('finance_accounts').select('*').order('due_date',{ascending:true}).order('created_at',{ascending:false});
+  if(error){
+    console.warn('Cuentas:',error.message);
+    financeAccounts=[];
+    if($('#financeAccountsBody'))$('#financeAccountsBody').innerHTML='<tr><td colspan="9">Ejecuta el SQL 03 para activar cuentas por cobrar y pagar.</td></tr>';
+    return;
+  }
+  financeAccounts=data||[];
+  renderFinanceAccounts();
+}
+
+function accountStatusLabel(status){
+  return ({pending:'Pendiente',partial:'Pago parcial',paid:'Pagada'})[status]||status;
+}
+
+function filteredFinanceAccounts(){
+  const filter=$('#financeAccountFilter')?.value||'all';
+  const today=isoToday();
+  return financeAccounts.filter(x=>{
+    if(filter==='all')return true;
+    if(filter==='overdue')return x.status!=='paid'&&x.due_date<today;
+    if(filter==='paid')return x.status==='paid';
+    return x.kind===filter;
+  });
+}
+
+function renderFinanceAccounts(){
+  if(!$('#financeAccountsBody'))return;
+  const pending=financeAccounts.filter(x=>x.status!=='paid');
+  const receivable=pending.filter(x=>x.kind==='receivable').reduce((s,x)=>s+Math.max(0,Number(x.amount)-Number(x.paid_amount||0)),0);
+  const payable=pending.filter(x=>x.kind==='payable').reduce((s,x)=>s+Math.max(0,Number(x.amount)-Number(x.paid_amount||0)),0);
+  const overdue=pending.filter(x=>x.due_date<isoToday()).length;
+  $('#accountsReceivableTotal').textContent=money(receivable);
+  $('#accountsPayableTotal').textContent=money(payable);
+  $('#accountsOverdueCount').textContent=overdue;
+
+  const rows=filteredFinanceAccounts();
+  $('#financeAccountsBody').innerHTML=rows.length?rows.map(x=>{
+    const balance=Math.max(0,Number(x.amount)-Number(x.paid_amount||0));
+    const overdue=x.status!=='paid'&&x.due_date<isoToday();
+    const statusClass=x.status==='paid'?'accountPaid':overdue?'accountOverdue':'accountPending';
+    return `<tr>
+      <td class="${overdue?'accountOverdue':''}">${x.due_date}</td>
+      <td>${x.kind==='receivable'?'Por cobrar':'Por pagar'}</td>
+      <td>${esc(x.party_name)}</td>
+      <td>${esc(x.description)}<small>${x.reference?` · ${esc(x.reference)}`:''}</small></td>
+      <td>${money(x.amount)}</td>
+      <td>${money(x.paid_amount||0)}</td>
+      <td><b>${money(balance)}</b></td>
+      <td class="${statusClass}">${overdue?'Vencida':accountStatusLabel(x.status)}</td>
+      <td>
+        <button data-account-edit="${x.id}">Editar</button>
+        ${x.status!=='paid'?`<button class="primary" data-account-paid="${x.id}">Marcar pagada</button>`:''}
+        <button class="danger" data-account-delete="${x.id}">Eliminar</button>
+      </td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="9">No hay cuentas registradas.</td></tr>';
+
+  $$('[data-account-edit]').forEach(b=>b.onclick=()=>editFinanceAccount(b.dataset.accountEdit));
+  $$('[data-account-paid]').forEach(b=>b.onclick=()=>markFinanceAccountPaid(b.dataset.accountPaid));
+  $$('[data-account-delete]').forEach(b=>b.onclick=()=>deleteFinanceAccount(b.dataset.accountDelete));
+}
+
+function resetFinanceAccount(){
+  $('#financeAccountForm')?.reset();
+  if($('#financeAccountId'))$('#financeAccountId').value='';
+  if($('#financeAccountDue'))$('#financeAccountDue').value=isoToday();
+  if($('#financeAccountPaid'))$('#financeAccountPaid').value=0;
+}
+
+function editFinanceAccount(id){
+  const x=financeAccounts.find(v=>String(v.id)===String(id));
+  if(!x)return;
+  $('#financeAccountId').value=x.id;
+  $('#financeAccountKind').value=x.kind;
+  $('#financeAccountParty').value=x.party_name;
+  $('#financeAccountAmount').value=x.amount;
+  $('#financeAccountDue').value=x.due_date;
+  $('#financeAccountStatus').value=x.status;
+  $('#financeAccountPaid').value=x.paid_amount||0;
+  $('#financeAccountMethod').value=x.payment_method||'cash';
+  $('#financeAccountReference').value=x.reference||'';
+  $('#financeAccountDescription').value=x.description;
+}
+
+async function markFinanceAccountPaid(id){
+  const x=financeAccounts.find(v=>String(v.id)===String(id));
+  if(!x)return;
+  const {error}=await db.from('finance_accounts').update({
+    status:'paid',
+    paid_amount:Number(x.amount),
+    paid_at:new Date().toISOString()
+  }).eq('id',id);
+  if(error)return toast(error.message);
+  toast('Cuenta marcada como pagada');
+  await loadFinanceAccounts();
+}
+
+async function deleteFinanceAccount(id){
+  if(!confirm('¿Eliminar esta cuenta?'))return;
+  const {error}=await db.from('finance_accounts').delete().eq('id',id);
+  if(error)return toast(error.message);
+  await loadFinanceAccounts();
+}
+
+$('#financeAccountForm')?.addEventListener('submit',async event=>{
+  event.preventDefault();
+  const id=$('#financeAccountId').value;
+  const amount=Number($('#financeAccountAmount').value);
+  let paid=Number($('#financeAccountPaid').value||0);
+  let status=$('#financeAccountStatus').value;
+  if(paid>=amount){paid=amount;status='paid'}
+  else if(paid>0)status='partial';
+  else if(status==='paid'){paid=amount}
+  const row={
+    kind:$('#financeAccountKind').value,
+    party_name:$('#financeAccountParty').value.trim(),
+    description:$('#financeAccountDescription').value.trim(),
+    amount,
+    due_date:$('#financeAccountDue').value,
+    status,
+    paid_amount:paid,
+    payment_method:$('#financeAccountMethod').value,
+    reference:$('#financeAccountReference').value.trim(),
+    paid_at:status==='paid'?new Date().toISOString():null
+  };
+  const q=id?db.from('finance_accounts').update(row).eq('id',id):db.from('finance_accounts').insert(row);
+  const {error}=await q;
+  if(error)return toast(error.message);
+  toast('Cuenta guardada');
+  resetFinanceAccount();
+  await loadFinanceAccounts();
+});
+$('#clearFinanceAccount')?.addEventListener('click',resetFinanceAccount);
+$('#financeAccountFilter')?.addEventListener('change',renderFinanceAccounts);
+
+/* Integrar las nuevas cargas con las pantallas existentes */
+const _originalLoadFinance=loadFinance;
+loadFinance=async function(){
+  await Promise.all([_originalLoadFinance(),loadFinanceAccounts()]);
+};
+const _originalFillSettings=fillSettings;
+fillSettings=function(){
+  _originalFillSettings();
+  loadBusinessHours();
+};
+resetFinanceAccount();
