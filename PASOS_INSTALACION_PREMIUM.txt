@@ -1,0 +1,23 @@
+MORDISCO OS — INSTALACIÓN PREMIUM FINAL
+
+NUEVO
+- El botón intenta abrir directamente el instalador oficial de Chrome.
+- Si Chrome aún no lo permite, aparece una ventana profesional de Mordisco.
+- Se eliminó el mensaje feo del navegador.
+- Se añadió una pantalla breve de bienvenida con logo y lema.
+- El botón desaparece cuando la app ya está instalada.
+
+IMPORTANTE
+Android no permite que una web instale una app sin autorización del navegador.
+Esta versión usa el método oficial más directo permitido por Chrome.
+
+PUBLICAR
+1. Extrae este ZIP.
+2. Copia todo dentro de Documentos\GitHub\mordisco-os-v20.
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Instalación premium final
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Cierra y vuelve a abrir mordiscofastfood.com.

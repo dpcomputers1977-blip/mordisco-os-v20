@@ -13,7 +13,7 @@
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/mordisco-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="/public-site.css?v=full-menu-dynamic-1">
+  <link rel="stylesheet" href="/public-site.css?v=install-premium-final-1">
 </head>
 <body>
   <div class="promo-bar">
@@ -230,7 +230,7 @@
       window.MORDISCO_SUPABASE.anonKey
     );
   </script>
-  <script src="/public-site.js?v=menu-whatsapp-final-1"></script>
+  <script src="/public-site.js?v=install-premium-final-1"></script>
 
   <button id="installMordiscoApp" class="install-app-button" type="button" aria-label="Instalar aplicación Mordisco">
     <span class="install-icon">⇩</span>
@@ -243,6 +243,31 @@
     <a class="mobile-order-main" href="/pedir"><span>＋</span><small>Pedir</small></a>
     <a href="/promociones"><span>★</span><small>Promos</small></a>
   </nav>
+
+
+  <div id="mordiscoSplash" class="mordisco-splash" aria-hidden="true">
+    <div class="mordisco-splash-card">
+      <img src="/mordisco-logo.png" alt="Mordisco Fast Food">
+      <strong>MORDISCO FAST FOOD</strong>
+      <span>El sabor que te hace volver.</span>
+    </div>
+  </div>
+
+  <div id="installHelpModal" class="install-help-modal hidden" role="dialog" aria-modal="true" aria-labelledby="installHelpTitle">
+    <div class="install-help-card">
+      <button id="closeInstallHelp" class="install-help-close" type="button" aria-label="Cerrar">×</button>
+      <div class="install-help-icon">📲</div>
+      <h2 id="installHelpTitle">Instala Mordisco</h2>
+      <p>Ten el menú y los pedidos siempre a mano.</p>
+      <ol id="installHelpSteps">
+        <li>Abre el menú <b>⋮</b> de Chrome.</li>
+        <li>Selecciona <b>Instalar aplicación</b>.</li>
+        <li>Confirma pulsando <b>Instalar</b>.</li>
+      </ol>
+      <button id="retryInstallButton" class="btn btn-primary btn-xl" type="button">Intentar instalar ahora</button>
+      <button id="dismissInstallHelp" class="btn btn-dark btn-xl" type="button">Más tarde</button>
+    </div>
+  </div>
 
 </body>
 </html>

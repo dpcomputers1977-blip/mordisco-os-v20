@@ -755,3 +755,113 @@ footer{background:#080808;color:#aaa;padding:45px 5vw;display:grid;grid-template
     width:100%;
   }
 }
+
+/* INSTALACIÓN PREMIUM Y SPLASH */
+.mordisco-splash{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:grid;
+  place-items:center;
+  background:#0d0d0d;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .35s ease,visibility .35s ease;
+}
+.mordisco-splash.show{
+  opacity:1;
+  visibility:visible;
+}
+.mordisco-splash-card{
+  display:grid;
+  justify-items:center;
+  gap:12px;
+  color:#fff;
+  text-align:center;
+  animation:splashPop .55s ease both;
+}
+.mordisco-splash-card img{
+  width:105px;
+  height:105px;
+  object-fit:contain;
+  border-radius:22px;
+  background:#fff;
+  padding:12px;
+  box-shadow:0 18px 45px rgba(255,196,0,.2);
+}
+.mordisco-splash-card strong{
+  margin-top:6px;
+  font-size:20px;
+  letter-spacing:.12em;
+  color:#ffc400;
+}
+.mordisco-splash-card span{
+  color:#ddd;
+  font-size:14px;
+}
+@keyframes splashPop{
+  from{transform:scale(.9);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+
+.install-help-modal{
+  position:fixed;
+  inset:0;
+  z-index:9998;
+  display:grid;
+  place-items:center;
+  padding:20px;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(8px);
+}
+.install-help-modal.hidden{display:none}
+.install-help-card{
+  position:relative;
+  width:min(430px,100%);
+  padding:30px 24px 24px;
+  border-radius:24px;
+  background:#fff;
+  color:#18130c;
+  text-align:center;
+  box-shadow:0 30px 80px rgba(0,0,0,.45);
+}
+.install-help-close{
+  position:absolute;
+  right:14px;
+  top:10px;
+  border:0;
+  background:none;
+  font-size:30px;
+  cursor:pointer;
+}
+.install-help-icon{
+  width:68px;
+  height:68px;
+  display:grid;
+  place-items:center;
+  margin:0 auto 12px;
+  border-radius:20px;
+  background:#fff2d2;
+  font-size:34px;
+}
+.install-help-card h2{
+  margin:0 0 8px;
+  font-size:30px;
+}
+.install-help-card p{
+  margin:0 0 18px;
+  color:#6e6251;
+}
+.install-help-card ol{
+  margin:0 0 22px;
+  padding:16px 18px 16px 38px;
+  border-radius:14px;
+  background:#fff8e8;
+  text-align:left;
+  line-height:1.65;
+}
+.install-help-card .btn{
+  width:100%;
+  min-height:50px;
+  margin-top:10px;
+}
