@@ -1,0 +1,15 @@
+ÚLTIMO PASO
+
+1. Copia todo este proyecto dentro de Documentos\GitHub\mordisco-os-v20.
+2. Reemplaza los archivos.
+3. GitHub Desktop:
+   Summary: Acceso administrativo final
+   Commit to main
+   Push origin
+4. Espera Vercel Ready.
+5. Abre:
+   https://mordisco-os-v20.vercel.app/acceso-admin
+6. Pulsa “Enviar enlace de acceso a Gmail”.
+7. Abre el correo recibido y pulsa el enlace.
+
+No escribas una contraseña antigua si no la recuerdas.
