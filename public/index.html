@@ -4,12 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Mordisco">
+  <meta name="format-detection" content="telephone=no">
   <meta name="description" content="Mordisco Fast Food: hamburguesas intensas, promociones y pedidos en línea.">
   <title>Mordisco Fast Food</title>
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/mordisco-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="/public-site.css?v=hours-1">
+  <link rel="stylesheet" href="/public-site.css?v=mobile-app-final">
 </head>
 <body>
   <div class="promo-bar">
@@ -218,6 +222,19 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/public-site.js?v=hours-1"></script>
+  <script src="/public-site.js?v=mobile-app-final"></script>
+
+  <button id="installMordiscoApp" class="install-app-button hidden" type="button" aria-label="Instalar aplicación Mordisco">
+    <span class="install-icon">⇩</span>
+    <span>Instalar app</span>
+  </button>
+
+  <nav class="mobile-bottom-nav" aria-label="Navegación móvil">
+    <a href="#inicio"><span>⌂</span><small>Inicio</small></a>
+    <a href="#menu"><span>🍔</span><small>Menú</small></a>
+    <a class="mobile-order-main" href="/pedir"><span>＋</span><small>Pedir</small></a>
+    <a href="/promociones"><span>★</span><small>Promos</small></a>
+  </nav>
+
 </body>
 </html>

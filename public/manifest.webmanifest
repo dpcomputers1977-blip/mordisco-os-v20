@@ -1,13 +1,23 @@
 {
   "name": "Mordisco Fast Food",
   "short_name": "Mordisco",
-  "description": "Menú, promociones y pedidos en línea de Mordisco Fast Food.",
+  "description": "Menú, promociones, horarios y pedidos en línea de Mordisco Fast Food.",
+  "id": "/",
   "start_url": "/?source=app",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#11100e",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone"
+  ],
+  "background_color": "#0d0d0d",
   "theme_color": "#ffc400",
   "orientation": "portrait-primary",
+  "categories": [
+    "food",
+    "shopping",
+    "lifestyle"
+  ],
   "icons": [
     {
       "src": "/icon-192.png",
@@ -26,7 +36,8 @@
     {
       "name": "Pedir ahora",
       "short_name": "Pedir",
-      "url": "/pedir.html",
+      "description": "Abrir pedidos en línea",
+      "url": "/pedir",
       "icons": [
         {
           "src": "/icon-192.png",
@@ -35,9 +46,22 @@
       ]
     },
     {
-      "name": "Ver promociones",
-      "short_name": "Promociones",
+      "name": "Promociones",
+      "short_name": "Promos",
+      "description": "Ver promociones activas",
       "url": "/promociones",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Horarios",
+      "short_name": "Horarios",
+      "description": "Consultar horarios de atención",
+      "url": "/#horarios",
       "icons": [
         {
           "src": "/icon-192.png",

@@ -187,3 +187,58 @@ async function loadPublicBusinessHours(){
 }
 
 document.addEventListener('DOMContentLoaded',loadPublicBusinessHours);
+
+
+/* ===== INSTALACIÓN DE LA APP MORDISCO ===== */
+let mordiscoInstallPrompt=null;
+const installButton=document.querySelector('#installMordiscoApp');
+
+window.addEventListener('beforeinstallprompt',event=>{
+  event.preventDefault();
+  mordiscoInstallPrompt=event;
+  installButton?.classList.remove('hidden');
+});
+
+installButton?.addEventListener('click',async()=>{
+  if(!mordiscoInstallPrompt){
+    const isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);
+    alert(isIos
+      ? 'En iPhone: pulsa Compartir y luego “Agregar a pantalla de inicio”.'
+      : 'Abre el menú del navegador y selecciona “Instalar aplicación” o “Agregar a pantalla principal”.'
+    );
+    return;
+  }
+
+  mordiscoInstallPrompt.prompt();
+  const result=await mordiscoInstallPrompt.userChoice;
+  if(result.outcome==='accepted'){
+    installButton.classList.add('hidden');
+  }
+  mordiscoInstallPrompt=null;
+});
+
+window.addEventListener('appinstalled',()=>{
+  installButton?.classList.add('hidden');
+});
+
+if(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone){
+  installButton?.classList.add('hidden');
+}
+
+/* Resaltar navegación móvil según sección */
+const mobileNavLinks=[...document.querySelectorAll('.mobile-bottom-nav a')];
+const mobileSections=['inicio','menu','horarios'];
+
+const mobileSectionObserver=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+    if(!entry.isIntersecting)return;
+    mobileNavLinks.forEach(link=>link.classList.remove('active'));
+    const link=document.querySelector(`.mobile-bottom-nav a[href="#${entry.target.id}"]`);
+    link?.classList.add('active');
+  });
+},{threshold:.35});
+
+mobileSections.forEach(id=>{
+  const node=document.getElementById(id);
+  if(node)mobileSectionObserver.observe(node);
+});

@@ -1,11 +1,12 @@
-const CACHE_NAME='mordisco-os-v20-final';
+const CACHE_NAME='mordisco-mobile-final-v1';
 const STATIC_ASSETS=[
   '/',
-  '/public-site.css?v=20.0.0',
-  '/public-site.js?v=20.0.0',
+  '/public-site.css?v=mobile-app-final',
+  '/public-site.js?v=mobile-app-final',
   '/mordisco-logo.png',
   '/icon-192.png',
-  '/icon-512.png'
+  '/icon-512.png',
+  '/manifest.webmanifest'
 ];
 
 self.addEventListener('install',event=>{
@@ -27,8 +28,8 @@ self.addEventListener('activate',event=>{
 self.addEventListener('fetch',event=>{
   if(event.request.method!=='GET')return;
 
-  const requestUrl=new URL(event.request.url);
-  if(requestUrl.origin!==location.origin)return;
+  const url=new URL(event.request.url);
+  if(url.origin!==self.location.origin)return;
 
   if(event.request.mode==='navigate'){
     event.respondWith(
@@ -38,21 +39,21 @@ self.addEventListener('fetch',event=>{
           caches.open(CACHE_NAME).then(cache=>cache.put(event.request,copy));
           return response;
         })
-        .catch(()=>caches.match(event.request).then(response=>response||caches.match('/')))
+        .catch(()=>caches.match(event.request).then(cached=>cached||caches.match('/')))
     );
     return;
   }
 
   event.respondWith(
     caches.match(event.request).then(cached=>{
-      if(cached)return cached;
-      return fetch(event.request).then(response=>{
+      const network=fetch(event.request).then(response=>{
         if(response.ok){
           const copy=response.clone();
           caches.open(CACHE_NAME).then(cache=>cache.put(event.request,copy));
         }
         return response;
-      });
+      }).catch(()=>cached);
+      return cached||network;
     })
   );
 });

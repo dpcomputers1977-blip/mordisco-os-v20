@@ -1,0 +1,32 @@
+MORDISCO OS — VERSIÓN MÓVIL FINAL E INSTALABLE
+
+NUEVO
+- Navegación inferior fija en celulares.
+- Botón central grande “Pedir”.
+- Accesos rápidos a Inicio, Menú y Promociones.
+- Botones y tarjetas más cómodos para tocar.
+- Mejor visualización de productos y horarios.
+- Botón flotante “Instalar app”.
+- PWA instalable en Android y computadora.
+- Instrucción especial para iPhone.
+
+PUBLICAR
+1. Extrae este ZIP.
+2. Copia todo dentro de:
+   Documentos\GitHub\mordisco-os-v20
+3. Reemplaza los archivos.
+4. GitHub Desktop:
+   Summary: Versión móvil final e instalable
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. En el celular abre mordiscofastfood.com.
+9. Actualiza la página.
+10. Pulsa “Instalar app”.
+
+ANDROID
+También puede instalarse desde:
+Chrome > menú ⋮ > Instalar aplicación
+
+IPHONE
+Safari > Compartir > Agregar a pantalla de inicio
