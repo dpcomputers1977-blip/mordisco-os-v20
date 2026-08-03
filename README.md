@@ -28,3 +28,7 @@ Versión consolidada y limpia para GitHub, Vercel y Supabase.
 - `scripts/build.mjs`: compilación
 - `supabase/`: SQL de instalación y respaldo
 - `vercel.json`: configuración de despliegue
+
+
+## V20.1
+Portada profesional reconstruida: EL SABOR QUE TE HACE VOLVER.

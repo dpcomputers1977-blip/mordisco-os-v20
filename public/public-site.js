@@ -1,77 +1,91 @@
-const db=window.supabase.createClient(window.MORDISCO_SUPABASE.url,window.MORDISCO_SUPABASE.key);
-const $=s=>document.querySelector(s);let products=[],categories=[],promotions=[],settings={},selected='all';
-const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-const money=n=>new Intl.NumberFormat('es-EC',{style:'currency',currency:'USD'}).format(Number(n||0));
-async function loadPublic(){
- const [pc,cc,pr,st]=await Promise.all([
-  db.from('products').select('id,name,description,price,image_url,category_id,sort_order,featured,active').eq('active',true).order('sort_order'),
-  db.from('categories').select('id,name,sort_order,active').eq('active',true).order('sort_order'),
-  db.from('promotions').select('*').eq('active',true).order('sort_order'),
-  db.from('business_settings').select('*').eq('id',1).maybeSingle()
- ]);
- if(pc.error){console.error('Productos:',pc.error);$('#catalogStatus').textContent='No se pudo cargar el menú. Ejecuta el SQL V13 en Supabase.';}
- products=pc.data||[];categories=cc.data||[];promotions=pr.data||[];settings=st.data||{};applySettings();renderCategories();renderProducts();renderPromotions();
-}
-function applySettings(){$('#businessDescription').textContent=settings.description||'Hamburguesas, combos y mucho sabor.';$('#businessAddress').textContent=settings.address||'Dirección por configurar';$('#businessSchedule').textContent=settings.schedule||settings.hours||'Horario por configurar';const phone=settings.phone||settings.whatsapp||'';$('#businessPhone').textContent=phone||'Teléfono por configurar';if(phone){const digits=String(phone).replace(/\D/g,'');$('#whatsappButton').href='https://wa.me/'+digits;$('#whatsappButton').classList.remove('hidden')}}
-function renderCategories(){$('#categoryFilters').innerHTML=`<button class="active" data-cat="all">Todos</button>`+categories.map(c=>`<button data-cat="${c.id}">${esc(c.name)}</button>`).join('');document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{selected=b.dataset.cat;document.querySelectorAll('[data-cat]').forEach(x=>x.classList.toggle('active',x===b));renderProducts()})}
-function visibleProducts(){const q=$('#productSearch').value.trim().toLowerCase();return products.filter(p=>(selected==='all'||String(p.category_id)===selected)&&(`${p.name} ${p.description||''}`).toLowerCase().includes(q))}
-function renderProducts(){const list=visibleProducts();$('#catalogStatus').classList.toggle('hidden',products.length>0);if(!products.length)$('#catalogStatus').textContent='No hay productos activos disponibles.';$('#productGrid').innerHTML=list.length?list.map(p=>`<article class="productCard">${p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(p.name)}" loading="lazy">`:`<div class="productImagePlaceholder">🍔</div>`}<div class="productBody"><h3>${esc(p.name)}</h3><p>${esc(p.description||'Preparado al momento.')}</p><div class="priceLine"><strong>${money(p.price)}</strong><span class="addProduct">Disponible en local</span></div></div></article>`).join(''):`<div class="emptyCatalog">No encontramos productos con esa búsqueda.</div>`}
-function renderPromotions(){const today=new Date().toISOString().slice(0,10);const list=promotions.filter(p=>(!p.starts_on||p.starts_on<=today)&&(!p.ends_on||p.ends_on>=today)&&p.featured).slice(0,6);$('#homePromotions').innerHTML=list.length?list.map(p=>`<article class="promoCard">${p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(p.title)}">`:''}<div class="promoBody">${p.badge?`<span class="promoBadge">${esc(p.badge)}</span>`:''}<h3>${esc(p.title)}</h3><p>${esc(p.description)}</p><div class="priceLine">${p.promo_price!=null?`<strong>${money(p.promo_price)}</strong>`:'<span></span>'}<a class="addProduct" href="${esc(p.link_url||'/app')}">Ver</a></div></div></article>`).join(''):'<p class="loading">Próximamente nuevas promociones.</p>'}
-$('#productSearch').addEventListener('input',renderProducts);loadPublic();
+document.addEventListener('DOMContentLoaded', async () => {
+  const toggle = document.querySelector('.menu-toggle');
+  const nav = document.querySelector('.main-nav');
 
-// V18.6 — navegación móvil e instalación como app.
-const mobileMenuButton=document.querySelector('#mobileMenuButton');
-const mainNavigation=document.querySelector('#mainNavigation');
+  toggle?.addEventListener('click', () => {
+    const open = nav.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(open));
+  });
 
-if(mobileMenuButton&&mainNavigation){
-  const closeMobileMenu=()=>{
-    mainNavigation.classList.remove('mobileOpen');
-    mobileMenuButton.setAttribute('aria-expanded','false');
-    mobileMenuButton.textContent='☰';
+  nav?.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => nav.classList.remove('open'));
+  });
+
+  const container = document.querySelector('#featured-products');
+  if (!container) return;
+
+  const safe = value => String(value ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+  })[c]);
+
+  const money = value => {
+    const n = Number(value || 0);
+    return n.toLocaleString('es-EC', { style:'currency', currency:'USD' });
   };
 
-  mobileMenuButton.addEventListener('click',()=>{
-    const open=mainNavigation.classList.toggle('mobileOpen');
-    mobileMenuButton.setAttribute('aria-expanded',String(open));
-    mobileMenuButton.textContent=open?'✕':'☰';
-  });
+  try {
+    const cfg = window.MORDISCO_SUPABASE || window.SUPABASE_CONFIG || {};
+    let products = [];
 
-  mainNavigation.querySelectorAll('a').forEach(link=>{
-    link.addEventListener('click',closeMobileMenu);
-  });
-
-  document.addEventListener('click',event=>{
-    if(!mainNavigation.contains(event.target)&&!mobileMenuButton.contains(event.target)){
-      closeMobileMenu();
+    if (window.supabase && cfg.url && cfg.anonKey) {
+      const client = window.supabase.createClient(cfg.url, cfg.anonKey);
+      const { data, error } = await client
+        .from('products')
+        .select('*')
+        .eq('active', true)
+        .order('featured', { ascending:false })
+        .limit(6);
+      if (error) throw error;
+      products = data || [];
     }
-  });
-}
 
-let deferredInstallPrompt=null;
-const installAppButton=document.querySelector('#installAppButton');
+    if (!products.length) {
+      container.innerHTML = `
+        <article class="menu-card">
+          <img src="/hamburguesa.png" alt="Hamburguesa Mordisco">
+          <div class="card-content">
+            <h3>Mordida Clásica</h3>
+            <p>Carne jugosa, queso, vegetales frescos y salsa especial.</p>
+            <div class="card-meta"><strong>$3,50</strong><a class="btn btn-primary" href="/pedir">Pedir</a></div>
+          </div>
+        </article>
+        <article class="menu-card">
+          <img src="/hamburguesa.png" alt="Hamburguesa doble">
+          <div class="card-content">
+            <h3>Mordida Doble</h3>
+            <p>Doble carne, doble queso y todo el sabor de Mordisco.</p>
+            <div class="card-meta"><strong>$6,00</strong><a class="btn btn-primary" href="/pedir">Pedir</a></div>
+          </div>
+        </article>
+        <article class="menu-card">
+          <img src="/sandwich.png" alt="Sándwich Mordisco">
+          <div class="card-content">
+            <h3>Especial Mordisco</h3>
+            <p>Una combinación intensa preparada al momento.</p>
+            <div class="card-meta"><strong>Desde $4,00</strong><a class="btn btn-primary" href="/pedir">Pedir</a></div>
+          </div>
+        </article>`;
+      return;
+    }
 
-window.addEventListener('beforeinstallprompt',event=>{
-  event.preventDefault();
-  deferredInstallPrompt=event;
-  installAppButton?.classList.remove('hidden');
+    container.innerHTML = products.slice(0,6).map(p => `
+      <article class="menu-card">
+        <img src="${safe(p.image_url || '/hamburguesa.png')}" alt="${safe(p.name)}">
+        <div class="card-content">
+          <h3>${safe(p.name)}</h3>
+          <p>${safe(p.description || 'Preparado al momento con el sabor de Mordisco.')}</p>
+          <div class="card-meta">
+            <strong>${money(p.price)}</strong>
+            <a class="btn btn-primary" href="/pedir">Pedir</a>
+          </div>
+        </div>
+      </article>
+    `).join('');
+  } catch (error) {
+    console.warn('No se pudieron cargar productos destacados:', error);
+  }
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
 });
-
-installAppButton?.addEventListener('click',async()=>{
-  if(!deferredInstallPrompt)return;
-  deferredInstallPrompt.prompt();
-  await deferredInstallPrompt.userChoice;
-  deferredInstallPrompt=null;
-  installAppButton.classList.add('hidden');
-});
-
-window.addEventListener('appinstalled',()=>{
-  installAppButton?.classList.add('hidden');
-});
-
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/sw.js?v=20.0').catch(error=>{
-      console.warn('No se pudo registrar la aplicación móvil:',error);
-    });
-  });
-}

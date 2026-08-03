@@ -1,0 +1,16 @@
+MORDISCO OS V20.1 — DISEÑO PROFESIONAL
+
+Esta actualización conserva todos los módulos de la V20 y reemplaza únicamente:
+- public/index.html
+- public/public-site.css
+- public/public-site.js
+
+PUBLICACIÓN CON GITHUB DESKTOP:
+1. Extraer este ZIP.
+2. Copiar todo su contenido dentro de la carpeta local mordisco-os-v20.
+3. Reemplazar archivos cuando Windows pregunte.
+4. GitHub Desktop:
+   Summary: Mordisco OS V20.1 diseño profesional
+   Commit to main
+   Push origin
+5. Esperar el despliegue automático de Vercel.
