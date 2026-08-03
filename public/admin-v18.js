@@ -13,7 +13,7 @@ const SUPABASE_URL='https://nmmjthqflxwucpmmmrks.supabase.co';
 const SUPABASE_KEY='sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0';
 const db=window.mordiscoSupabaseClient||window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 window.mordiscoSupabaseClient=db;
-let products=[],categories=[],settings={},orders=[],cart=[],posCart=[],ingredients=[],inventoryMovements=[],recipes=[],staffMembers=[],tables=[],tableCart=[],currentTable=null,currentEmployee=null,currentShift=null,shifts=[],financeMovements=[],financeAccounts=[],businessHours=[],customers=[],promotions=[],contentPages=[],extraOptions=[],isAdminSession=false,shiftAction='start',selectedCategory='Todos',editingImage='',adminProductQuery='',adminProductFilter='all',orderStatusFilter='all',ordersChannel=null,lastKnownOrderIds=new Set(),kitchenTimerHandle=null,lastReceiptOrder=null,paymentOrderId=null,posDiscountType='none',posDiscountValue=0;
+let products=[],categories=[],settings={},orders=[],cart=[],posCart=[],ingredients=[],inventoryMovements=[],recipes=[],staffMembers=[],tables=[],tableCart=[],currentTable=null,currentEmployee=null,currentShift=null,shifts=[],financeMovements=[],financeAccounts=[],businessHours=[],customers=[],promotions=[],contentPages=[],extraOptions=[],cashRegisterState=null,isAdminSession=false,shiftAction='start',selectedCategory='Todos',editingImage='',adminProductQuery='',adminProductFilter='all',orderStatusFilter='all',ordersChannel=null,lastKnownOrderIds=new Set(),kitchenTimerHandle=null,lastReceiptOrder=null,paymentOrderId=null,posDiscountType='none',posDiscountValue=0;
 const $$=s=>[...document.querySelectorAll(s)];
 const missingElementProxy=new Proxy({},{
   get(_target,property){
@@ -149,7 +149,7 @@ async function init(){
   const requestedTab=params.get('tab');
 
   try{
-    await Promise.all([loadCategories(),loadProducts(),loadSettings()]);
+    await Promise.all([loadCategories(),loadProducts(),loadSettings(),loadCashRegisterState()]);
     renderAll();
   }catch(error){
     console.warn('Carga inicial:',error);
@@ -162,6 +162,13 @@ async function init(){
       location.href='/staff';
       return;
     }
+    const {data:freshEmployee}=await db.from('staff').select('id,name,role,active,permissions').eq('id',savedEmployee.id).maybeSingle();
+    if(!freshEmployee?.active){
+      localStorage.removeItem('mordisco_employee');
+      location.href='/staff';
+      return;
+    }
+    savedEmployee=freshEmployee;
 
     if(savedEmployee.role==='waiter'){
       location.replace('/comandas');
@@ -1331,10 +1338,38 @@ if(document.querySelector('#sendTableOrder'))document.querySelector('#sendTableO
 if(document.querySelector('#markTablePayment'))document.querySelector('#markTablePayment').onclick=async()=>{if(!currentTable)return;await db.from('restaurant_tables').update({status:'payment',updated_at:new Date().toISOString()}).eq('id',currentTable.id);toast('Mesa pendiente de cobro');$('#tableOrderModal').classList.add('hidden');await loadTables()};
 if(document.querySelector('#freeTable'))document.querySelector('#freeTable').onclick=async()=>{if(!currentTable)return;await db.from('restaurant_tables').update({status:'free',current_order_id:null,staff_id:null,updated_at:new Date().toISOString()}).eq('id',currentTable.id);toast('Mesa liberada');$('#tableOrderModal').classList.add('hidden');await loadTables()};
 
+
+const DEFAULT_ROLE_PERMISSIONS={
+  waiter:['comandas'],
+  cashier:['pos'],
+  kitchen:['kitchen']
+};
+
+function normalizePermissions(value,role){
+  const valid=['pos','kitchen','orders','tables','shifts','customers','comandas'];
+  const list=Array.isArray(value)?value:[];
+  const clean=[...new Set(list.filter(item=>valid.includes(item)))];
+  return clean.length?clean:(DEFAULT_ROLE_PERMISSIONS[role]||[]);
+}
+
+function selectedStaffPermissions(){
+  const role=$('#staffRole').value;
+  if(role==='waiter')return ['comandas'];
+  return $$('[name="staffPermission"]:checked').map(input=>input.value);
+}
+
+function applyRolePermissionDefaults(role,permissions=null){
+  const selected=normalizePermissions(permissions,role);
+  $$('[name="staffPermission"]').forEach(input=>{
+    input.checked=selected.includes(input.value);
+    input.disabled=role==='waiter';
+  });
+}
+
 function staffRoleLabel(role){return({waiter:'Mesero',cashier:'Cajero',kitchen:'Cocina'})[role]||role}
 function staffRoleIcon(role){return({waiter:'🧑‍🍽️',cashier:'💵',kitchen:'👨‍🍳'})[role]||'👤'}
 async function loadStaff(){
-  const {data,error}=await db.from('staff').select('id,name,role,phone,active,created_at,updated_at').order('name');
+  const {data,error}=await db.from('staff').select('id,name,role,phone,active,permissions,created_at,updated_at').order('name');
   if(error){
     console.error('Error cargando personal:',error);
     return toast('Error cargando personal: '+error.message);
@@ -1375,6 +1410,7 @@ function renderStaff(){
   $('#staffList').innerHTML=list.length?list.map(s=>`<article class="staffCard ${s.active?'':'staffInactive'}">
     <div class="staffIdentity"><div class="staffAvatar">${staffRoleIcon(s.role)}</div><div><h4>${esc(s.name)}</h4><p>${esc(s.phone||'Sin teléfono')} · ${s.active?'Activo':'Inactivo'}</p></div></div>
     <span class="staffRoleBadge ${s.role}">${staffRoleLabel(s.role)}</span>
+    <div class="staffPermissionSummary">${normalizePermissions(s.permissions,s.role).map(p=>`<small>${esc({pos:'Caja',kitchen:'Cocina',orders:'Pedidos',tables:'Mesas',shifts:'Turnos',customers:'Clientes',comandas:'Comandas'}[p]||p)}</small>`).join('')}</div>
     <div class="staffActions"><button class="dark" data-edit-staff="${s.id}">Editar</button><button class="${s.active?'warning':'success'}" data-toggle-staff="${s.id}" data-active="${s.active}">${s.active?'Desactivar':'Activar'}</button><button class="danger" data-delete-staff="${s.id}">Eliminar</button></div>
   </article>`).join(''):'<div class="inventoryEmpty">No hay empleados registrados.</div>';
   $$('[data-edit-staff]').forEach(b=>b.onclick=()=>editStaff(b.dataset.editStaff));
@@ -1395,10 +1431,11 @@ function fillPosStaff(){
 }
 function resetStaffForm(){
   $('#staffForm').reset();$('#staffId').value='';$('#staffActive').checked=true;$('#staffPin').value='';
+  applyRolePermissionDefaults($('#staffRole').value);
 }
 function editStaff(id){
   const s=staffMembers.find(x=>String(x.id)===String(id));if(!s)return;
-  $('#staffId').value=s.id;$('#staffName').value=s.name;$('#staffRole').value=s.role;$('#staffPhone').value=s.phone||'';$('#staffActive').checked=s.active;$('#staffPin').value='';$('#staffName').focus();
+  $('#staffId').value=s.id;$('#staffName').value=s.name;$('#staffRole').value=s.role;$('#staffPhone').value=s.phone||'';$('#staffActive').checked=s.active;$('#staffPin').value='';applyRolePermissionDefaults(s.role,s.permissions);$('#staffName').focus();
 }
 async function toggleStaff(id,isActive){
   const {error}=await db.from('staff').update({active:!isActive,updated_at:new Date().toISOString()}).eq('id',id);
@@ -1426,9 +1463,20 @@ if(document.querySelector('#staffForm'))document.querySelector('#staffForm').ons
   if(!id&&!/^\d{4,6}$/.test(pin))return toast('El PIN debe tener entre 4 y 6 números');
   if(id&&pin&&!/^\d{4,6}$/.test(pin))return toast('El PIN debe tener entre 4 y 6 números');
   const payload={staff_id:id||null,staff_name:$('#staffName').value.trim(),staff_role:$('#staffRole').value,staff_phone:$('#staffPhone').value.trim()||null,staff_pin:pin||null,staff_active:$('#staffActive').checked};
-  const {error}=await db.rpc('save_staff_member',payload);
+  const {data:savedId,error}=await db.rpc('save_staff_member',payload);
   if(error)return toast(error.message);
+  const employeeId=id||savedId;
+  if(employeeId){
+    const {error:permissionError}=await db.from('staff').update({
+      permissions:selectedStaffPermissions(),
+      updated_at:new Date().toISOString()
+    }).eq('id',employeeId);
+    if(permissionError)return toast('Empleado guardado, pero no se pudieron guardar permisos: '+permissionError.message);
+  }
   toast(id?'Empleado actualizado':'Empleado creado');resetStaffForm();await loadStaff();
+};
+if(document.querySelector('#staffRole'))document.querySelector('#staffRole').onchange=()=>{
+  applyRolePermissionDefaults($('#staffRole').value);
 };
 if(document.querySelector('#clearStaff'))document.querySelector('#clearStaff').onclick=resetStaffForm;
 if(document.querySelector('#staffSearch'))document.querySelector('#staffSearch').oninput=renderStaff;
@@ -1446,11 +1494,12 @@ function fillEmployeeLogin(){
 }
 function applyEmployeePermissions(employee){
   currentEmployee=employee;
+  employee.permissions=normalizePermissions(employee.permissions,employee.role);
   localStorage.setItem('mordisco_employee',JSON.stringify(employee));
   document.body.classList.add('employeeMode');
   document.body.dataset.employeeRole=employee.role;
 
-  if(employee.role==='waiter'){
+  if(employee.role==='waiter'||employee.permissions.includes('comandas')){
     location.replace('/comandas');
     return;
   }
@@ -1463,23 +1512,17 @@ function applyEmployeePermissions(employee){
       }
       if($('#activeCashierName'))$('#activeCashierName').textContent=employee.name;
     },0);
-  }else{
-    if($('#posCashier'))$('#posCashier').disabled=false;
-    if($('#activeCashierName'))$('#activeCashierName').textContent='Sin seleccionar';
   }
 
-  const allowed={
-    cashier:['pos'],
-    kitchen:['kitchen'],
-    admin:['dashboard','products','categories','orders','kitchen','pos','inventory','tables','shifts','finance','customers','promotions','pages','staff','extras','settings']
-  }[employee.role]||[];
+  const allowed=employee.permissions.filter(permission=>permission!=='comandas');
 
   $$('.sidebar [data-tab]').forEach(button=>{
     const permitted=allowed.includes(button.dataset.tab);
+    button.classList.toggle('employeeAllowed',permitted);
     button.classList.toggle('roleRestricted',!permitted);
     button.hidden=!permitted;
+    button.style.setProperty('display',permitted?'flex':'none','important');
     button.setAttribute('aria-hidden',String(!permitted));
-    if(!permitted)button.tabIndex=-1;
   });
 
   $$('#adminView .tab').forEach(section=>{
@@ -1490,7 +1533,7 @@ function applyEmployeePermissions(employee){
     }
   });
 
-  $('#logoutBtn').textContent='Cerrar turno';
+  $('#logoutBtn').textContent='Cerrar sesión';
   const first=$(`.sidebar [data-tab="${allowed[0]}"]`);
   if(first)first.click();
 }
@@ -2371,5 +2414,77 @@ document.addEventListener('click',event=>{
     event.preventDefault();
     event.stopImmediatePropagation();
     toast('No tienes permiso para abrir esta sección');
+  }
+},true);
+
+
+/* ===== CONTROL ADMINISTRATIVO DE CAJA ===== */
+async function loadCashRegisterState(){
+  const {data,error}=await db.from('cash_register_state').select('*').eq('id',1).maybeSingle();
+  if(error){
+    console.warn('Estado de caja:',error);
+    return;
+  }
+  cashRegisterState=data||{id:1,is_open:false};
+  renderCashRegisterState();
+}
+
+function renderCashRegisterState(){
+  const isOpen=!!cashRegisterState?.is_open;
+  document.body.classList.toggle('cashRegisterClosed',!isOpen);
+
+  const badge=$('#cashRegisterBadge');
+  if(badge){
+    badge.textContent=isOpen?'Caja abierta':'Caja cerrada';
+    badge.className='cashRegisterBadge '+(isOpen?'open':'closed');
+  }
+
+  if($('#cashRegisterMessage')){
+    $('#cashRegisterMessage').textContent=isOpen
+      ? `Abierta${cashRegisterState.opened_at?' desde '+new Date(cashRegisterState.opened_at).toLocaleString('es-EC'):''}.`
+      : `Cerrada${cashRegisterState.closed_at?' desde '+new Date(cashRegisterState.closed_at).toLocaleString('es-EC'):''}.`;
+  }
+
+  $('#openCashRegisterBtn')?.classList.toggle('hidden',isOpen);
+  $('#closeCashRegisterBtn')?.classList.toggle('hidden',!isOpen);
+  $('#cashRegisterClosedNotice')?.classList.toggle('hidden',isOpen||isAdminSession);
+
+  const cashierBlocked=currentEmployee?.role==='cashier'&&!isOpen;
+  ['#posCreateOrder','#posCharge','#sendPosOrder','#chargeOrderConfirm'].forEach(selector=>{
+    const node=$(selector);
+    if(node)node.disabled=cashierBlocked;
+  });
+}
+
+async function setCashRegisterState(isOpen){
+  if(!isAdminSession)return toast('Solo el administrador puede abrir o cerrar la caja');
+  const {data:{user}}=await db.auth.getUser();
+  const row={
+    id:1,
+    is_open:isOpen,
+    opened_at:isOpen?new Date().toISOString():cashRegisterState?.opened_at,
+    closed_at:!isOpen?new Date().toISOString():null,
+    changed_by:user?.id||null,
+    updated_at:new Date().toISOString()
+  };
+  const {error}=await db.from('cash_register_state').upsert(row);
+  if(error)return toast(error.message);
+  toast(isOpen?'Caja abierta correctamente':'Caja cerrada correctamente');
+  await loadCashRegisterState();
+}
+
+$('#openCashRegisterBtn')?.addEventListener('click',()=>setCashRegisterState(true));
+$('#closeCashRegisterBtn')?.addEventListener('click',()=>{
+  if(confirm('¿Cerrar la caja? Los cajeros no podrán registrar ni cobrar ventas.'))setCashRegisterState(false);
+});
+
+/* Bloqueo adicional antes de acciones de cobro o venta */
+document.addEventListener('click',event=>{
+  if(currentEmployee?.role!=='cashier'||cashRegisterState?.is_open)return;
+  const action=event.target.closest?.('#posCreateOrder,#posCharge,#sendPosOrder,#chargeOrderConfirm,.chargeOrderBtn');
+  if(action){
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    toast('La caja está cerrada. Solicita al administrador que la abra.');
   }
 },true);

@@ -55,7 +55,7 @@
 
     try {
       employees = await supabaseRequest(
-        'staff?select=id,name,role&active=eq.true&order=name.asc'
+        'staff?select=id,name,role,permissions&active=eq.true&order=name.asc'
       );
 
       employeeSelect.innerHTML = '<option value="">Selecciona tu nombre</option>' +

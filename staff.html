@@ -1,175 +1,222 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Personal | Mordisco V13.10</title>
+  <link rel="stylesheet" href="/portal.css?v=20.0.0">
+  <meta name="theme-color" content="#11100e">
+</head>
+<body>
+<main class="portalWrap">
+  <form id="staffLoginForm" class="portalCard" autocomplete="off">
+    <img src="/mordisco-logo.png" alt="Mordisco">
+    <span>PORTAL DEL PERSONAL</span>
+    <h1>Iniciar sesión</h1>
+    <p>Selecciona tu nombre e ingresa tu PIN.</p>
 
-const db=supabase.createClient(
-  "https://nmmjthqflxwucpmmmrks.supabase.co",
-  "sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0"
-);
-const $=s=>document.querySelector(s);
-let staff=[],tables=[],products=[],categories=[],employee=null,employeePin='',currentTable=null,currentOrder=null,cart=[];
-const money=n=>new Intl.NumberFormat('es-EC',{style:'currency',currency:'USD'}).format(Number(n||0));
-const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-function toast(m){const t=$('#commandToast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2800)}
-function statusLabel(s){return ({free:'Libre',occupied:'Ocupada',preparing:'Preparando',payment:'Por cobrar'})[s]||s}
+    <label for="staffEmployee">Empleado</label>
+    <select id="staffEmployee" name="employee_id" required>
+      <option value="">Cargando empleados...</option>
+    </select>
 
-async function loadBase(){
-  const [a,b,c,d]=await Promise.all([
-    db.from('staff').select('id,name,role,active').eq('active',true).in('role',['waiter','cashier','admin']),
-    db.from('restaurant_tables').select('*').order('sort_order'),
-    db.from('products').select('*,categories(name)').eq('active',true),
-    db.from('categories').select('*').eq('active',true).order('sort_order')
-  ]);
-  if(a.error)return toast(a.error.message);
-  if(b.error)return toast(b.error.message);
-  staff=a.data||[];tables=(b.data||[]).filter(t=>t.active!==false);products=c.data||[];categories=d.data||[];
-  $('#commandEmployee').innerHTML=staff.map(s=>`<option value="${s.id}">${esc(s.name)} — ${s.role==='waiter'?'Mesero':s.role==='cashier'?'Cajero':'Administrador'}</option>`).join('');
-  renderTables();fillCategories();
-}
+    <label for="staffPin">PIN</label>
+    <input id="staffPin" name="employee_pin" type="password"
+           inputmode="numeric" pattern="[0-9]*" maxlength="6"
+           autocomplete="new-password" placeholder="PIN de 4 a 6 números" required>
 
-async function login(){
-  const id=$('#commandEmployee').value,pin=$('#commandPin').value.trim();
-  if(!/^\d{4,6}$/.test(pin))return toast('PIN inválido');
-  const {data,error}=await db.rpc('verify_staff_pin',{staff_id:id,staff_pin:pin});
-  if(error)return toast('No se pudo validar el PIN');
-  if(!data)return toast('PIN incorrecto');
-  employee=staff.find(s=>s.id===id);
-  employeePin=pin;
-  $('#commandEmployeeName').textContent=employee.name;
-  $('#commandLogin').classList.add('hidden');
-  $('#commandApp').classList.remove('hidden');
-  renderTables();
-}
+    <button id="staffLogin" type="submit">Ingresar</button>
+    <small id="staffMessage" role="alert">Iniciando sistema de empleados...</small>
+    <a href="/">Volver a la página</a>
+  </form>
+</main>
+<script>
+(() => {
+  'use strict';
 
-function renderTables(){
-  $('#commandTables').innerHTML=tables.map(t=>`
-    <button class="commandTable ${t.status||'free'}" data-id="${t.id}">
-      <h3>${esc(t.name)}</h3>
-      <span>${Number(t.seats||4)} puestos</span>
-      <strong>${statusLabel(t.status||'free')}</strong>
-      ${t.current_order_id?'<small>Ver cuenta y cobrar</small>':''}
-    </button>`).join('');
-  document.querySelectorAll('.commandTable').forEach(b=>b.onclick=()=>openTable(b.dataset.id));
-}
+  const SUPABASE_URL = 'https://nmmjthqflxwucpmmmrks.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0';
 
-function fillCategories(){
-  $('#commandCategory').innerHTML='<option value="all">Todas</option>'+
-    categories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
-}
+  const $ = (selector) => document.querySelector(selector);
+  const form = $('#staffLoginForm');
+  const employeeSelect = $('#staffEmployee');
+  const pinInput = $('#staffPin');
+  const loginButton = $('#staffLogin');
+  const message = $('#staffMessage');
+  let employees = [];
 
-async function openTable(id){
-  currentTable=tables.find(t=>String(t.id)===String(id));
-  currentOrder=null;cart=[];
-  $('#commandTableName').textContent=currentTable.name;
-  $('#commandApp').classList.add('hidden');
-  $('#commandOrder').classList.remove('hidden');
-  renderProducts();renderCart();
-  await loadCurrentOrder();
-}
+  function showMessage(text, isError = true) {
+    message.textContent = text;
+    message.classList.toggle('successMessage', !isError);
+  }
 
-async function loadCurrentOrder(){
-  const panel=$('#commandCurrentAccount');
-  panel.classList.add('hidden');
-  if(!currentTable?.current_order_id)return;
-  const {data,error}=await db.from('orders')
-    .select('id,order_number,total,status,payment_status,payment_method')
-    .eq('id',currentTable.current_order_id).maybeSingle();
-  if(error)return toast('No se pudo cargar la cuenta');
-  currentOrder=data;
-  if(!currentOrder)return;
-  $('#commandCurrentOrderNumber').textContent=`Pedido #${currentOrder.order_number}`;
-  $('#commandCurrentOrderStatus').textContent=currentOrder.payment_status==='paid'?'Pagada en Caja':'Pendiente de cobro en Caja';
-  $('#commandCurrentOrderTotal').textContent=money(currentOrder.total);
-    panel.classList.remove('hidden');
-}
+  async function supabaseRequest(path, options = {}) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
 
-function filteredProducts(){
-  const q=$('#commandSearch').value.toLowerCase(),cat=$('#commandCategory').value;
-  return products.filter(p=>(cat==='all'||String(p.category_id)===cat)&&(`${p.name} ${p.description||''}`).toLowerCase().includes(q));
-}
+    try {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+        ...options,
+        signal: controller.signal,
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          ...options.headers
+        }
+      });
 
-function renderProducts(){
-  $('#commandProducts').innerHTML=filteredProducts().map(p=>`
-    <button class="commandProduct" data-id="${p.id}">
-      ${p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(p.name)}">`:''}
-      <div><b>${esc(p.name)}</b><strong>${money(p.price)}</strong></div>
-    </button>`).join('');
-  document.querySelectorAll('.commandProduct').forEach(b=>b.onclick=()=>{
-    const r=cart.find(x=>String(x.id)===String(b.dataset.id));
-    if(r)r.qty++;else cart.push({id:b.dataset.id,qty:1});
-    renderCart();
+      const text = await response.text();
+      let data = null;
+      if (text) {
+        try { data = JSON.parse(text); } catch { data = text; }
+      }
+
+      if (!response.ok) {
+        const detail = data?.message || data?.hint || data?.details || `Error ${response.status}`;
+        throw new Error(detail);
+      }
+      return data;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  async function loadEmployees() {
+    showMessage('Cargando empleados...', false);
+    employeeSelect.disabled = true;
+
+    try {
+      employees = await supabaseRequest(
+        'staff?select=id,name,role,permissions&active=eq.true&order=name.asc'
+      );
+
+      employeeSelect.innerHTML = '<option value="">Selecciona tu nombre</option>' +
+        employees.map((employee) => {
+          const roles = {
+            admin: 'Administrador',
+            waiter: 'Mesero',
+            cashier: 'Cajero',
+            kitchen: 'Cocina'
+          };
+          return `<option value="${employee.id}">${employee.name} — ${roles[employee.role] || employee.role}</option>`;
+        }).join('');
+
+      employeeSelect.disabled = false;
+      showMessage(
+        employees.length ? 'Selecciona tu nombre y escribe el PIN.' : 'No hay empleados activos registrados.',
+        !employees.length
+      );
+    } catch (error) {
+      console.error('Error cargando empleados:', error);
+      employeeSelect.innerHTML = '<option value="">No se pudieron cargar los empleados</option>';
+      showMessage(`No se pudieron cargar los empleados: ${error.message}`);
+    }
+  }
+
+  async function verifyPin(employeeId, pin) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+
+    try {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/verify_staff_pin`, {
+        method: 'POST',
+        signal: controller.signal,
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          staff_id: employeeId,
+          staff_pin: pin
+        })
+      });
+
+      const text = await response.text();
+      let result = null;
+      if (text) {
+        try { result = JSON.parse(text); } catch { result = text; }
+      }
+
+      if (!response.ok) {
+        const detail = result?.message || result?.hint || result?.details || `Error ${response.status}`;
+        throw new Error(detail);
+      }
+
+      return result === true || result === 'true';
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  function redirectEmployee(employee) {
+    localStorage.setItem('mordisco_employee', JSON.stringify(employee));
+
+    const destinations = {
+      waiter: '/comandas',
+      kitchen: '/admin?employee=1&tab=kitchen',
+      cashier: '/admin?employee=1&tab=pos',
+      admin: '/admin?employee=1&tab=dashboard'
+    };
+
+    window.location.assign(destinations[employee.role] || '/staff');
+  }
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const employeeId = employeeSelect.value;
+    const pin = pinInput.value.trim();
+
+    if (!employeeId) {
+      showMessage('Selecciona un empleado.');
+      employeeSelect.focus();
+      return;
+    }
+
+    if (!/^\d{4,6}$/.test(pin)) {
+      showMessage('El PIN debe contener entre 4 y 6 números.');
+      pinInput.focus();
+      return;
+    }
+
+    loginButton.disabled = true;
+    loginButton.textContent = 'Verificando...';
+    showMessage('Validando acceso...', false);
+
+    try {
+      const valid = await verifyPin(employeeId, pin);
+      if (!valid) {
+        showMessage('PIN incorrecto.');
+        pinInput.select();
+        return;
+      }
+
+      const employee = employees.find((item) => item.id === employeeId);
+      if (!employee) {
+        showMessage('No se encontró la información del empleado.');
+        return;
+      }
+
+      showMessage(`Bienvenido, ${employee.name}.`, false);
+      setTimeout(() => redirectEmployee(employee), 350);
+    } catch (error) {
+      console.error('Error validando PIN:', error);
+      if (error.name === 'AbortError') {
+        showMessage('La validación tardó demasiado. Revisa tu conexión e inténtalo nuevamente.');
+      } else {
+        showMessage(`No se pudo validar el ingreso: ${error.message}`);
+      }
+    } finally {
+      loginButton.disabled = false;
+      loginButton.textContent = 'Ingresar';
+    }
   });
-}
 
-function renderCart(){
-  let total=0;
-  $('#commandCartItems').innerHTML=cart.length?cart.map(r=>{
-    const p=products.find(x=>String(x.id)===String(r.id));
-    total+=Number(p.price)*r.qty;
-    return `<div class="cartLine"><span>${esc(p.name)} × ${r.qty}</span><div><button data-minus="${r.id}">−</button><button data-plus="${r.id}">+</button></div></div>`;
-  }).join(''):'Sin productos';
-  $('#commandCartTotal').textContent=money(total);
-  document.querySelectorAll('[data-minus]').forEach(b=>b.onclick=()=>{
-    const r=cart.find(x=>String(x.id)===String(b.dataset.minus));r.qty--;
-    cart=cart.filter(x=>x.qty>0);renderCart();
-  });
-  document.querySelectorAll('[data-plus]').forEach(b=>b.onclick=()=>{
-    cart.find(x=>String(x.id)===String(b.dataset.plus)).qty++;renderCart();
-  });
-}
+  loadEmployees();
+})();
 
-async function sendCommand(){
-  if(!employee)return toast('Inicia sesión');
-  if(!cart.length)return toast('Agrega productos');
-  if(currentTable.current_order_id)return toast('Esta mesa ya tiene una cuenta abierta');
-
-  const total=cart.reduce((s,r)=>{
-    const p=products.find(x=>String(x.id)===String(r.id));
-    return s+Number(p.price)*r.qty;
-  },0);
-
-  const order={
-    customer_name:$('#commandCustomer').value.trim()||currentTable.name,
-    customer_phone:'',customer_address:'',order_type:'local',
-    payment_method:null,payment_status:'unpaid',
-    notes:`${currentTable.name}. ${$('#commandNotes').value.trim()}`,
-    subtotal:total,delivery_cost:0,total,status:'pending',
-    waiter_id:employee.role==='waiter'?employee.id:null,
-    cashier_id:employee.role==='cashier'?employee.id:null,
-    table_id:currentTable.id
-  };
-
-  const {data,error}=await db.from('orders').insert(order).select().single();
-  if(error)return toast(error.message);
-
-  const items=cart.map(r=>{
-    const p=products.find(x=>String(x.id)===String(r.id));
-    return {order_id:data.id,product_id:p.id,product_name:p.name,unit_price:p.price,quantity:r.qty,subtotal:Number(p.price)*r.qty};
-  });
-  const {error:itemError}=await db.from('order_items').insert(items);
-  if(itemError)return toast(itemError.message);
-
-  const {error:tableError}=await db.from('restaurant_tables')
-    .update({status:'preparing',current_order_id:data.id,staff_id:employee.id,updated_at:new Date().toISOString()})
-    .eq('id',currentTable.id);
-  if(tableError)return toast(tableError.message);
-
-  currentTable.current_order_id=data.id;
-  currentTable.status='preparing';
-  currentOrder=data;
-  cart=[];renderCart();renderTables();await loadCurrentOrder();
-  toast(`Comanda #${data.order_number} enviada a cocina`);
-}
-
-
-$('#commandLoginBtn').onclick=login;
-$('#commandPin').onkeydown=e=>{if(e.key==='Enter')login()};
-$('#backTables').onclick=async()=>{
-  $('#commandOrder').classList.add('hidden');
-  $('#commandApp').classList.remove('hidden');
-  const {data}=await db.from('restaurant_tables').select('*').order('sort_order');
-  tables=(data||[]).filter(t=>t.active!==false);renderTables();
-};
-$('#commandSearch').oninput=renderProducts;
-$('#commandCategory').onchange=renderProducts;
-$('#sendCommand').onclick=sendCommand;
-$('#refreshCommand').onclick=()=>location.reload();
-$('#logoutCommand').onclick=()=>{employee=null;employeePin='';location.reload()};
-loadBase();
+</script>
+</body>
+</html>

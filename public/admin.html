@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=roles-strict-1">
+<link rel="stylesheet" href="/admin-v18.css?v=permissions-cash-1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 </head>
@@ -187,6 +187,20 @@
 
 
    <section id="tab-pos" class="tab hidden">
+
+      <section id="adminCashControl" class="panel adminCashControl">
+        <div>
+          <span class="eyebrow">CONTROL ADMINISTRATIVO</span>
+          <h3>Estado de la caja</h3>
+          <p id="cashRegisterMessage">Consultando estado…</p>
+        </div>
+        <div class="cashControlActions">
+          <span id="cashRegisterBadge" class="cashRegisterBadge">Consultando</span>
+          <button id="openCashRegisterBtn" class="success" type="button">Abrir caja</button>
+          <button id="closeCashRegisterBtn" class="danger" type="button">Cerrar caja</button>
+        </div>
+      </section>
+
       <div class="posHeader">
         <div>
           <h2>Punto de venta</h2>
@@ -200,7 +214,13 @@
         </div>
       </div>
 
-      <div class="posLayout">
+      
+      <div id="cashRegisterClosedNotice" class="cashRegisterClosedNotice hidden">
+        <strong>🔒 Caja cerrada</strong>
+        <span>Un administrador debe abrir la caja antes de registrar o cobrar ventas.</span>
+      </div>
+
+<div class="posLayout">
         <section class="posCatalog panel">
           <div class="posCatalogTop">
             <input id="posSearch" placeholder="Buscar producto...">
@@ -694,6 +714,21 @@
           <label class="check wide">
             <input id="staffActive" type="checkbox" checked> Empleado activo
           </label>
+
+          <fieldset class="wide staffPermissionsBox">
+            <legend>Permisos del empleado</legend>
+            <p>Selecciona únicamente las funciones que podrá utilizar.</p>
+            <div class="staffPermissionGrid">
+              <label class="check"><input type="checkbox" name="staffPermission" value="pos"> POS / Caja</label>
+              <label class="check"><input type="checkbox" name="staffPermission" value="kitchen"> Cocina</label>
+              <label class="check"><input type="checkbox" name="staffPermission" value="orders"> Pedidos web</label>
+              <label class="check"><input type="checkbox" name="staffPermission" value="tables"> Mesas</label>
+              <label class="check"><input type="checkbox" name="staffPermission" value="shifts"> Turnos</label>
+              <label class="check"><input type="checkbox" name="staffPermission" value="customers"> Clientes</label>
+            </div>
+            <small>Meseros siempre entran a Comandas. El administrador conserva acceso completo.</small>
+          </fieldset>
+
           <div class="wide formActions">
             <button class="primary">Guardar empleado</button>
             <button type="button" class="dark" id="clearStaff">Limpiar</button>
@@ -951,7 +986,7 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=roles-strict-1"></script>
+<script src="/admin-v18.js?v=permissions-cash-1"></script>
 
 
 
