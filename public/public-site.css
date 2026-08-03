@@ -272,7 +272,7 @@ footer{background:#080808;color:#aaa;padding:45px 5vw;display:grid;grid-template
   font-weight:900;
 }
 .business-status.open{background:#dcf7e5;color:#176b35}
-.business-status.closed{background:#ffe2df;color:#9b271d}
+.business-status.closed{background:#fff0df;color:#934400}
 .business-status.loading{background:#eee6d7;color:#6a5c45}
 .public-hours-list{display:grid;gap:9px}
 .public-hour-row{
@@ -617,5 +617,86 @@ footer{background:#080808;color:#aaa;padding:45px 5vw;display:grid;grid-template
   }
   .product-image{
     height:195px;
+  }
+}
+
+/* =====================================================
+   MORDISCO — IDENTIDAD NARANJA PREMIUM
+   ===================================================== */
+:root{
+  --mordisco-orange:#ff7a00;
+  --mordisco-orange-dark:#d96500;
+  --mordisco-orange-soft:#fff0df;
+  --mordisco-yellow:#ffc400;
+  --mordisco-black:#0d0d0d;
+}
+
+/* Barra animada de categorías */
+.category-marquee,
+.category-strip,
+.ticker,
+.menu-marquee{
+  background:var(--mordisco-orange)!important;
+}
+
+/* Detalles y estados activos */
+.badge-hot,
+.badge-offer,
+.promo-tag,
+.category-label,
+.nav-active,
+.mobile-bottom-nav a.active{
+  color:var(--mordisco-orange-dark);
+}
+
+.mobile-bottom-nav a.active:not(.mobile-order-main){
+  background:rgba(255,122,0,.14);
+  color:#ff9a2f;
+}
+
+.mobile-bottom-nav .mobile-order-main{
+  background:var(--mordisco-yellow);
+}
+
+/* Promociones y elementos destacados */
+.promo-card::before,
+.product-card::before,
+.section-accent,
+.orange-accent{
+  background:var(--mordisco-orange);
+}
+
+/* Botones secundarios premium */
+.btn-orange,
+.button-orange,
+.promo-button{
+  background:var(--mordisco-orange);
+  color:#fff;
+  border-color:var(--mordisco-orange);
+}
+
+.btn-orange:hover,
+.button-orange:hover,
+.promo-button:hover{
+  background:var(--mordisco-orange-dark);
+  border-color:var(--mordisco-orange-dark);
+}
+
+/* Estados de cierre en naranja en vez de rojo */
+.business-status.closed,
+.onlineClosedBanner{
+  background:var(--mordisco-orange-soft)!important;
+  color:#8b4300!important;
+  border-color:#f4be86!important;
+}
+
+/* Instalación móvil */
+.install-app-button{
+  box-shadow:0 16px 38px rgba(255,122,0,.24);
+}
+
+@media(max-width:800px){
+  .mobile-bottom-nav{
+    border-top-color:rgba(255,122,0,.28);
   }
 }

@@ -17,9 +17,9 @@
   margin:0 auto 18px;
   padding:16px 18px;
   border-radius:14px;
-  background:#ffe4df;
-  border:1px solid #f2b6ad;
-  color:#8f241b;
+  background:#fff0df;
+  border:1px solid #f4be86;
+  color:#873f00;
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -43,7 +43,7 @@
   display:grid;
   place-items:center;
   border-radius:18px;
-  color:#8f241b;
+  color:#873f00;
   font-weight:900;
   z-index:8;
 }

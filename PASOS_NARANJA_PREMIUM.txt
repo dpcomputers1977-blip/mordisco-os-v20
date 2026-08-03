@@ -1,0 +1,21 @@
+MORDISCO OS — NARANJA PREMIUM
+
+CAMBIOS
+- Se reemplazaron los elementos rojos por naranja premium.
+- Se mantiene el amarillo para botones principales.
+- Se mantiene el negro como fondo principal.
+- Se conserva la versión móvil tipo app.
+- Se conserva el botón Instalar app.
+- No se modificaron Administración, Caja, Cocina, Supabase ni horarios.
+
+PUBLICAR
+1. Extrae este ZIP.
+2. Copia todo dentro de:
+   Documentos\GitHub\mordisco-os-v20
+3. Reemplaza los archivos.
+4. GitHub Desktop:
+   Summary: Identidad naranja premium
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. En celular y computadora actualiza con Ctrl + F5.
