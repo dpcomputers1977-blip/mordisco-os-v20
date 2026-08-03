@@ -1,0 +1,16 @@
+MORDISCO OS — PORTADA CORRECTA FINAL
+
+Esta actualización:
+- conserva el acceso administrativo que ya funciona;
+- conserva Supabase, Caja, Cocina, Pedidos y Administración;
+- reemplaza únicamente la página pública;
+- utiliza la portada profesional con la hamburguesa grande;
+- elimina el sándwich de la portada principal.
+
+PUBLICAR:
+1. Copiar todo dentro de Documentos\GitHub\mordisco-os-v20
+2. Reemplazar archivos
+3. GitHub Desktop
+4. Summary: Portada correcta con hamburguesa
+5. Commit to main
+6. Push origin
