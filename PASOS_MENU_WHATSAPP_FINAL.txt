@@ -1,0 +1,25 @@
+MORDISCO OS — MENÚ COMPLETO + WHATSAPP FINAL
+
+CONFIRMADO EN SUPABASE:
+- business_name: Mordisco Fast Food
+- whatsapp: 593959005534
+- accepting_orders: true
+
+CORRECCIONES:
+- WhatsApp usa la columna correcta: business_name.
+- El botón verde lee el número guardado en Negocio.
+- La página muestra todas las categorías activas.
+- La página muestra todos los productos visibles.
+- Menú completo queda visible en la navegación.
+- No se modifican productos, precios, imágenes ni inventario.
+
+PUBLICAR:
+1. Extrae este ZIP.
+2. Copia todo dentro de Documentos\GitHub\mordisco-os-v20.
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Menú completo y WhatsApp final
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Cierra y vuelve a abrir mordiscofastfood.com.

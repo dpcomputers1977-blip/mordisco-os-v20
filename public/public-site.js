@@ -30,15 +30,77 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   let allProducts = [];
+  let allCategories = [];
+  let activeCategory = 'all';
 
-  const renderProducts = products => {
-    const container = document.querySelector('#featured-products');
+  const slugCategory = value => String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase()
+    .trim();
+
+  const renderCategoryFilters = () => {
+    const container = document.querySelector('#category-filters');
     if (!container) return;
-    container.innerHTML = products.slice(0,6).map((product,index) => `
-      <article class="product-card reveal visible" data-category="${safe((product.category || '').toLowerCase())}">
+
+    const categoriesWithProducts = allCategories.filter(category =>
+      allProducts.some(product => String(product.category_id || '') === String(category.id))
+    );
+
+    container.innerHTML = [
+      '<button class="active" data-category="all">Todos</button>',
+      ...categoriesWithProducts.map(category =>
+        `<button data-category="${safe(String(category.id))}">${safe(category.name)}</button>`
+      )
+    ].join('');
+
+    container.querySelectorAll('button').forEach(button => {
+      button.addEventListener('click', () => {
+        container.querySelectorAll('button').forEach(item => item.classList.remove('active'));
+        button.classList.add('active');
+        activeCategory = button.dataset.category || 'all';
+        renderProducts();
+      });
+    });
+  };
+
+  const filteredProducts = () => {
+    if (activeCategory === 'all') return allProducts;
+    return allProducts.filter(product =>
+      String(product.category_id || '') === String(activeCategory)
+    );
+  };
+
+  const renderProducts = () => {
+    const container = document.querySelector('#featured-products');
+    const summary = document.querySelector('#menuCatalogSummary');
+    if (!container) return;
+
+    const products = filteredProducts();
+    const activeName = activeCategory === 'all'
+      ? 'todas las categorías'
+      : allCategories.find(category => String(category.id) === String(activeCategory))?.name || 'esta categoría';
+
+    if (summary) {
+      summary.textContent = activeCategory === 'all'
+        ? `${allProducts.length} productos disponibles en ${allCategories.filter(c => allProducts.some(p => String(p.category_id) === String(c.id))).length} categorías`
+        : `${products.length} productos en ${activeName}`;
+    }
+
+    if (!products.length) {
+      container.innerHTML = `
+        <div class="menu-empty-state">
+          <strong>No hay productos visibles en ${safe(activeName)}.</strong>
+          <span>Selecciona “Todos” para ver el menú completo.</span>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = products.map((product,index) => `
+      <article class="product-card reveal visible" data-category="${safe(slugCategory(product.category))}">
         <div class="product-image">
           <img src="${safe(product.image_url || '/media/hamburguesa.png')}" alt="${safe(product.name)}" loading="lazy">
-          ${product.featured || index === 0 ? '<span class="product-tag">DESTACADO</span>' : ''}
+          ${product.featured ? '<span class="product-tag">DESTACADO</span>' : ''}
         </div>
         <div class="product-body">
           <span class="product-category">${safe(product.category || 'Mordisco')}</span>
@@ -46,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <p>${safe(product.description || 'Preparado al momento con todo el sabor de Mordisco.')}</p>
           <div class="product-footer">
             <strong>${money(product.price)}</strong>
-            <a class="btn btn-primary" href="/pedir">Añadir</a>
+            <a class="btn btn-primary" href="/pedir">Pedir</a>
           </div>
         </div>
       </article>
@@ -55,37 +117,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const loadProducts = async () => {
     try {
-      const cfg = window.MORDISCO_SUPABASE || window.SUPABASE_CONFIG || {};
-      if (window.supabase && cfg.url && cfg.anonKey) {
-        const client = window.supabase.createClient(cfg.url, cfg.anonKey);
-        const { data, error } = await client
+      const client = window.mordiscoSupabaseClient;
+      if (!client) throw new Error('No se encontró la conexión con Supabase.');
+
+      const [
+        { data: categoryData, error: categoryError },
+        { data: productData, error: productError }
+      ] = await Promise.all([
+        client
+          .from('categories')
+          .select('id,name,sort_order,active')
+          .eq('active', true)
+          .order('sort_order', { ascending:true })
+          .order('name', { ascending:true }),
+        client
           .from('products')
-          .select('*')
+          .select('*,categories(id,name)')
           .eq('active', true)
           .order('featured', { ascending:false })
-          .limit(12);
-        if (error) throw error;
-        allProducts = (data || []).map(p => ({
-          ...p,
-          category: p.category_name || p.category || 'Hamburguesas'
-        }));
-      }
-    } catch (error) {
-      console.warn('No se pudieron cargar productos desde Supabase:', error);
-    }
-    if (!allProducts.length) allProducts = fallbackProducts;
-    renderProducts(allProducts);
-  };
+          .order('sort_order', { ascending:true })
+          .order('name', { ascending:true })
+      ]);
 
-  document.querySelectorAll('#category-filters button').forEach(button => {
-    button.addEventListener('click', () => {
-      document.querySelectorAll('#category-filters button').forEach(b => b.classList.remove('active'));
-      button.classList.add('active');
-      const category = button.dataset.category;
-      if (category === 'all') return renderProducts(allProducts);
-      renderProducts(allProducts.filter(p => String(p.category || '').toLowerCase().includes(category)));
-    });
-  });
+      if (categoryError) throw categoryError;
+      if (productError) throw productError;
+
+      allCategories = categoryData || [];
+      allProducts = (productData || []).map(product => ({
+        ...product,
+        category: product.categories?.name || 'Sin categoría'
+      }));
+    } catch (error) {
+      console.warn('No se pudo cargar el menú completo desde Supabase:', error);
+      allCategories = [
+        {id:'fallback-hamburguesas',name:'Hamburguesas',active:true,sort_order:0},
+        {id:'fallback-combos',name:'Combos',active:true,sort_order:1}
+      ];
+      allProducts = fallbackProducts.map((product,index) => ({
+        ...product,
+        category_id:index < 2 ? 'fallback-hamburguesas' : 'fallback-combos'
+      }));
+    }
+
+    renderCategoryFilters();
+    renderProducts();
+  };
 
   loadProducts();
 
@@ -313,7 +389,7 @@ async function loadDynamicWhatsapp(){
 
     const {data,error}=await client
       .from('business_settings')
-      .select('whatsapp,name')
+      .select('whatsapp,business_name')
       .limit(1)
       .maybeSingle();
 
@@ -322,7 +398,7 @@ async function loadDynamicWhatsapp(){
     const phone=normalizeWhatsappNumber(data?.whatsapp);
     if(!phone) throw new Error('No hay número de WhatsApp configurado.');
 
-    const message=`Hola ${data?.name || 'Mordisco Fast Food'}, deseo realizar un pedido.`;
+    const message=`Hola ${data?.business_name || 'Mordisco Fast Food'}, deseo realizar un pedido.`;
     const url=buildWhatsappUrl(phone,message);
 
     document.querySelectorAll(

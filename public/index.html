@@ -13,7 +13,7 @@
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/mordisco-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="/public-site.css?v=production-1">
+  <link rel="stylesheet" href="/public-site.css?v=full-menu-dynamic-1">
 </head>
 <body>
   <div class="promo-bar">
@@ -34,7 +34,7 @@
 
     <nav class="main-nav" aria-label="Navegación principal">
       <a href="#inicio">Inicio</a>
-      <a href="#menu">Menú</a>
+      <a href="#menu">Menú completo</a>
       <a href="/promociones">Promociones</a>
       <a href="#nosotros">Nosotros</a>
       <a href="#contacto">Contacto</a>
@@ -99,14 +99,11 @@
         <div class="eyebrow dark"><span></span>NUESTRO MENÚ</div>
         <h2>Elige tu próximo Mordisco</h2>
         <p>Productos preparados al momento, con sabor intenso y calidad que se nota.</p>
+        <div id="menuCatalogSummary" class="menu-catalog-summary">Cargando el menú completo…</div>
       </div>
 
       <div class="category-pills reveal" id="category-filters">
         <button class="active" data-category="all">Todos</button>
-        <button data-category="hamburguesas">Hamburguesas</button>
-        <button data-category="combos">Combos</button>
-        <button data-category="papas">Papas</button>
-        <button data-category="bebidas">Bebidas</button>
       </div>
 
       <div class="products-grid" id="featured-products">
@@ -117,7 +114,8 @@
       </div>
 
       <div class="section-action reveal">
-        <a class="btn btn-primary btn-xl" href="/pedir">Ver menú completo</a>
+        <a class="btn btn-primary btn-xl" href="#menu">Menú completo en esta página</a>
+        <a class="btn btn-dark btn-xl" href="/pedir">Abrir pedidos y carrito</a>
       </div>
     </section>
 
@@ -213,7 +211,7 @@
       <p>El sabor que te hace volver.</p>
     </div>
     <div class="footer-links">
-      <a href="#menu">Menú</a>
+      <a href="#menu">Menú completo</a>
       <a href="/promociones">Promociones</a>
       <a href="/pedir">Pedir ahora</a>
       <a href="/acceso-admin">Administración</a>
@@ -232,7 +230,7 @@
       window.MORDISCO_SUPABASE.anonKey
     );
   </script>
-  <script src="/public-site.js?v=whatsapp-public-fix-1"></script>
+  <script src="/public-site.js?v=menu-whatsapp-final-1"></script>
 
   <button id="installMordiscoApp" class="install-app-button" type="button" aria-label="Instalar aplicación Mordisco">
     <span class="install-icon">⇩</span>

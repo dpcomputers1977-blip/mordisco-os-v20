@@ -1,8 +1,8 @@
-const CACHE_NAME='mordisco-whatsapp-public-fix-v1';
+const CACHE_NAME='mordisco-menu-whatsapp-final-v1';
 const STATIC_ASSETS=[
   '/',
-  '/public-site.css?v=production-1',
-  '/public-site.js?v=whatsapp-public-fix-1',
+  '/public-site.css?v=full-menu-dynamic-1',
+  '/public-site.js?v=menu-whatsapp-final-1',
   '/mordisco-logo.png',
   '/icon-192.png',
   '/icon-512.png',

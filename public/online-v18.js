@@ -232,7 +232,7 @@ async function loadOnlineWhatsapp(){
     const client=window.mordiscoSupabaseClient || db;
     const {data,error}=await client
       .from('business_settings')
-      .select('whatsapp,name')
+      .select('whatsapp,business_name')
       .limit(1)
       .maybeSingle();
 
@@ -244,7 +244,7 @@ async function loadOnlineWhatsapp(){
     window.MORDISCO_WHATSAPP=phone;
 
     document.querySelectorAll('a[href*="wa.me"], [data-whatsapp-link]').forEach(link=>{
-      const text=encodeURIComponent(`Hola ${data?.name || 'Mordisco Fast Food'}, necesito ayuda con mi pedido.`);
+      const text=encodeURIComponent(`Hola ${data?.business_name || 'Mordisco Fast Food'}, necesito ayuda con mi pedido.`);
       link.href=`https://wa.me/${phone}?text=${text}`;
       link.target='_blank';
       link.rel='noopener noreferrer';

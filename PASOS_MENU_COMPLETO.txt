@@ -1,0 +1,31 @@
+MORDISCO OS — MENÚ COMPLETO DINÁMICO
+
+CORRECCIONES
+- La portada muestra TODOS los productos visibles.
+- Las categorías se leen del administrador.
+- Solo aparecen categorías que tienen productos visibles.
+- Se muestra la cantidad real de productos y categorías.
+- “Menú completo” queda visible en la navegación.
+- Se mantiene un botón separado para abrir pedidos y carrito.
+
+NO SE MODIFICAN
+- Productos
+- Categorías
+- Precios
+- Imágenes
+- Inventario
+- Empleados
+- Ventas
+- Pedidos
+- Contabilidad
+
+PUBLICAR
+1. Extrae este ZIP.
+2. Copia todo dentro de Documentos\GitHub\mordisco-os-v20.
+3. Reemplaza los archivos.
+4. GitHub Desktop:
+   Summary: Mostrar menú completo y categorías reales
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Cierra y vuelve a abrir mordiscofastfood.com.
