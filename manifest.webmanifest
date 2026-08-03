@@ -1,0 +1,6 @@
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:radial-gradient(circle at top,#302b24,#0f0e0c);color:#171512;min-height:100vh}.portalWrap{min-height:100vh;display:grid;place-items:center;padding:22px}.portalCard{background:#fffdf9;width:min(430px,100%);padding:34px;border-radius:25px;box-shadow:0 25px 70px #0008;text-align:center}.portalCard img{width:125px;height:105px;object-fit:contain}.portalCard span{display:block;color:#b68100;font-weight:900;font-size:.73rem;letter-spacing:2px}.portalCard h1{font-size:2rem;margin:10px}.portalCard p{color:#6e655a}.portalCard select,.portalCard input,.portalCard button{width:100%;padding:14px;border-radius:12px;border:1px solid #d8cec0;margin-top:10px;font-size:1rem}.portalCard button{background:#ffc400;font-weight:900;border:0}.portalCard small{display:block;color:#b42318;min-height:25px;padding-top:10px}.portalCard a{display:inline-block;color:#6e655a;margin-top:15px;font-size:.8rem}
+/* V13.9 — LOGIN DE EMPLEADOS */
+.portalCard label{display:block;text-align:left;font-size:.78rem;font-weight:800;margin-top:12px}
+.portalCard button:disabled{opacity:.65;cursor:wait}
+.portalCard small{display:block;min-height:38px;padding-top:11px;line-height:1.35}
+.portalCard small.successMessage{color:#18763c}

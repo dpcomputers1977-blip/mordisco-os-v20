@@ -1,0 +1,7 @@
+/admin /admin.html 200
+/staff /staff.html 200
+/comandas /comandas.html 200
+/pedir /pedir.html 200
+/app /pedir.html 200
+/promociones /promociones.html 200
+/pagina/* /page.html 200

@@ -1,0 +1,21 @@
+MORDISCO OS V20 — PUBLICACIÓN SEGURA
+
+1. Crea un repositorio NUEVO llamado: mordisco-os-v20
+2. No borres todavía mordisco-os-v18.
+3. Sube TODO el contenido de esta carpeta al nuevo repositorio.
+4. Importa mordisco-os-v20 en Vercel como un proyecto NUEVO.
+5. Verifica:
+   / 
+   /pedir
+   /promociones
+   /admin
+6. Solo después de confirmar que todo funciona:
+   - mueve mordiscofastfood.com al proyecto V20
+   - elimina los proyectos V15, V16 y V18 antiguos si ya no los necesitas
+
+IMPORTANTE:
+No ejecutes nuevamente todos los SQL si tu base Supabase actual ya funciona.
+Los SQL quedan en supabase/ como respaldo.
+
+COMMIT RECOMENDADO:
+Mordisco OS V20 final

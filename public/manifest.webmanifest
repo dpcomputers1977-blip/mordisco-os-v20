@@ -1,0 +1,49 @@
+{
+  "name": "Mordisco Fast Food",
+  "short_name": "Mordisco",
+  "description": "Menú, promociones y pedidos en línea de Mordisco Fast Food.",
+  "start_url": "/?source=app",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#11100e",
+  "theme_color": "#ffc400",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Pedir ahora",
+      "short_name": "Pedir",
+      "url": "/pedir.html",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Ver promociones",
+      "short_name": "Promociones",
+      "url": "/promociones",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

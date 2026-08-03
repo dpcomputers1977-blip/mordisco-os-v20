@@ -1,0 +1,6 @@
+-- MORDISCO OS
+-- La estructura principal ya fue ejecutada en tu proyecto Supabase.
+-- Conserva aquí una copia de los scripts usados para mantenimiento.
+--
+-- Script adicional:
+-- 02_storage_y_admin.sql

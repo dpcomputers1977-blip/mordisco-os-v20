@@ -1,0 +1,15 @@
+PUBLICAR MORDISCO OS V18
+
+1. Descomprime el ZIP.
+2. En GitHub crea un repositorio nuevo llamado mordisco-os-v18.
+3. Sube TODO el contenido descomprimido.
+4. Conecta ese repositorio nuevo a Vercel.
+5. Framework: Other.
+6. Root Directory: /
+7. Deploy.
+
+NO SUBAS V18 ENCIMA DEL REPOSITORIO V16.
+Un repositorio nuevo evita todo archivo antiguo y todo caché heredado.
+
+PRUEBA:
+https://mordisco-os-v18.vercel.app/admin?v=18

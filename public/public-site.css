@@ -1,0 +1,460 @@
+*{box-sizing:border-box}html{scroll-behavior:smooth}:root{--black:#11100e;--yellow:#ffc400;--cream:#f5f0e8;--muted:#71685d}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--cream);color:var(--black)}.siteHeader{height:82px;background:#11100ef5;color:#fff;display:flex;align-items:center;padding:10px 5vw;gap:34px;position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)}.siteBrand{display:flex;align-items:center;color:#fff;text-decoration:none;font-weight:1000;letter-spacing:1.5px}.siteBrand img{width:62px;height:58px;object-fit:contain}.siteBrand span{display:flex;flex-direction:column}.siteBrand small{font-size:.55rem;color:var(--yellow);letter-spacing:2px}.siteHeader nav{display:flex;gap:25px;margin-left:auto}.siteHeader nav a{color:#ddd5ca;text-decoration:none;font-weight:800;font-size:.9rem}.siteHeader nav a:hover{color:var(--yellow)}.orderHeader,.yellowButton{background:var(--yellow);color:#111;text-decoration:none;padding:13px 19px;border-radius:12px;font-weight:1000;display:inline-block;box-shadow:0 9px 25px #ffc40035}.publicHero{height:min(720px,78vh);min-height:540px;position:relative;overflow:hidden;background:#080706;color:#fff;display:flex;align-items:center;padding:7vw}.publicHero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.3}.heroShade{position:absolute;inset:0;background:linear-gradient(90deg,#080706 15%,#080706d8 46%,#08070640)}.heroText{position:relative;z-index:2;max-width:720px}.heroText>span,.sectionTitle span,.contactPublic>div>span{color:var(--yellow);font-weight:1000;letter-spacing:2px;font-size:.78rem}.heroText h1{font-size:clamp(3.1rem,6.8vw,7rem);line-height:.9;margin:19px 0;letter-spacing:-4px}.heroText h1 em{color:var(--yellow);font-style:normal}.heroText p{font-size:1.2rem;color:#d5cec4;max-width:540px}.heroText>div{display:flex;gap:12px;margin-top:28px}.outlineButton{border:1px solid #ffffff69;color:#fff;text-decoration:none;padding:13px 19px;border-radius:12px;font-weight:900}.heroFood{position:absolute;z-index:1;width:min(47vw,720px);right:-4vw;bottom:-9%;filter:drop-shadow(0 30px 45px #000b)}.serviceBar{max-width:1150px;margin:-38px auto 0;position:relative;z-index:4;display:grid;grid-template-columns:repeat(3,1fr);background:#fff;border-radius:22px;box-shadow:0 18px 50px #372c1e22;padding:16px}.serviceBar article{display:flex;align-items:center;justify-content:center;gap:13px;padding:15px;font-size:1.5rem}.serviceBar article+article{border-left:1px solid #eee4d7}.serviceBar div{display:flex;flex-direction:column;font-size:1rem}.serviceBar small{color:var(--muted);margin-top:3px}.publicSection{padding:85px 5vw}.promoSection{background:#eee6da}.sectionTitle{display:flex;justify-content:space-between;align-items:end;gap:20px;max-width:1500px;margin:auto auto 32px}.sectionTitle h2{font-size:clamp(2.2rem,4vw,4.2rem);margin:8px 0 0;letter-spacing:-2px}.sectionTitle>a{color:#111;font-weight:900;text-decoration:none}.promoGrid,.publicProducts{max-width:1500px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.promoCard,.productCard{background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 12px 35px #30251412}.promoCard{background:#151310;color:#fff}.promoCard img,.productCard img{width:100%;height:230px;object-fit:cover}.promoBody,.productBody{padding:20px}.promoBody h3,.productBody h3{font-size:1.35rem;margin:8px 0}.promoBody p,.productBody p{color:#bfb6aa;line-height:1.5}.productBody p{color:var(--muted);min-height:44px}.promoBadge{display:inline-block;background:var(--yellow);color:#111;border-radius:100px;padding:5px 9px;font-size:.7rem;font-weight:1000}.priceLine{display:flex;justify-content:space-between;align-items:center;margin-top:18px}.priceLine strong{font-size:1.4rem}.addProduct{border:0;background:#111;color:#fff;border-radius:10px;padding:10px 13px;font-weight:900;cursor:pointer}.menuPublic{background:var(--cream)}.menuSearch{background:#fff;border:1px solid #e1d8cc;border-radius:14px;padding:4px 12px;display:flex;align-items:center;width:min(330px,100%)}.menuSearch input{border:0;outline:0;background:transparent;padding:12px;width:100%;font-size:.95rem}.categoryPills{max-width:1500px;margin:0 auto 30px;display:flex;gap:10px;flex-wrap:wrap}.categoryPills button{border:1px solid #ddd2c4;background:#fff;padding:11px 18px;border-radius:999px;font-weight:900;cursor:pointer}.categoryPills button.active{background:#111;color:#fff;border-color:#111}.catalogStatus{max-width:1500px;margin:25px auto;color:var(--muted)}.productImagePlaceholder{height:230px;background:#e6ded2;display:grid;place-items:center;font-size:3rem}.contactPublic{margin:30px 5vw 80px;border-radius:28px;padding:55px;background:#111;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:25px}.contactPublic h2{font-size:clamp(2.3rem,4vw,4.2rem);margin:14px 0}.contactPublic p{color:#d8d0c5}.siteFooter{background:#0e0d0b;color:#8e867c;padding:24px 5vw;display:flex;justify-content:space-between;align-items:center}.siteFooter>div{display:flex;align-items:center;gap:10px}.siteFooter img{width:44px;height:40px;object-fit:contain}.quietAccess{opacity:.12;transition:.2s}.quietAccess:hover{opacity:.75}.quietAccess a{color:#fff;text-decoration:none;font-size:.65rem;padding:4px}.whatsappButton{position:fixed;right:22px;bottom:22px;background:#20b65a;color:white;border-radius:999px;padding:14px 18px;text-decoration:none;font-weight:900;box-shadow:0 12px 30px #0003;z-index:30}.hidden{display:none!important}.loading{color:#bcb3a8}.emptyCatalog{grid-column:1/-1;background:#fff;border-radius:18px;padding:30px;text-align:center;color:var(--muted)}@media(max-width:950px){.siteHeader nav{display:none}.heroFood{opacity:.5;width:70vw}.promoGrid,.publicProducts{grid-template-columns:repeat(2,1fr)}.heroText h1{letter-spacing:-2px}.serviceBar{margin:-20px 20px 0}}@media(max-width:620px){.siteHeader{height:68px;padding:8px 14px}.siteBrand img{width:50px}.siteBrand span{font-size:.85rem}.orderHeader{padding:10px 12px;font-size:.8rem}.publicHero{min-height:590px;padding:36px 20px}.heroFood{width:110vw;right:-35vw;opacity:.32}.heroText h1{font-size:3.6rem}.serviceBar{grid-template-columns:1fr;margin:-15px 14px 0}.serviceBar article+article{border-left:0;border-top:1px solid #eee4d7}.publicSection{padding:60px 18px}.sectionTitle{align-items:start;flex-direction:column}.promoGrid,.publicProducts{grid-template-columns:1fr}.menuSearch{width:100%}.contactPublic{margin:20px 14px 60px;padding:30px 22px;display:block}.contactPublic .yellowButton{margin-top:20px}.siteFooter{padding:20px 16px}}
+
+/* V13.1 — ACCESOS PARA ADMINISTRADOR Y EMPLEADOS */
+.systemAccessSection{
+  background:#171512;
+  padding:22px 5vw;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.systemAccessInner{
+  max-width:1180px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+}
+.systemAccessText{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  color:#fff;
+}
+.systemAccessText small{
+  color:#ffc400;
+  font-size:.66rem;
+  font-weight:900;
+  letter-spacing:1.8px;
+}
+.systemAccessText strong{
+  font-size:1.05rem;
+}
+.systemAccessText span{
+  color:#aaa39a;
+  font-size:.8rem;
+}
+.systemAccessButtons{
+  display:flex;
+  gap:10px;
+}
+.systemAccessButton{
+  min-width:190px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:11px 14px;
+  border-radius:13px;
+  text-decoration:none;
+  transition:transform .18s ease,background .18s ease,border-color .18s ease;
+}
+.systemAccessButton:hover{
+  transform:translateY(-2px);
+}
+.systemAccessButton span:last-child{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.systemAccessButton b{
+  font-size:.88rem;
+}
+.systemAccessButton small{
+  font-size:.67rem;
+  opacity:.7;
+}
+.systemAccessIcon{
+  font-size:1.2rem;
+}
+.staffButton{
+  background:#ffc400;
+  color:#171512;
+}
+.adminButton{
+  background:rgba(255,255,255,.06);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.18);
+}
+.adminButton:hover{
+  background:rgba(255,255,255,.12);
+}
+@media(max-width:760px){
+  .systemAccessInner{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .systemAccessButtons{
+    width:100%;
+  }
+  .systemAccessButton{
+    flex:1;
+    min-width:0;
+  }
+}
+@media(max-width:480px){
+  .systemAccessButtons{
+    flex-direction:column;
+  }
+  .systemAccessButton{
+    width:100%;
+  }
+}
+
+
+/* =====================================================
+   MORDISCO OS V18.6 — WEB MÓVIL / PWA
+   ===================================================== */
+body{
+  min-width:0;
+  overflow-x:hidden;
+}
+.mobileMenuButton,
+.mobileOrderBar,
+.installAppButton{
+  display:none;
+}
+.siteHeader{
+  padding-left:max(5vw,env(safe-area-inset-left));
+  padding-right:max(5vw,env(safe-area-inset-right));
+}
+.siteHeader nav a,
+.orderHeader,
+.yellowButton,
+.outlineButton,
+.categoryPills button,
+.addProduct{
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.publicHero{
+  padding-left:max(7vw,env(safe-area-inset-left));
+  padding-right:max(7vw,env(safe-area-inset-right));
+}
+.productCard,
+.promoCard{
+  min-width:0;
+}
+.productCard img,
+.promoCard img{
+  display:block;
+}
+.installAppButton{
+  position:fixed;
+  right:18px;
+  bottom:84px;
+  z-index:70;
+  border:0;
+  border-radius:999px;
+  padding:12px 16px;
+  background:#11100e;
+  color:#fff;
+  font-weight:900;
+  box-shadow:0 12px 30px #0004;
+}
+
+@media(max-width:950px){
+  .siteHeader{
+    gap:14px;
+  }
+  .mobileMenuButton{
+    display:grid;
+    place-items:center;
+    margin-left:auto;
+    width:44px;
+    height:44px;
+    border:1px solid rgba(255,255,255,.22);
+    border-radius:12px;
+    background:rgba(255,255,255,.06);
+    color:#fff;
+    font-size:1.35rem;
+    cursor:pointer;
+  }
+  .siteHeader nav{
+    display:none;
+    position:absolute;
+    top:calc(100% + 1px);
+    left:12px;
+    right:12px;
+    margin:0;
+    padding:12px;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:0 0 18px 18px;
+    background:#11100ef8;
+    box-shadow:0 18px 38px #0007;
+    flex-direction:column;
+    gap:4px;
+  }
+  .siteHeader nav.mobileOpen{
+    display:flex;
+  }
+  .siteHeader nav a{
+    padding:14px;
+    border-radius:10px;
+    font-size:1rem;
+  }
+  .siteHeader nav a:hover{
+    background:rgba(255,255,255,.08);
+  }
+  .heroFood{
+    max-width:none;
+  }
+}
+
+@media(max-width:620px){
+  body{
+    padding-bottom:calc(72px + env(safe-area-inset-bottom));
+  }
+  .siteHeader{
+    height:70px;
+    padding:7px 12px;
+  }
+  .siteBrand{
+    min-width:0;
+  }
+  .siteBrand img{
+    width:48px;
+    height:48px;
+  }
+  .siteBrand span{
+    font-size:.82rem;
+    line-height:1.05;
+  }
+  .siteBrand small{
+    font-size:.48rem;
+  }
+  .siteHeader>.orderHeader{
+    display:none;
+  }
+  .mobileMenuButton{
+    flex:0 0 42px;
+    width:42px;
+    height:42px;
+  }
+
+  .publicHero{
+    height:auto;
+    min-height:calc(100svh - 70px);
+    padding:54px 18px 115px;
+    align-items:flex-start;
+  }
+  .publicHero video{
+    opacity:.22;
+  }
+  .heroShade{
+    background:linear-gradient(180deg,#080706f5 5%,#080706ce 58%,#0807067a);
+  }
+  .heroText{
+    max-width:100%;
+  }
+  .heroText>span{
+    font-size:.68rem;
+  }
+  .heroText h1{
+    font-size:clamp(3rem,16vw,4.5rem);
+    line-height:.88;
+    letter-spacing:-2px;
+    overflow-wrap:anywhere;
+  }
+  .heroText p{
+    font-size:1rem;
+    line-height:1.5;
+    max-width:88%;
+  }
+  .heroText>div{
+    flex-direction:column;
+    align-items:stretch;
+    width:min(100%,310px);
+  }
+  .heroText .yellowButton,
+  .heroText .outlineButton{
+    text-align:center;
+    padding:14px 18px;
+  }
+  .heroFood{
+    width:125vw;
+    max-width:none;
+    right:-50vw;
+    bottom:-4%;
+    opacity:.28;
+  }
+
+  .serviceBar{
+    position:relative;
+    z-index:5;
+    margin:-58px 12px 0;
+    padding:8px;
+    border-radius:18px;
+  }
+  .serviceBar article{
+    justify-content:flex-start;
+    padding:12px;
+    font-size:1.2rem;
+  }
+  .serviceBar div{
+    font-size:.92rem;
+  }
+
+  .publicSection{
+    padding:52px 14px;
+  }
+  .sectionTitle{
+    margin-bottom:22px;
+    gap:12px;
+  }
+  .sectionTitle h2{
+    font-size:2.25rem;
+    line-height:1;
+    letter-spacing:-1px;
+  }
+  .sectionTitle>a{
+    display:inline-flex;
+    padding:10px 0;
+  }
+
+  .promoGrid,
+  .publicProducts{
+    gap:14px;
+  }
+  .promoCard,
+  .productCard{
+    border-radius:17px;
+  }
+  .promoCard img,
+  .productCard img,
+  .productImagePlaceholder{
+    height:205px;
+  }
+  .promoBody,
+  .productBody{
+    padding:17px;
+  }
+  .productBody p{
+    min-height:0;
+  }
+  .priceLine{
+    align-items:center;
+    gap:10px;
+  }
+  .addProduct{
+    min-height:44px;
+    padding:11px 15px;
+  }
+
+  .categoryPills{
+    gap:7px;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    padding-bottom:7px;
+    scrollbar-width:none;
+  }
+  .categoryPills::-webkit-scrollbar{
+    display:none;
+  }
+  .categoryPills button{
+    flex:0 0 auto;
+    min-height:43px;
+    padding:10px 15px;
+  }
+  .menuSearch input{
+    min-height:44px;
+  }
+
+  .contactPublic{
+    margin:14px 12px 38px;
+    border-radius:20px;
+    padding:30px 20px;
+  }
+  .contactPublic h2{
+    font-size:2.2rem;
+    line-height:1.02;
+  }
+  .contactPublic p{
+    line-height:1.45;
+  }
+
+  .systemAccessSection{
+    padding:26px 14px;
+  }
+  .systemAccessButtons{
+    flex-direction:column;
+  }
+  .systemAccessButton{
+    width:100%;
+    min-height:58px;
+  }
+  .siteFooter{
+    flex-direction:column;
+    gap:12px;
+    text-align:center;
+    padding:24px 14px calc(24px + env(safe-area-inset-bottom));
+  }
+
+  .whatsappButton{
+    right:14px;
+    bottom:84px;
+    width:48px;
+    height:48px;
+    padding:0;
+    display:grid;
+    place-items:center;
+    overflow:hidden;
+    font-size:0;
+  }
+  .whatsappButton::before{
+    content:"WA";
+    font-size:.8rem;
+    font-weight:1000;
+  }
+
+  .mobileOrderBar{
+    display:grid;
+    grid-template-columns:1fr 1.35fr;
+    gap:9px;
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:65;
+    padding:9px 12px calc(9px + env(safe-area-inset-bottom));
+    background:#11100ef7;
+    border-top:1px solid rgba(255,255,255,.12);
+    box-shadow:0 -10px 30px #0004;
+    backdrop-filter:blur(12px);
+  }
+  .mobileOrderBar a{
+    min-height:48px;
+    display:grid;
+    place-items:center;
+    border:1px solid rgba(255,255,255,.22);
+    border-radius:12px;
+    color:#fff;
+    text-decoration:none;
+    font-weight:900;
+  }
+  .mobileOrderBar .mobileOrderPrimary{
+    background:var(--yellow);
+    color:#111;
+    border-color:var(--yellow);
+  }
+  .installAppButton{
+    display:block;
+    bottom:82px;
+  }
+  .installAppButton.hidden{
+    display:none!important;
+  }
+}
+
+@media(max-width:380px){
+  .siteBrand span{
+    display:none;
+  }
+  .heroText h1{
+    font-size:2.9rem;
+  }
+  .heroText p{
+    max-width:100%;
+  }
+  .sectionTitle h2{
+    font-size:2rem;
+  }
+}

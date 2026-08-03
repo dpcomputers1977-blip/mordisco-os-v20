@@ -1,0 +1,21 @@
+LIMPIEZA DE VERSIONES ANTERIORES
+
+GITHUB
+1. Primero publica y prueba mordisco-os-v20.
+2. Conserva temporalmente mordisco-os-v18 como respaldo.
+3. Para borrar un repositorio antiguo:
+   Settings > General > Danger Zone > Delete this repository
+4. Borra primero mordisco-os-v15 y mordisco-os-v16.
+5. Borra mordisco-os-v18 únicamente cuando V20 y el dominio funcionen bien.
+
+VERCEL
+1. Publica V20 como proyecto nuevo.
+2. Conecta el dominio mordiscofastfood.com a V20.
+3. Confirma que Inicio, Pedir, Promociones y Admin funcionen.
+4. Luego abre cada proyecto antiguo:
+   Settings > General > Delete Project
+5. Elimina V15 y V16.
+6. Mantén V18 unos días como respaldo y después elimínalo.
+
+NO BORRES SUPABASE.
+La base de datos puede seguir siendo la misma.

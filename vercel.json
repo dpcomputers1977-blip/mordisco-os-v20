@@ -1,0 +1,60 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/admin",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/staff",
+      "destination": "/staff.html"
+    },
+    {
+      "source": "/comandas",
+      "destination": "/comandas.html"
+    },
+    {
+      "source": "/pedir",
+      "destination": "/pedir.html"
+    },
+    {
+      "source": "/app",
+      "destination": "/pedir.html"
+    },
+    {
+      "source": "/promociones",
+      "destination": "/promociones.html"
+    },
+    {
+      "source": "/pagina/:slug",
+      "destination": "/page.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        }
+      ]
+    },
+    {
+      "source": "/(.*).html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
+  ]
+}
