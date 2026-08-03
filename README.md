@@ -1,12 +1,13 @@
-# Mordisco OS V21 Ultimate
+# Mordisco OS Definitivo
 
-Versión consolidada basada en la V20 estable.
+Versión consolidada sobre la V21 aprobada.
 
-## Mejoras V21
-- Portada premium y animada
-- Menú dinámico y filtros visuales
-- Promociones destacadas
-- Testimonios
-- WhatsApp flotante
-- Responsive para móvil, tableta y PC
-- Conserva Administración, Caja, Cocina, Pedidos, Promociones y Comandas
+## Corrección definitiva de acceso
+- Login con contraseña
+- Enlace mágico por correo
+- Recuperación de contraseña
+- Página para crear contraseña nueva
+- Validación en `admin_users`
+- Activación SQL de los dos correos administrativos conocidos
+
+No modifica la portada, Caja, Cocina, Pedidos, Productos ni la base existente.

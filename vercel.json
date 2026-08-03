@@ -31,6 +31,10 @@
     {
       "source": "/pagina/:slug",
       "destination": "/page.html"
+    },
+    {
+      "source": "/reset-password",
+      "destination": "/reset-password.html"
     }
   ],
   "headers": [

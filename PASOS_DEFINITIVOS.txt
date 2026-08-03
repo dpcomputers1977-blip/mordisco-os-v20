@@ -1,0 +1,20 @@
+MORDISCO OS DEFINITIVO
+
+1. Copia esta versión dentro de Documentos\GitHub\mordisco-os-v20.
+2. GitHub Desktop:
+   Summary: Mordisco OS definitivo - acceso corregido
+   Commit to main
+   Push origin
+3. Espera que Vercel muestre Ready.
+4. En Supabase > SQL Editor ejecuta:
+   01_EJECUTAR_UNA_VEZ_ADMIN_DEFINITIVO.sql
+5. Abre /admin.
+6. El correo ya aparece escrito:
+   dpcomputers1977+admin@gmail.com
+7. Si la contraseña no funciona:
+   pulsa “Restablecer contraseña”
+   o “Enviar enlace de acceso”.
+8. Revisa el correo y sigue el enlace.
+
+Esta versión NO cambia la portada, Caja, Cocina, Pedidos, Productos ni Supabase.
+Solo hace definitivo el acceso administrativo.
