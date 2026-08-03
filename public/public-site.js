@@ -1,93 +1,89 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const nav = document.querySelector('.main-nav');
+document.addEventListener('DOMContentLoaded', async () => {
   const toggle = document.querySelector('.menu-toggle');
+  const nav = document.querySelector('.main-nav');
 
   toggle?.addEventListener('click', () => {
-    const open = nav?.classList.toggle('open');
-    toggle.setAttribute('aria-expanded', String(Boolean(open)));
+    const open = nav.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(open));
   });
-  nav?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => nav.classList.remove('open')));
 
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.12 });
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  nav?.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => nav.classList.remove('open'));
+  });
 
-  const safe = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+  const container = document.querySelector('#featured-products');
+  if (!container) return;
+
+  const safe = value => String(value ?? '').replace(/[&<>"']/g, c => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
-  })[char]);
-  const money = value => Number(value || 0).toLocaleString('es-EC', { style:'currency', currency:'USD' });
+  })[c]);
 
-  const fallbackProducts = [
-    {name:'Mordida Clásica',description:'Carne jugosa, queso, vegetales frescos y salsa especial.',price:3.5,image_url:'/media/hamburguesa.png',category:'Hamburguesas',featured:true},
-    {name:'Mordida Doble',description:'Doble carne, doble queso y todo el sabor de Mordisco.',price:6,image_url:'/media/hamburguesa.png',category:'Hamburguesas',featured:true},
-    {name:'Combo Mordisco',description:'Hamburguesa, papas y bebida para disfrutar completo.',price:7.5,image_url:'/media/hamburguesa.png',category:'Combos',featured:true}
-  ];
+  const money = value => {
+    const n = Number(value || 0);
+    return n.toLocaleString('es-EC', { style:'currency', currency:'USD' });
+  };
 
-  let allProducts = [];
+  try {
+    const cfg = window.MORDISCO_SUPABASE || window.SUPABASE_CONFIG || {};
+    let products = [];
 
-  const renderProducts = products => {
-    const container = document.querySelector('#featured-products');
-    if (!container) return;
-    container.innerHTML = products.slice(0,6).map((product,index) => `
-      <article class="product-card reveal visible" data-category="${safe((product.category || '').toLowerCase())}">
-        <div class="product-image">
-          <img src="${safe(product.image_url || '/media/hamburguesa.png')}" alt="${safe(product.name)}" loading="lazy">
-          ${product.featured || index === 0 ? '<span class="product-tag">DESTACADO</span>' : ''}
-        </div>
-        <div class="product-body">
-          <span class="product-category">${safe(product.category || 'Mordisco')}</span>
-          <h3>${safe(product.name)}</h3>
-          <p>${safe(product.description || 'Preparado al momento con todo el sabor de Mordisco.')}</p>
-          <div class="product-footer">
-            <strong>${money(product.price)}</strong>
-            <a class="btn btn-primary" href="/pedir">Añadir</a>
+    if (window.supabase && cfg.url && cfg.anonKey) {
+      const client = window.supabase.createClient(cfg.url, cfg.anonKey);
+      const { data, error } = await client
+        .from('products')
+        .select('*')
+        .eq('active', true)
+        .order('featured', { ascending:false })
+        .limit(6);
+      if (error) throw error;
+      products = data || [];
+    }
+
+    if (!products.length) {
+      container.innerHTML = `
+        <article class="menu-card">
+          <img src="/hamburguesa.png" alt="Hamburguesa Mordisco">
+          <div class="card-content">
+            <h3>Mordida Clásica</h3>
+            <p>Carne jugosa, queso, vegetales frescos y salsa especial.</p>
+            <div class="card-meta"><strong>$3,50</strong><a class="btn btn-primary" href="/pedir">Pedir</a></div>
+          </div>
+        </article>
+        <article class="menu-card">
+          <img src="/hamburguesa.png" alt="Hamburguesa doble">
+          <div class="card-content">
+            <h3>Mordida Doble</h3>
+            <p>Doble carne, doble queso y todo el sabor de Mordisco.</p>
+            <div class="card-meta"><strong>$6,00</strong><a class="btn btn-primary" href="/pedir">Pedir</a></div>
+          </div>
+        </article>
+        <article class="menu-card">
+          <img src="/sandwich.png" alt="Sándwich Mordisco">
+          <div class="card-content">
+            <h3>Especial Mordisco</h3>
+            <p>Una combinación intensa preparada al momento.</p>
+            <div class="card-meta"><strong>Desde $4,00</strong><a class="btn btn-primary" href="/pedir">Pedir</a></div>
+          </div>
+        </article>`;
+      return;
+    }
+
+    container.innerHTML = products.slice(0,6).map(p => `
+      <article class="menu-card">
+        <img src="${safe(p.image_url || '/hamburguesa.png')}" alt="${safe(p.name)}">
+        <div class="card-content">
+          <h3>${safe(p.name)}</h3>
+          <p>${safe(p.description || 'Preparado al momento con el sabor de Mordisco.')}</p>
+          <div class="card-meta">
+            <strong>${money(p.price)}</strong>
+            <a class="btn btn-primary" href="/pedir">Pedir</a>
           </div>
         </div>
       </article>
     `).join('');
-  };
-
-  const loadProducts = async () => {
-    try {
-      const cfg = window.MORDISCO_SUPABASE || window.SUPABASE_CONFIG || {};
-      if (window.supabase && cfg.url && cfg.anonKey) {
-        const client = window.supabase.createClient(cfg.url, cfg.anonKey);
-        const { data, error } = await client
-          .from('products')
-          .select('*')
-          .eq('active', true)
-          .order('featured', { ascending:false })
-          .limit(12);
-        if (error) throw error;
-        allProducts = (data || []).map(p => ({
-          ...p,
-          category: p.category_name || p.category || 'Hamburguesas'
-        }));
-      }
-    } catch (error) {
-      console.warn('No se pudieron cargar productos desde Supabase:', error);
-    }
-    if (!allProducts.length) allProducts = fallbackProducts;
-    renderProducts(allProducts);
-  };
-
-  document.querySelectorAll('#category-filters button').forEach(button => {
-    button.addEventListener('click', () => {
-      document.querySelectorAll('#category-filters button').forEach(b => b.classList.remove('active'));
-      button.classList.add('active');
-      const category = button.dataset.category;
-      if (category === 'all') return renderProducts(allProducts);
-      renderProducts(allProducts.filter(p => String(p.category || '').toLowerCase().includes(category)));
-    });
-  });
-
-  loadProducts();
+  } catch (error) {
+    console.warn('No se pudieron cargar productos destacados:', error);
+  }
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});

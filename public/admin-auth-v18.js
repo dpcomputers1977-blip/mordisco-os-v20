@@ -3,42 +3,45 @@
 
   const SUPABASE_URL = 'https://nmmjthqflxwucpmmmrks.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0';
-  const DEFAULT_ADMIN_EMAIL = 'dpcomputers1977+admin@gmail.com';
+  const DEFAULT_EMAIL = 'dpcomputers1977+admin@gmail.com';
 
   const client = window.mordiscoSupabaseClient ||
     window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   if (client) window.mordiscoSupabaseClient = client;
 
-  function message(text, type = 'info') {
-    let box = document.querySelector('#loginDirectMessage');
+  const $ = (selector) => document.querySelector(selector);
+
+  function showMessage(text, type = 'info') {
+    let box = $('#loginDirectMessage');
     if (!box) {
       box = document.createElement('div');
       box.id = 'loginDirectMessage';
       box.setAttribute('role', 'status');
-      document.querySelector('#loginForm')?.appendChild(box);
+      $('#loginForm')?.appendChild(box);
     }
-    const styles = {
-      info: ['#fff1b8', '#6a5100'],
-      error: ['#ffe0dc', '#8d1e16'],
-      success: ['#dff7e7', '#11652d']
+    const palette = {
+      info: ['#fff4c7', '#654d00'],
+      success: ['#def7e7', '#11652d'],
+      error: ['#ffe1dd', '#8b1f17']
     };
-    const [background, color] = styles[type] || styles.info;
+    const [background, color] = palette[type] || palette.info;
     Object.assign(box.style, {
       marginTop: '12px',
-      padding: '11px 13px',
+      padding: '12px 14px',
       borderRadius: '10px',
-      font: '700 13px system-ui,sans-serif',
       background,
-      color
+      color,
+      font: '700 13px system-ui, sans-serif',
+      lineHeight: '1.4'
     });
     box.textContent = text;
   }
 
-  async function verifyAdmin(userId) {
+  async function isAdmin(userId) {
     const { data, error } = await client
       .from('admin_users')
-      .select('user_id, active')
+      .select('user_id,active')
       .eq('user_id', userId)
       .eq('active', true)
       .maybeSingle();
@@ -47,106 +50,106 @@
     return Boolean(data);
   }
 
-  async function openAdmin(session) {
-    const allowed = await verifyAdmin(session.user.id);
+  async function enterAdmin(session) {
+    if (!session?.user?.id) throw new Error('No se pudo crear la sesión.');
+    const allowed = await isAdmin(session.user.id);
     if (!allowed) {
       await client.auth.signOut();
-      throw new Error('Este usuario no tiene permiso de administrador.');
+      throw new Error('Este usuario no está autorizado como administrador.');
     }
     sessionStorage.setItem('mordisco_admin_verified', '1');
     window.location.replace('/admin?session=ok');
   }
 
-  async function passwordLogin(email, password) {
+  async function signIn(email, password) {
     const { data, error } = await client.auth.signInWithPassword({ email, password });
     if (error) throw error;
-    if (!data?.session) throw new Error('Supabase no devolvió una sesión.');
-    await openAdmin(data.session);
+    await enterAdmin(data.session);
   }
 
   async function sendMagicLink(email) {
-    const redirectTo = `${window.location.origin}/admin`;
     const { error } = await client.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: redirectTo, shouldCreateUser: false }
+      options: {
+        shouldCreateUser: false,
+        emailRedirectTo: `${window.location.origin}/admin`
+      }
     });
     if (error) throw error;
   }
 
-  async function sendRecovery(email) {
-    const redirectTo = `${window.location.origin}/reset-password`;
-    const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo });
+  async function sendReset(email) {
+    const { error } = await client.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`
+    });
     if (error) throw error;
   }
 
-  function addRecoveryButtons(form) {
-    if (document.querySelector('#adminRecoveryActions')) return;
-    const actions = document.createElement('div');
-    actions.id = 'adminRecoveryActions';
-    actions.innerHTML = `
-      <button type="button" id="magicLinkButton">Enviar enlace de acceso</button>
+  function addRecoveryActions(form) {
+    if ($('#adminRecoveryActions')) return;
+    const wrapper = document.createElement('div');
+    wrapper.id = 'adminRecoveryActions';
+    wrapper.innerHTML = `
+      <button type="button" id="magicLinkButton">Entrar con enlace por correo</button>
       <button type="button" id="resetPasswordButton">Restablecer contraseña</button>
     `;
-    Object.assign(actions.style, {
-      display:'grid',
-      gridTemplateColumns:'1fr',
-      gap:'8px',
-      marginTop:'10px'
+    Object.assign(wrapper.style, {
+      display: 'grid',
+      gap: '8px',
+      marginTop: '10px'
     });
-    actions.querySelectorAll('button').forEach(button => Object.assign(button.style, {
-      border:'1px solid #dfcda9',
-      background:'#fff',
-      color:'#4b3b1c',
-      padding:'11px',
-      borderRadius:'10px',
-      fontWeight:'800',
-      cursor:'pointer'
+    wrapper.querySelectorAll('button').forEach(button => Object.assign(button.style, {
+      width: '100%',
+      border: '1px solid #dec99f',
+      background: '#fff',
+      color: '#4a3917',
+      borderRadius: '10px',
+      padding: '11px 12px',
+      fontWeight: '800',
+      cursor: 'pointer'
     }));
-    form.appendChild(actions);
+    form.appendChild(wrapper);
 
-    actions.querySelector('#magicLinkButton').addEventListener('click', async () => {
-      const email = document.querySelector('#loginEmail')?.value.trim();
-      if (!email) return message('Escribe primero el correo del administrador.', 'error');
+    $('#magicLinkButton').addEventListener('click', async () => {
+      const email = $('#loginEmail')?.value.trim();
+      if (!email) return showMessage('Escribe primero el correo.', 'error');
       try {
-        message('Enviando enlace de acceso…');
+        showMessage('Enviando enlace de acceso…');
         await sendMagicLink(email);
-        message('Revisa tu correo. Te enviamos un enlace para entrar sin contraseña.', 'success');
+        showMessage('Revisa tu correo. Te enviamos un enlace para entrar sin contraseña.', 'success');
       } catch (error) {
-        message(error?.message || 'No se pudo enviar el enlace.', 'error');
+        showMessage(error?.message || 'No se pudo enviar el enlace.', 'error');
       }
     });
 
-    actions.querySelector('#resetPasswordButton').addEventListener('click', async () => {
-      const email = document.querySelector('#loginEmail')?.value.trim();
-      if (!email) return message('Escribe primero el correo del administrador.', 'error');
+    $('#resetPasswordButton').addEventListener('click', async () => {
+      const email = $('#loginEmail')?.value.trim();
+      if (!email) return showMessage('Escribe primero el correo.', 'error');
       try {
-        message('Enviando recuperación…');
-        await sendRecovery(email);
-        message('Revisa tu correo. Te enviamos un enlace para crear una contraseña nueva.', 'success');
+        showMessage('Enviando recuperación…');
+        await sendReset(email);
+        showMessage('Revisa tu correo. Te enviamos un enlace para crear una contraseña nueva.', 'success');
       } catch (error) {
-        message(error?.message || 'No se pudo enviar la recuperación.', 'error');
+        showMessage(error?.message || 'No se pudo enviar la recuperación.', 'error');
       }
     });
   }
 
-  async function start() {
-    const form = document.querySelector('#loginForm');
-    if (!form || !client) {
-      message('No se pudo cargar la conexión con Supabase.', 'error');
-      return;
-    }
+  async function initialize() {
+    const form = $('#loginForm');
+    if (!form || !client) return;
 
-    const emailInput = document.querySelector('#loginEmail');
-    if (emailInput && !emailInput.value) emailInput.value = DEFAULT_ADMIN_EMAIL;
-    addRecoveryButtons(form);
+    const emailInput = $('#loginEmail');
+    if (emailInput && !emailInput.value) emailInput.value = DEFAULT_EMAIL;
+    addRecoveryActions(form);
 
     const { data } = await client.auth.getSession();
     if (data?.session) {
       try {
-        await openAdmin(data.session);
+        await enterAdmin(data.session);
         return;
       } catch (error) {
-        message(error.message, 'error');
+        showMessage(error.message, 'error');
       }
     }
 
@@ -155,25 +158,25 @@
       event.stopImmediatePropagation();
 
       const email = emailInput?.value.trim() || '';
-      const password = document.querySelector('#loginPassword')?.value || '';
-      const button = form.querySelector('button[type="submit"], button.primary');
+      const password = $('#loginPassword')?.value || '';
+      const button = form.querySelector('button[type="submit"]');
 
-      if (!email || !password) return message('Escribe el correo y la contraseña.', 'error');
+      if (!email || !password) return showMessage('Escribe el correo y la contraseña.', 'error');
 
       if (button) {
         button.disabled = true;
         button.textContent = 'Ingresando…';
       }
-      message('Verificando acceso…');
+      showMessage('Verificando acceso…');
 
       try {
-        await passwordLogin(email, password);
+        await signIn(email, password);
       } catch (error) {
-        const raw = String(error?.message || 'Error desconocido');
+        const raw = String(error?.message || 'No se pudo iniciar sesión.');
         const friendly = /invalid login credentials/i.test(raw)
-          ? 'La contraseña no coincide. Usa “Restablecer contraseña” o “Enviar enlace de acceso”.'
+          ? 'La contraseña no coincide. Usa “Entrar con enlace por correo” o “Restablecer contraseña”.'
           : raw;
-        message(friendly, 'error');
+        showMessage(friendly, 'error');
         if (button) {
           button.disabled = false;
           button.textContent = 'Ingresar';
@@ -183,8 +186,8 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', start, { once:true });
+    document.addEventListener('DOMContentLoaded', initialize, { once: true });
   } else {
-    start();
+    initialize();
   }
 })();

@@ -1,0 +1,28 @@
+MORDISCO OS FINAL ÚNICO
+
+PUBLICAR
+1. Extrae este ZIP.
+2. Copia todo dentro de:
+   Documentos\GitHub\mordisco-os-v20
+3. Reemplaza los archivos.
+4. En GitHub Desktop:
+   Summary: Mordisco OS final único
+   Commit to main
+   Push origin
+5. Espera que Vercel muestre Ready.
+
+SUPABASE
+El SQL ya fue ejecutado correctamente según la captura del usuario.
+No es necesario volver a ejecutarlo.
+El archivo 01_ADMIN_FINAL_UNICO.sql queda solo como respaldo.
+
+ENTRAR
+1. Abre /admin
+2. Usa:
+   dpcomputers1977+admin@gmail.com
+3. Si la contraseña no funciona:
+   - Entrar con enlace por correo
+   o
+   - Restablecer contraseña
+
+Esta versión mantiene la página profesional y no cambia Caja, Cocina, Pedidos ni Productos.

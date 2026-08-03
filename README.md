@@ -1,13 +1,20 @@
-# Mordisco OS Definitivo
+# Mordisco OS Final Único
 
-Versión consolidada sobre la V21 aprobada.
+Versión final consolidada sobre la página profesional aprobada.
 
-## Corrección definitiva de acceso
+## Acceso definitivo
 - Login con contraseña
-- Enlace mágico por correo
+- Enlace de acceso por correo
 - Recuperación de contraseña
-- Página para crear contraseña nueva
-- Validación en `admin_users`
-- Activación SQL de los dos correos administrativos conocidos
+- Página para crear una contraseña nueva
+- Validación contra `admin_users`
 
-No modifica la portada, Caja, Cocina, Pedidos, Productos ni la base existente.
+## Se conserva
+- Página pública profesional
+- Pedidos
+- Promociones
+- Caja
+- Cocina
+- Comandas
+- Administración
+- Supabase existente
