@@ -1,0 +1,12 @@
+MORDISCO OS V20.2 — PORTADA PREMIUM CORREGIDA
+
+Corrección:
+- Se eliminó la imagen de sándwich.
+- Se usa /media/hamburguesa.png.
+- Se reconstruyó la portada con composición profesional.
+
+Copiar únicamente:
+public/index.html
+public/public-site.css
+public/public-site.js
+PUBLICAR_V20_2.txt

@@ -3,25 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#111111">
+  <meta name="theme-color" content="#0c0c0c">
   <meta name="description" content="Mordisco Fast Food: hamburguesas intensas, promociones y pedidos en línea.">
   <title>Mordisco Fast Food</title>
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/mordisco-logo.png">
-  <link rel="stylesheet" href="/public-site.css?v=20.1.0">
+  <link rel="stylesheet" href="/public-site.css?v=20.2.0">
 </head>
 <body>
-  <div class="announcement">🔥 SABOR QUE SE SIENTE · PEDIDOS EN LÍNEA DISPONIBLES</div>
+  <div class="top-banner">🔥 SABOR QUE SE SIENTE · PEDIDOS EN LÍNEA DISPONIBLES</div>
 
-  <header class="site-header">
-    <a class="brand" href="/">
+  <header class="header">
+    <a class="logo" href="/">
       <img src="/mordisco-logo.png" alt="Mordisco Fast Food">
-      <span><strong>MORDISCO</strong><small>FAST FOOD</small></span>
+      <span><b>MORDISCO</b><small>FAST FOOD</small></span>
     </a>
 
-    <button class="menu-toggle" aria-label="Abrir menú" aria-expanded="false">☰</button>
+    <button class="nav-toggle" aria-label="Abrir menú">☰</button>
 
-    <nav class="main-nav">
+    <nav class="nav">
       <a href="#inicio">Inicio</a>
       <a href="#menu">Menú</a>
       <a href="/promociones">Promociones</a>
@@ -29,86 +29,86 @@
       <a href="#contacto">Contacto</a>
     </nav>
 
-    <div class="header-actions">
-      <a class="btn btn-outline" href="/staff">Empleados</a>
-      <a class="btn btn-primary" href="/pedir">Pedir ahora <span>→</span></a>
+    <div class="actions">
+      <a class="btn ghost" href="/staff">Empleados</a>
+      <a class="btn yellow" href="/pedir">Pedir ahora <span>→</span></a>
     </div>
   </header>
 
   <main>
     <section class="hero" id="inicio">
       <div class="hero-copy">
-        <span class="eyebrow">MORDISCO FAST FOOD</span>
-        <h1>EL SABOR<br>QUE TE HACE<br><em>VOLVER.</em></h1>
+        <span class="kicker">MORDISCO FAST FOOD</span>
+        <h1>
+          <span>EL SABOR</span>
+          <span>QUE TE HACE</span>
+          <strong>VOLVER.</strong>
+        </h1>
         <p>Hamburguesas intensas, ingredientes frescos y pedidos en línea sin complicaciones.</p>
-        <div class="hero-buttons">
-          <a class="btn btn-primary btn-large" href="/pedir">Ordenar ahora</a>
-          <a class="btn btn-dark btn-large" href="#menu">Ver menú</a>
+
+        <div class="hero-actions">
+          <a class="btn yellow large" href="/pedir">Ordenar ahora</a>
+          <a class="btn dark large" href="#menu">Ver menú</a>
         </div>
-        <div class="hero-stats">
-          <div><strong>100%</strong><span>Sabor artesanal</span></div>
-          <div><strong>Rápido</strong><span>Pedido en línea</span></div>
-          <div><strong>Fresco</strong><span>Hecho al momento</span></div>
+
+        <div class="benefits">
+          <div><b>100%</b><small>Sabor artesanal</small></div>
+          <div><b>Rápido</b><small>Pedido en línea</small></div>
+          <div><b>Fresco</b><small>Hecho al momento</small></div>
         </div>
       </div>
 
-      <div class="hero-visual">
-        <div class="yellow-disc"></div>
-        <img class="hero-burger" src="/media/sandwich.png" alt="Hamburguesa Mordisco">
-        <div class="floating-tag tag-left">🔥 La favorita</div>
-        <div class="floating-tag tag-right">⭐ Sabor premium</div>
+      <div class="hero-art">
+        <div class="circle"></div>
+        <img class="burger" src="/media/hamburguesa.png" alt="Hamburguesa Mordisco">
+        <div class="badge badge-left">🔥 La favorita</div>
+        <div class="badge badge-right">⭐ Sabor premium</div>
       </div>
     </section>
 
-    <div class="category-strip">
-      <span>HAMBURGUESAS</span><b>✦</b>
-      <span>SÁNDWICHES</span><b>✦</b>
-      <span>PAPAS</span><b>✦</b>
-      <span>BEBIDAS</span><b>✦</b>
+    <div class="categories">
+      <span>HAMBURGUESAS</span><i>✦</i>
+      <span>SÁNDWICHES</span><i>✦</i>
+      <span>PAPAS</span><i>✦</i>
+      <span>BEBIDAS</span><i>✦</i>
       <span>COMBOS</span>
     </div>
 
-    <section class="section" id="menu">
-      <div class="section-heading">
-        <span class="eyebrow">NUESTRO MENÚ</span>
-        <h2>Elige tu próximo mordisco</h2>
-        <p>Consulta todos los productos y arma tu pedido desde el celular o la computadora.</p>
+    <section class="menu-section" id="menu">
+      <div class="section-title">
+        <span>NUESTRO MENÚ</span>
+        <h2>Elige tu próximo Mordisco</h2>
+        <p>Productos preparados al momento, con sabor intenso y calidad que se nota.</p>
       </div>
-      <div class="menu-cards" id="featured-products">
-        <article class="menu-card skeleton">
-          <div class="card-image"></div>
-          <div class="card-content"><h3>Cargando productos...</h3></div>
-        </article>
+      <div id="featured-products" class="products">
+        <article class="product-card loading"><div></div><h3>Cargando productos…</h3></article>
       </div>
-      <div class="center"><a class="btn btn-primary btn-large" href="/pedir">Ver menú completo</a></div>
+      <div class="center"><a class="btn yellow large" href="/pedir">Ver menú completo</a></div>
     </section>
 
-    <section class="about-section" id="nosotros">
+    <section class="brand-block" id="nosotros">
       <div>
-        <span class="eyebrow">HECHO CON ACTITUD</span>
-        <h2>No vendemos comida rápida. Creamos antojos.</h2>
+        <span>NO ES SOLO COMIDA</span>
+        <h2>Es Mordisco.</h2>
       </div>
-      <p>En Mordisco combinamos carne jugosa, ingredientes frescos y sabores intensos para que cada pedido sea memorable.</p>
+      <p>Carne jugosa, queso derretido, vegetales frescos y combinaciones que hacen que quieras volver.</p>
     </section>
 
-    <section class="contact-section" id="contacto">
-      <div>
-        <span class="eyebrow">HAZ TU PEDIDO</span>
-        <h2>¿Listo para darle un mordisco?</h2>
-      </div>
-      <a class="btn btn-primary btn-large" href="/pedir">Pedir ahora →</a>
+    <section class="cta" id="contacto">
+      <div><span>¿LISTO PARA MORDER?</span><h2>Haz tu pedido ahora</h2></div>
+      <a class="btn black large" href="/pedir">Pedir ahora →</a>
     </section>
   </main>
 
   <footer>
-    <div class="brand footer-brand">
+    <div class="logo">
       <img src="/mordisco-logo.png" alt="Mordisco">
-      <span><strong>MORDISCO</strong><small>FAST FOOD</small></span>
+      <span><b>MORDISCO</b><small>FAST FOOD</small></span>
     </div>
-    <p>© 2026 Mordisco Fast Food. Todos los derechos reservados.</p>
+    <p>© 2026 Mordisco Fast Food</p>
     <a href="/admin">Administración</a>
   </footer>
 
-  <script src="/public-site.js?v=20.1.0"></script>
+  <script src="/public-site.js?v=20.2.0"></script>
 </body>
 </html>
