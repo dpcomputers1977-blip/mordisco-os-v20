@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=20.0.0">
+<link rel="stylesheet" href="/admin-v18.css?v=pages-upload-1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 </head>
@@ -570,7 +570,14 @@
       <label>Título<input id="pageTitle" required></label>
       <label>Dirección URL<input id="pageSlug" required placeholder="combo-del-mes"></label>
       <label class="wide">Resumen<textarea id="pageSummary"></textarea></label>
-      <label class="wide">Imagen principal URL<input id="pageHeroImage" placeholder="https://..."></label>
+      <label class="wide">Imagen principal URL<input id="pageHeroImage" placeholder="https://...">
+<div class="page-upload-box">
+  <input id="pageImageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+  <button id="pageImageSelectBtn" class="secondary" type="button">📁 Elegir imagen desde la computadora</button>
+  <button id="pageImageUploadBtn" class="secondary" type="button" disabled>⬆️ Subir imagen</button>
+  <span id="pageImageUploadStatus" class="page-upload-status">Ningún archivo seleccionado</span>
+  <img id="pageImagePreview" class="page-image-preview" alt="Vista previa de la imagen" hidden>
+</div></label>
       <label class="wide">Contenido<textarea id="pageContent" rows="12" required placeholder="Escribe el contenido de la página..."></textarea></label>
       <label>Texto del botón<input id="pageButtonText" placeholder="Pedir ahora"></label>
       <label>Enlace del botón<input id="pageButtonLink" placeholder="/app"></label>
@@ -768,7 +775,7 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=20.0.0"></script>
+<script src="/admin-v18.js?v=pages-upload-1"></script>
 
 
 

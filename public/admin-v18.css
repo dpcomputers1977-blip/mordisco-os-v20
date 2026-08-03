@@ -1206,3 +1206,47 @@ button:disabled{
 .quickDiscounts button:hover{
   background:#ffc400;
 }
+
+/* Subida de imágenes desde la computadora - Páginas */
+.page-upload-box{
+  display:grid;
+  grid-template-columns:max-content max-content 1fr;
+  gap:10px;
+  align-items:center;
+  margin-top:10px;
+  padding:12px;
+  border:1px dashed #d7c7aa;
+  border-radius:12px;
+  background:#fffaf0;
+}
+.page-upload-box .secondary{
+  border:1px solid #d7c7aa;
+  background:#fff;
+  color:#33270f;
+  padding:10px 13px;
+  border-radius:9px;
+  font-weight:800;
+  cursor:pointer;
+}
+.page-upload-box .secondary:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+.page-upload-status{
+  font-size:12px;
+  color:#6d6252;
+}
+.page-image-preview{
+  grid-column:1/-1;
+  width:min(360px,100%);
+  max-height:220px;
+  object-fit:cover;
+  border-radius:10px;
+  border:1px solid #e2d7c3;
+  background:#fff;
+}
+@media(max-width:700px){
+  .page-upload-box{grid-template-columns:1fr}
+  .page-upload-box .secondary{width:100%}
+  .page-image-preview{grid-column:1}
+}

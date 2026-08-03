@@ -1788,3 +1788,131 @@ init();
 
 $$('[data-close="employeeLoginModal"]').forEach(b=>b.onclick=()=>$('#employeeLoginModal').classList.add('hidden'));
 $$('[data-close="tableOrderModal"]').forEach(b=>b.onclick=()=>$('#tableOrderModal').classList.add('hidden'));
+
+
+/* ===== SUBIDA DE IMÁGENES PARA PÁGINAS ===== */
+(function initPageImageUploader(){
+  const STORAGE_BUCKET = 'page-images';
+
+  function getSupabaseClient(){
+    return window.mordiscoSupabaseClient ||
+      window.supabaseClient ||
+      window.sb ||
+      window.supabaseAdmin ||
+      null;
+  }
+
+  function sanitizeFileName(name){
+    return String(name || 'imagen')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/[^a-zA-Z0-9._-]+/g,'-')
+      .replace(/-+/g,'-')
+      .toLowerCase();
+  }
+
+  function setup(){
+    const fileInput = document.querySelector('#pageImageFile');
+    const selectBtn = document.querySelector('#pageImageSelectBtn');
+    const uploadBtn = document.querySelector('#pageImageUploadBtn');
+    const status = document.querySelector('#pageImageUploadStatus');
+    const preview = document.querySelector('#pageImagePreview');
+    const urlInput = document.querySelector('#pageImageUrl') ||
+      document.querySelector('input[name="image_url"]');
+
+    if(!fileInput || !selectBtn || !uploadBtn || !status || !urlInput) return;
+
+    let selectedFile = null;
+
+    selectBtn.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', () => {
+      selectedFile = fileInput.files?.[0] || null;
+      if(!selectedFile){
+        uploadBtn.disabled = true;
+        status.textContent = 'Ningún archivo seleccionado';
+        preview.hidden = true;
+        return;
+      }
+
+      const allowed = ['image/jpeg','image/png','image/webp','image/gif'];
+      if(!allowed.includes(selectedFile.type)){
+        selectedFile = null;
+        fileInput.value = '';
+        uploadBtn.disabled = true;
+        status.textContent = 'Formato no permitido. Usa JPG, PNG, WEBP o GIF.';
+        preview.hidden = true;
+        return;
+      }
+
+      if(selectedFile.size > 5 * 1024 * 1024){
+        selectedFile = null;
+        fileInput.value = '';
+        uploadBtn.disabled = true;
+        status.textContent = 'La imagen supera 5 MB.';
+        preview.hidden = true;
+        return;
+      }
+
+      uploadBtn.disabled = false;
+      status.textContent = `${selectedFile.name} · ${(selectedFile.size/1024/1024).toFixed(2)} MB`;
+      preview.src = URL.createObjectURL(selectedFile);
+      preview.hidden = false;
+    });
+
+    uploadBtn.addEventListener('click', async () => {
+      if(!selectedFile) return;
+
+      const client = getSupabaseClient();
+      if(!client){
+        status.textContent = 'No se encontró la conexión con Supabase.';
+        return;
+      }
+
+      uploadBtn.disabled = true;
+      selectBtn.disabled = true;
+      status.textContent = 'Subiendo imagen…';
+
+      try{
+        const ext = selectedFile.name.split('.').pop() || 'jpg';
+        const base = sanitizeFileName(selectedFile.name.replace(/\.[^.]+$/,''));
+        const path = `pages/${Date.now()}-${base}.${ext.toLowerCase()}`;
+
+        const { error: uploadError } = await client.storage
+          .from(STORAGE_BUCKET)
+          .upload(path, selectedFile, {
+            cacheControl: '3600',
+            upsert: false,
+            contentType: selectedFile.type
+          });
+
+        if(uploadError) throw uploadError;
+
+        const { data } = client.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+        if(!data?.publicUrl) throw new Error('No se pudo obtener la URL pública.');
+
+        urlInput.value = data.publicUrl;
+        urlInput.dispatchEvent(new Event('input', { bubbles:true }));
+        urlInput.dispatchEvent(new Event('change', { bubbles:true }));
+
+        status.textContent = 'Imagen subida correctamente.';
+        status.style.color = '#147a32';
+      }catch(error){
+        console.error('Error al subir imagen de página:', error);
+        const msg = String(error?.message || 'Error desconocido');
+        status.textContent = /bucket not found/i.test(msg)
+          ? 'Falta crear el bucket page-images en Supabase Storage.'
+          : `No se pudo subir: ${msg}`;
+        status.style.color = '#a1261d';
+      }finally{
+        uploadBtn.disabled = false;
+        selectBtn.disabled = false;
+      }
+    });
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', setup, { once:true });
+  }else{
+    setup();
+  }
+})();

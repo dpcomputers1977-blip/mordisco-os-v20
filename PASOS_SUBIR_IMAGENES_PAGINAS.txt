@@ -1,0 +1,17 @@
+MORDISCO OS — SUBIR IMÁGENES EN PÁGINAS
+
+1. Copia este proyecto dentro de Documentos\GitHub\mordisco-os-v20.
+2. Reemplaza archivos.
+3. GitHub Desktop:
+   Summary: Subida de imágenes en páginas
+   Commit to main
+   Push origin
+4. Espera Vercel Ready.
+5. Supabase > SQL Editor:
+   ejecuta 02_STORAGE_IMAGENES_PAGINAS.sql una sola vez.
+6. Abre Administración > Páginas.
+7. Pulsa “Elegir imagen desde la computadora”.
+8. Selecciona JPG, PNG, WEBP o GIF de máximo 5 MB.
+9. Pulsa “Subir imagen”.
+10. La URL aparecerá automáticamente en Imagen principal URL.
+11. Guarda la página.
