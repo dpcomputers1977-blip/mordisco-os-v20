@@ -1,8 +1,8 @@
-const CACHE_NAME='mordisco-production-install-fix-1';
+const CACHE_NAME='mordisco-whatsapp-dynamic-v1';
 const STATIC_ASSETS=[
   '/',
   '/public-site.css?v=production-1',
-  '/public-site.js?v=production-install-fix-1',
+  '/public-site.js?v=whatsapp-dynamic-1',
   '/mordisco-logo.png',
   '/icon-192.png',
   '/icon-512.png',

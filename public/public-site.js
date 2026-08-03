@@ -286,3 +286,67 @@ mobileSections.forEach(id=>{
   const node=document.getElementById(id);
   if(node)mobileSectionObserver.observe(node);
 });
+
+
+/* ===== WHATSAPP DINÁMICO DESDE CONFIGURACIÓN DEL NEGOCIO ===== */
+function normalizeWhatsappNumber(value){
+  return String(value || '').replace(/\D/g,'');
+}
+
+function buildWhatsappUrl(number,message=''){
+  const phone=normalizeWhatsappNumber(number);
+  const text=encodeURIComponent(message || 'Hola Mordisco Fast Food, deseo realizar un pedido.');
+  return phone ? `https://wa.me/${phone}?text=${text}` : '#';
+}
+
+async function loadDynamicWhatsapp(){
+  try{
+    const client=window.mordiscoSupabaseClient ||
+      window.supabaseClient ||
+      window.db ||
+      null;
+
+    if(!client) throw new Error('No se encontró la conexión con Supabase.');
+
+    const {data,error}=await client
+      .from('business_settings')
+      .select('whatsapp,name')
+      .limit(1)
+      .maybeSingle();
+
+    if(error) throw error;
+
+    const phone=normalizeWhatsappNumber(data?.whatsapp);
+    if(!phone) throw new Error('No hay número de WhatsApp configurado.');
+
+    const message=`Hola ${data?.name || 'Mordisco Fast Food'}, deseo realizar un pedido.`;
+    const url=buildWhatsappUrl(phone,message);
+
+    document.querySelectorAll(
+      'a[href*="wa.me"], .whatsapp-button, [data-whatsapp-link], #whatsappButton'
+    ).forEach(link=>{
+      link.href=url;
+      link.target='_blank';
+      link.rel='noopener noreferrer';
+      link.dataset.dynamicWhatsapp='1';
+    });
+
+    window.MORDISCO_WHATSAPP=phone;
+  }catch(error){
+    console.warn('WhatsApp dinámico:',error);
+    document.querySelectorAll(
+      'a[href*="wa.me"], .whatsapp-button, [data-whatsapp-link], #whatsappButton'
+    ).forEach(link=>{
+      link.addEventListener('click',event=>{
+        event.preventDefault();
+        alert('El número de WhatsApp no está disponible temporalmente.');
+      },{once:true});
+    });
+  }
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',loadDynamicWhatsapp,{once:true});
+}else{
+  loadDynamicWhatsapp();
+}

@@ -1,0 +1,22 @@
+CORRECCIÓN WHATSAPP DINÁMICO
+
+Problema corregido:
+El número 593999999999 estaba escrito directamente en el código.
+
+Ahora:
+- El botón flotante lee el campo WhatsApp de Administrador > Negocio.
+- La página de pedidos usa el mismo número.
+- Si cambias el número en Negocio, la web se actualiza sin modificar código.
+
+PUBLICAR:
+1. Copia todo dentro de Documentos\GitHub\mordisco-os-v20.
+2. Reemplaza archivos.
+3. GitHub Desktop:
+   Summary: WhatsApp dinámico desde Negocio
+4. Commit to main.
+5. Push origin.
+6. Espera Vercel Ready.
+7. Cierra y vuelve a abrir la página en el teléfono.
+
+Número actualmente configurado:
+593959005534

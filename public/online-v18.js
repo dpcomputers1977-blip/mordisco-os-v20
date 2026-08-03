@@ -224,3 +224,37 @@ async function loadOnlineBusinessHours(){
 }
 
 document.addEventListener('DOMContentLoaded',loadOnlineBusinessHours);
+
+
+/* ===== WHATSAPP DINÁMICO PARA PEDIDOS EN LÍNEA ===== */
+async function loadOnlineWhatsapp(){
+  try{
+    const {data,error}=await db
+      .from('business_settings')
+      .select('whatsapp,name')
+      .limit(1)
+      .maybeSingle();
+
+    if(error) throw error;
+
+    const phone=String(data?.whatsapp || '').replace(/\D/g,'');
+    if(!phone) return;
+
+    window.MORDISCO_WHATSAPP=phone;
+
+    document.querySelectorAll('a[href*="wa.me"], [data-whatsapp-link]').forEach(link=>{
+      const text=encodeURIComponent(`Hola ${data?.name || 'Mordisco Fast Food'}, necesito ayuda con mi pedido.`);
+      link.href=`https://wa.me/${phone}?text=${text}`;
+      link.target='_blank';
+      link.rel='noopener noreferrer';
+    });
+  }catch(error){
+    console.warn('No se pudo cargar WhatsApp:',error);
+  }
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',loadOnlineWhatsapp,{once:true});
+}else{
+  loadOnlineWhatsapp();
+}
