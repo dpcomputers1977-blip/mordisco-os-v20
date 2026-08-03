@@ -302,9 +302,12 @@ function buildWhatsappUrl(number,message=''){
 async function loadDynamicWhatsapp(){
   try{
     const client=window.mordiscoSupabaseClient ||
-      window.supabaseClient ||
-      window.db ||
-      null;
+      (window.supabase && window.MORDISCO_SUPABASE
+        ? window.supabase.createClient(
+            window.MORDISCO_SUPABASE.url,
+            window.MORDISCO_SUPABASE.anonKey
+          )
+        : null);
 
     if(!client) throw new Error('No se encontró la conexión con Supabase.');
 

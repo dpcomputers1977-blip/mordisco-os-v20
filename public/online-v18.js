@@ -229,7 +229,8 @@ document.addEventListener('DOMContentLoaded',loadOnlineBusinessHours);
 /* ===== WHATSAPP DINÁMICO PARA PEDIDOS EN LÍNEA ===== */
 async function loadOnlineWhatsapp(){
   try{
-    const {data,error}=await db
+    const client=window.mordiscoSupabaseClient || db;
+    const {data,error}=await client
       .from('business_settings')
       .select('whatsapp,name')
       .limit(1)

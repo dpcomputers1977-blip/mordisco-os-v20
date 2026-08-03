@@ -1,0 +1,36 @@
+CORRECCIÓN DEFINITIVA DE WHATSAPP
+
+NO SE TOCAN:
+- Productos
+- Categorías
+- Precios
+- Imágenes
+- Inventario
+- Ventas
+- Pedidos
+- Empleados
+- Contabilidad
+
+PUBLICAR
+1. Extrae este ZIP.
+2. Copia todo dentro de:
+   Documentos\GitHub\mordisco-os-v20
+3. Reemplaza los archivos.
+4. GitHub Desktop:
+   Summary: Corregir lectura pública de WhatsApp
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+
+ACTIVAR PERMISO
+1. Supabase > SQL Editor.
+2. Abre 05_WHATSAPP_CONFIGURACION_PUBLICA.sql.
+3. Copia TODO.
+4. Pega en una consulta nueva.
+5. Pulsa Run una sola vez.
+
+PRUEBA
+1. Cierra la página de Mordisco.
+2. Vuelve a abrir mordiscofastfood.com.
+3. Pulsa el botón verde de WhatsApp.
+4. Debe abrir el número guardado en Negocio.

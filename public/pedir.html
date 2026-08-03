@@ -7,6 +7,16 @@
   <title>Pedir | Mordisco Fast Food</title>
   <link rel="stylesheet" href="/online-v18.css?v=orange-premium-1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    window.MORDISCO_SUPABASE = {
+      url: 'https://nmmjthqflxwucpmmmrks.supabase.co',
+      anonKey: 'sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0'
+    };
+    window.mordiscoSupabaseClient = window.supabase.createClient(
+      window.MORDISCO_SUPABASE.url,
+      window.MORDISCO_SUPABASE.anonKey
+    );
+  </script>
 </head>
 <body>
 <header class="orderTopbar">
@@ -65,6 +75,6 @@
 </main>
 
 <div id="onlineToast" class="onlineToast"></div>
-<script src="/online-v18.js?v=whatsapp-dynamic-1"></script>
+<script src="/online-v18.js?v=whatsapp-public-fix-1"></script>
 </body>
 </html>
