@@ -93,3 +93,97 @@ document.addEventListener('DOMContentLoaded', () => {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
 });
+
+
+/* ===== HORARIOS PÚBLICOS ===== */
+const PUBLIC_WEEK_DAYS=[
+  {day:1,label:'Lunes'},{day:2,label:'Martes'},{day:3,label:'Miércoles'},
+  {day:4,label:'Jueves'},{day:5,label:'Viernes'},{day:6,label:'Sábado'},
+  {day:0,label:'Domingo'}
+];
+
+function minutesFromTime(value){
+  const [hour,minute]=String(value||'00:00').slice(0,5).split(':').map(Number);
+  return hour*60+minute;
+}
+
+function getBusinessStatus(rows,date=new Date()){
+  const day=date.getDay();
+  const current=date.getHours()*60+date.getMinutes();
+  const today=rows.find(x=>Number(x.day_of_week)===day);
+  if(!today || today.closed)return {open:false,today,nextText:'Hoy estamos cerrados'};
+
+  const opens=minutesFromTime(today.opens_at);
+  const closes=minutesFromTime(today.closes_at);
+  const open=current>=opens && current<closes;
+  return {
+    open,
+    today,
+    nextText:open
+      ? `Abierto ahora · cerramos a las ${String(today.closes_at).slice(0,5)}`
+      : current<opens
+        ? `Abrimos hoy a las ${String(today.opens_at).slice(0,5)}`
+        : `Ya cerramos por hoy`
+  };
+}
+
+function findNextOpening(rows,date=new Date()){
+  for(let offset=0;offset<8;offset++){
+    const candidate=new Date(date);
+    candidate.setDate(date.getDate()+offset);
+    const row=rows.find(x=>Number(x.day_of_week)===candidate.getDay());
+    if(!row || row.closed)continue;
+    const nowMinutes=date.getHours()*60+date.getMinutes();
+    if(offset===0 && nowMinutes>=minutesFromTime(row.opens_at))continue;
+    const label=offset===0?'hoy':offset===1?'mañana':PUBLIC_WEEK_DAYS.find(x=>x.day===candidate.getDay())?.label.toLowerCase();
+    return `Volvemos a abrir ${label} a las ${String(row.opens_at).slice(0,5)}`;
+  }
+  return 'Consulta nuevamente más tarde';
+}
+
+async function loadPublicBusinessHours(){
+  const list=document.querySelector('#publicBusinessHours');
+  const statusNode=document.querySelector('#publicBusinessStatus');
+  if(!list || !statusNode)return;
+
+  try{
+    const cfg=window.MORDISCO_SUPABASE || window.SUPABASE_CONFIG || {};
+    const client=window.mordiscoSupabaseClient ||
+      (window.supabase && cfg.url && cfg.anonKey
+        ? window.supabase.createClient(cfg.url,cfg.anonKey)
+        : null);
+
+    if(!client)throw new Error('No se encontró la conexión');
+
+    const {data,error}=await client.from('business_hours').select('*').order('sort_order');
+    if(error)throw error;
+    const rows=data||[];
+
+    const currentDay=new Date().getDay();
+    list.innerHTML=PUBLIC_WEEK_DAYS.map(item=>{
+      const row=rows.find(x=>Number(x.day_of_week)===item.day);
+      const text=!row || row.closed
+        ? 'Cerrado'
+        : `${String(row.opens_at).slice(0,5)} – ${String(row.closes_at).slice(0,5)}`;
+      return `<div class="public-hour-row ${item.day===currentDay?'today':''}">
+        <strong>${item.label}</strong>
+        <span>${text}</span>
+        <b>${item.day===currentDay?'Hoy':''}</b>
+      </div>`;
+    }).join('');
+
+    const state=getBusinessStatus(rows);
+    statusNode.classList.remove('loading');
+    statusNode.classList.add(state.open?'open':'closed');
+    statusNode.textContent=state.open
+      ? `● ${state.nextText}`
+      : `● ${state.nextText}. ${findNextOpening(rows)}`;
+  }catch(error){
+    console.warn('No se pudieron cargar horarios públicos:',error);
+    list.innerHTML='<div class="hours-loading">Horario no disponible temporalmente.</div>';
+    statusNode.className='business-status closed';
+    statusNode.textContent='Consulta el horario por WhatsApp';
+  }
+}
+
+document.addEventListener('DOMContentLoaded',loadPublicBusinessHours);

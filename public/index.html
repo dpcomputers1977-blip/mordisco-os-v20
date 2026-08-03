@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/mordisco-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="/public-site.css?v=21.0.0">
+  <link rel="stylesheet" href="/public-site.css?v=hours-1">
 </head>
 <body>
   <div class="promo-bar">
@@ -149,7 +149,22 @@
       </div>
     </section>
 
-    <section class="reviews-section section">
+    
+    <section class="hours-section section" id="horarios">
+      <div class="hours-card reveal">
+        <div class="hours-copy">
+          <div class="eyebrow dark"><span></span>HORARIOS DE ATENCIÓN</div>
+          <h2>¿Cuándo puedes pedir?</h2>
+          <p>Consulta nuestros horarios actualizados. Los pedidos en línea se habilitan automáticamente cuando estamos abiertos.</p>
+          <div id="publicBusinessStatus" class="business-status loading">Consultando horario…</div>
+        </div>
+        <div id="publicBusinessHours" class="public-hours-list">
+          <div class="hours-loading">Cargando horarios…</div>
+        </div>
+      </div>
+    </section>
+
+<section class="reviews-section section">
       <div class="section-heading reveal">
         <div class="eyebrow dark"><span></span>LO QUE DICEN</div>
         <h2>Clientes con ganas de volver</h2>
@@ -203,6 +218,6 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/public-site.js?v=21.0.0"></script>
+  <script src="/public-site.js?v=hours-1"></script>
 </body>
 </html>

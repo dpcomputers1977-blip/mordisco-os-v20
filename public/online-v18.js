@@ -147,3 +147,80 @@ document.querySelector("#onlineOrderForm").onsubmit=async event=>{
 };
 
 load();
+
+/* ===== BLOQUEO AUTOMÁTICO POR HORARIO ===== */
+let onlineBusinessOpen=true;
+let onlineBusinessHours=[];
+
+function onlineMinutes(value){
+  const [h,m]=String(value||'00:00').slice(0,5).split(':').map(Number);
+  return h*60+m;
+}
+
+function onlineStatus(rows,date=new Date()){
+  const row=rows.find(x=>Number(x.day_of_week)===date.getDay());
+  if(!row || row.closed)return {open:false,text:'Hoy no atendemos pedidos en línea.'};
+  const current=date.getHours()*60+date.getMinutes();
+  const opens=onlineMinutes(row.opens_at);
+  const closes=onlineMinutes(row.closes_at);
+  if(current<opens)return {open:false,text:`Abrimos hoy a las ${String(row.opens_at).slice(0,5)}.`};
+  if(current>=closes)return {open:false,text:`Ya cerramos por hoy. El horario fue hasta las ${String(row.closes_at).slice(0,5)}.`};
+  return {open:true,text:`Abierto hasta las ${String(row.closes_at).slice(0,5)}.`};
+}
+
+function nextOnlineOpening(rows,date=new Date()){
+  for(let offset=0;offset<8;offset++){
+    const candidate=new Date(date);
+    candidate.setDate(date.getDate()+offset);
+    const row=rows.find(x=>Number(x.day_of_week)===candidate.getDay());
+    if(!row || row.closed)continue;
+    const current=date.getHours()*60+date.getMinutes();
+    if(offset===0 && current>=onlineMinutes(row.opens_at))continue;
+    const dayName=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'][candidate.getDay()];
+    return `${offset===0?'Hoy':offset===1?'Mañana':dayName} abrimos a las ${String(row.opens_at).slice(0,5)}.`;
+  }
+  return '';
+}
+
+function applyOnlineOrderingState(){
+  const state=onlineStatus(onlineBusinessHours);
+  onlineBusinessOpen=state.open;
+
+  const banner=document.querySelector('#onlineClosedBanner');
+  const text=document.querySelector('#onlineClosedText');
+  const submit=document.querySelector('#onlineSubmit');
+  const products=document.querySelector('.onlineProducts') || document.querySelector('#onlineProducts');
+
+  if(state.open){
+    banner?.classList.add('hidden');
+    if(submit)submit.disabled=false;
+    products?.classList.remove('onlineOrderingLocked');
+  }else{
+    banner?.classList.remove('hidden');
+    if(text)text.textContent=`${state.text} ${nextOnlineOpening(onlineBusinessHours)}`;
+    if(submit)submit.disabled=true;
+    products?.classList.add('onlineOrderingLocked');
+  }
+}
+
+async function loadOnlineBusinessHours(){
+  try{
+    const {data,error}=await db.from('business_hours').select('*').order('sort_order');
+    if(error)throw error;
+    onlineBusinessHours=data||[];
+    applyOnlineOrderingState();
+    setInterval(applyOnlineOrderingState,60000);
+  }catch(error){
+    console.warn('Horarios no disponibles:',error);
+    onlineBusinessOpen=false;
+    onlineBusinessHours=[];
+    const banner=document.querySelector('#onlineClosedBanner');
+    const text=document.querySelector('#onlineClosedText');
+    banner?.classList.remove('hidden');
+    if(text)text.textContent='No se pudo comprobar el horario. Intenta nuevamente o contáctanos.';
+    const submit=document.querySelector('#onlineSubmit');
+    if(submit)submit.disabled=true;
+  }
+}
+
+document.addEventListener('DOMContentLoaded',loadOnlineBusinessHours);

@@ -11,3 +11,42 @@
 }
 .onlinePaymentInfo b{display:block;margin-bottom:4px}
 .onlinePaymentInfo p{margin:0}
+
+.onlineClosedBanner{
+  max-width:1180px;
+  margin:0 auto 18px;
+  padding:16px 18px;
+  border-radius:14px;
+  background:#ffe4df;
+  border:1px solid #f2b6ad;
+  color:#8f241b;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+}
+.onlineClosedBanner b{font-size:15px}
+.onlineClosedBanner p{margin:5px 0 0;font-size:12px;line-height:1.5}
+.onlineClosedBanner .secondary{
+  white-space:nowrap;
+  text-decoration:none;
+}
+.onlineOrderingLocked{
+  position:relative;
+}
+.onlineOrderingLocked:after{
+  content:'Fuera del horario de atención';
+  position:absolute;
+  inset:0;
+  background:rgba(255,255,255,.72);
+  backdrop-filter:blur(2px);
+  display:grid;
+  place-items:center;
+  border-radius:18px;
+  color:#8f241b;
+  font-weight:900;
+  z-index:8;
+}
+@media(max-width:650px){
+  .onlineClosedBanner{flex-direction:column;align-items:flex-start}
+}
