@@ -50,3 +50,58 @@
 @media(max-width:650px){
   .onlineClosedBanner{flex-direction:column;align-items:flex-start}
 }
+
+/* EXTRAS Y EMPAQUES EN PEDIDOS */
+.onlineExtrasPanel{
+  padding:14px;
+  border-radius:14px;
+  background:#fff8e8;
+  border:1px solid #ead8b4;
+}
+.onlinePanelTitle{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+.onlinePanelTitle b{display:block;font-size:14px}
+.onlinePanelTitle small{display:block;color:#746856;margin-top:3px}
+.onlineExtraOptions{display:grid;gap:10px}
+.onlineExtraGroup{display:grid;gap:8px}
+.onlineExtraGroup h4{
+  margin:0;
+  font-size:12px;
+  color:#744700;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+.onlineExtraOption{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:10px;
+  align-items:center;
+  padding:11px;
+  border-radius:11px;
+  background:#fff;
+  border:1px solid #eadfce;
+}
+.onlineExtraOption input{
+  width:20px;
+  height:20px;
+}
+.onlineExtraOption strong{display:block;font-size:13px}
+.onlineExtraOption small{display:block;color:#756a59;margin-top:2px}
+.onlineExtraPrice{
+  font-weight:900;
+  color:#9a5200;
+  white-space:nowrap;
+}
+.onlineExtraLoading{
+  padding:14px;
+  text-align:center;
+  color:#756957;
+}
+@media(max-width:560px){
+  .onlineExtraOption{grid-template-columns:auto 1fr}
+  .onlineExtraPrice{grid-column:2}
+}

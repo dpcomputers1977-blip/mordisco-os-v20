@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=finance-hours-1">
+<link rel="stylesheet" href="/admin-v18.css?v=extras-packaging-1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 </head>
@@ -48,7 +48,8 @@
 </main>
 
 <section id="adminView" class="hidden adminShell">
- <aside class="sidebar"><img src="media/logo.png" alt="Mordisco"><button data-tab="dashboard"><span>▦</span> Resumen</button><button data-tab="products" class="active"><span>🍔</span> Productos</button><button data-tab="categories"><span>▤</span> Categorías</button><button data-tab="orders"><span>🌐</span> Pedidos web</button><button data-tab="kitchen"><span>♨</span> Cocina</button><button data-tab="pos"><span>▣</span> POS / Caja</button><button data-tab="inventory"><span>◇</span> Inventario</button><button data-tab="tables"><span>🍽</span> Mesas</button><button data-tab="shifts"><span>🕒</span> Turnos</button><button data-tab="finance"><span>💰</span> Contabilidad</button><button data-tab="customers"><span>👤</span> Clientes</button><button data-tab="promotions"><span>🎁</span> Promociones</button><button data-tab="pages"><span>📄</span> Páginas</button><button data-tab="staff"><span>👥</span> Personal</button><button data-tab="settings"><span>⚙</span> Negocio</button><button id="logoutBtn"><span>↪</span> Cerrar sesión</button><button id="backToStore"><span>↗</span> Ver página</button></aside>
+ <aside class="sidebar"><img src="media/logo.png" alt="Mordisco"><button data-tab="dashboard"><span>▦</span> Resumen</button><button data-tab="products" class="active"><span>🍔</span> Productos</button><button data-tab="categories"><span>▤</span> Categorías</button><button data-tab="orders"><span>🌐</span> Pedidos web</button><button data-tab="kitchen"><span>♨</span> Cocina</button><button data-tab="pos"><span>▣</span> POS / Caja</button><button data-tab="inventory"><span>◇</span> Inventario</button><button data-tab="tables"><span>🍽</span> Mesas</button><button data-tab="shifts"><span>🕒</span> Turnos</button><button data-tab="finance"><span>💰</span> Contabilidad</button><button data-tab="customers"><span>👤</span> Clientes</button><button data-tab="promotions"><span>🎁</span> Promociones</button><button data-tab="pages"><span>📄</span> Páginas</button><button data-tab="staff"><span>👥</span> Personal</button><button data-tab="extras">➕ Extras y empaques</button>
+<button data-tab="settings"><span>⚙</span> Negocio</button><button id="logoutBtn"><span>↪</span> Cerrar sesión</button><button id="backToStore"><span>↗</span> Ver página</button></aside>
  <div class="adminContent">
    <div class="adminTop"><div><span class="eyebrow">MORDISCO OS V18</span><h1 id="adminTitle">Productos</h1></div><span class="cloudStatus">● Conectado a Supabase</span></div>
    <section id="tab-dashboard" class="tab hidden">
@@ -721,7 +722,71 @@
       </div>
     </section>
 
-   <section id="tab-settings" class="tab hidden">
+   
+<section id="tab-extras" class="tab hidden">
+  <div class="dashboardGrid extrasGrid">
+    <form id="extraOptionForm" class="panel formGrid">
+      <input type="hidden" id="extraOptionId">
+      <h3 class="wide">Crear extra o empaque</h3>
+
+      <label>Nombre
+        <input id="extraOptionName" required placeholder="Ej. Extra queso">
+      </label>
+
+      <label>Tipo
+        <select id="extraOptionType">
+          <option value="extra">Extra de producto</option>
+          <option value="packaging">Empaque especial</option>
+        </select>
+      </label>
+
+      <label>Precio adicional
+        <input id="extraOptionPrice" type="number" min="0" step="0.01" required>
+      </label>
+
+      <label>Categoría
+        <select id="extraOptionCategory">
+          <option value="">Todas las categorías</option>
+        </select>
+      </label>
+
+      <label class="wide">Descripción
+        <textarea id="extraOptionDescription" placeholder="Ej. Queso cheddar adicional"></textarea>
+      </label>
+
+      <label>Orden
+        <input id="extraOptionOrder" type="number" min="0" value="0">
+      </label>
+
+      <label class="check">
+        <input id="extraOptionActive" type="checkbox" checked>
+        Disponible para clientes
+      </label>
+
+      <label class="check">
+        <input id="extraOptionFeatured" type="checkbox">
+        Destacado
+      </label>
+
+      <div class="wide">
+        <button class="primary">Guardar opción</button>
+        <button type="button" class="dark" id="clearExtraOption">Limpiar</button>
+      </div>
+    </form>
+
+    <section class="panel">
+      <div class="panelTitle">
+        <div>
+          <h3>Extras y empaques disponibles</h3>
+          <small>Estas opciones aparecerán automáticamente en Pedir en línea.</small>
+        </div>
+      </div>
+      <div id="extraOptionsList" class="extraOptionsList"></div>
+    </section>
+  </div>
+</section>
+
+<section id="tab-settings" class="tab hidden">
   <div class="dashboardGrid settingsGrid">
     <form id="settingsForm" class="panel formGrid">
       <h3 class="wide">Información del negocio</h3>
@@ -865,7 +930,7 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=finance-hours-1"></script>
+<script src="/admin-v18.js?v=extras-packaging-1"></script>
 
 
 

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#11100e">
   <title>Pedir | Mordisco Fast Food</title>
-  <link rel="stylesheet" href="/online-v18.css?v=orange-premium-1">
+  <link rel="stylesheet" href="/online-v18.css?v=extras-packaging-1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     window.MORDISCO_SUPABASE = {
@@ -67,6 +67,19 @@
         <b>Pago con tarjeta</b>
         <p>Tu pedido quedará registrado con pago por tarjeta. El negocio te enviará el enlace o realizará el cobro al confirmar.</p>
       </div>
+      
+      <section class="onlineExtrasPanel">
+        <div class="onlinePanelTitle">
+          <div>
+            <b>Personaliza tu pedido</b>
+            <small>Selecciona extras y empaques especiales.</small>
+          </div>
+        </div>
+        <div id="onlineExtraOptions" class="onlineExtraOptions">
+          <div class="onlineExtraLoading">Cargando opciones…</div>
+        </div>
+      </section>
+
       <label>Notas<textarea id="onlineNotes" placeholder="Sin cebolla, punto de referencia, número de comprobante…"></textarea></label>
       <button id="sendOnlineOrder" type="submit">Enviar pedido</button>
       <p class="onlineNotice" id="onlinePaymentNotice">Selecciona el método de pago que prefieras.</p>
@@ -75,6 +88,6 @@
 </main>
 
 <div id="onlineToast" class="onlineToast"></div>
-<script src="/online-v18.js?v=menu-whatsapp-final-1"></script>
+<script src="/online-v18.js?v=extras-packaging-1"></script>
 </body>
 </html>

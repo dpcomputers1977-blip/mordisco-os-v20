@@ -1278,3 +1278,41 @@ button:disabled{
   .businessHourRow{grid-template-columns:1fr 1fr}
   .businessHourRow strong{grid-column:1/-1}
 }
+
+/* EXTRAS Y EMPAQUES */
+.extrasGrid{grid-template-columns:minmax(360px,.75fr) minmax(520px,1.25fr)}
+.extraOptionsList{display:grid;gap:12px;margin-top:16px}
+.extraOptionCard{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:14px;
+  align-items:center;
+  padding:15px;
+  border:1px solid #e5dac7;
+  border-radius:14px;
+  background:#fffaf1;
+}
+.extraOptionCard h4{margin:0 0 5px}
+.extraOptionCard small{display:block;color:#756957}
+.extraOptionMeta{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+.extraOptionMeta span{
+  padding:5px 8px;
+  border-radius:999px;
+  background:#fff;
+  border:1px solid #eadfce;
+  font-size:10px;
+  font-weight:800;
+}
+.extraOptionActions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+@media(max-width:950px){
+  .extrasGrid{grid-template-columns:1fr}
+}
+@media(max-width:620px){
+  .extraOptionCard{grid-template-columns:1fr}
+  .extraOptionActions{justify-content:flex-start}
+}

@@ -13,7 +13,7 @@ const SUPABASE_URL='https://nmmjthqflxwucpmmmrks.supabase.co';
 const SUPABASE_KEY='sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0';
 const db=window.mordiscoSupabaseClient||window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 window.mordiscoSupabaseClient=db;
-let products=[],categories=[],settings={},orders=[],cart=[],posCart=[],ingredients=[],inventoryMovements=[],recipes=[],staffMembers=[],tables=[],tableCart=[],currentTable=null,currentEmployee=null,currentShift=null,shifts=[],financeMovements=[],financeAccounts=[],businessHours=[],customers=[],promotions=[],contentPages=[],isAdminSession=false,shiftAction='start',selectedCategory='Todos',editingImage='',adminProductQuery='',adminProductFilter='all',orderStatusFilter='all',ordersChannel=null,lastKnownOrderIds=new Set(),kitchenTimerHandle=null,lastReceiptOrder=null,paymentOrderId=null,posDiscountType='none',posDiscountValue=0;
+let products=[],categories=[],settings={},orders=[],cart=[],posCart=[],ingredients=[],inventoryMovements=[],recipes=[],staffMembers=[],tables=[],tableCart=[],currentTable=null,currentEmployee=null,currentShift=null,shifts=[],financeMovements=[],financeAccounts=[],businessHours=[],customers=[],promotions=[],contentPages=[],extraOptions=[],isAdminSession=false,shiftAction='start',selectedCategory='Todos',editingImage='',adminProductQuery='',adminProductFilter='all',orderStatusFilter='all',ordersChannel=null,lastKnownOrderIds=new Set(),kitchenTimerHandle=null,lastReceiptOrder=null,paymentOrderId=null,posDiscountType='none',posDiscountValue=0;
 const $$=s=>[...document.querySelectorAll(s)];
 const missingElementProxy=new Proxy({},{
   get(_target,property){
@@ -2141,3 +2141,149 @@ fillSettings=function(){
   loadBusinessHours();
 };
 resetFinanceAccount();
+
+
+/* ===== EXTRAS Y EMPAQUES ===== */
+async function loadExtraOptions(){
+  const {data,error}=await db
+    .from('extra_options')
+    .select('*,categories(id,name)')
+    .order('sort_order',{ascending:true})
+    .order('name',{ascending:true});
+
+  if(error){
+    console.warn('Extras:',error.message);
+    extraOptions=[];
+    if($('#extraOptionsList')){
+      $('#extraOptionsList').innerHTML='<div class="emptyState">Ejecuta el SQL 06 para activar extras y empaques.</div>';
+    }
+    return;
+  }
+
+  extraOptions=data||[];
+  renderExtraOptions();
+  fillExtraCategoryOptions();
+}
+
+function fillExtraCategoryOptions(){
+  const select=$('#extraOptionCategory');
+  if(!select)return;
+  const current=select.value;
+  select.innerHTML='<option value="">Todas las categorías</option>'+
+    categories.filter(x=>x.active!==false).map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('');
+  if([...select.options].some(o=>o.value===current))select.value=current;
+}
+
+function extraTypeLabel(type){
+  return type==='packaging'?'Empaque especial':'Extra de producto';
+}
+
+function renderExtraOptions(){
+  const node=$('#extraOptionsList');
+  if(!node)return;
+
+  if(!extraOptions.length){
+    node.innerHTML='<div class="emptyState">No hay extras ni empaques creados.</div>';
+    return;
+  }
+
+  node.innerHTML=extraOptions.map(option=>`
+    <article class="extraOptionCard">
+      <div>
+        <h4>${esc(option.name)}</h4>
+        <small>${esc(option.description||'Sin descripción')}</small>
+        <div class="extraOptionMeta">
+          <span>${extraTypeLabel(option.option_type)}</span>
+          <span>${money(option.price)}</span>
+          <span>${option.categories?.name ? esc(option.categories.name) : 'Todas las categorías'}</span>
+          <span>${option.active?'Disponible':'Oculto'}</span>
+          ${option.featured?'<span>Destacado</span>':''}
+        </div>
+      </div>
+      <div class="extraOptionActions">
+        <button data-extra-edit="${option.id}">Editar</button>
+        <button data-extra-toggle="${option.id}" class="${option.active?'warning':'primary'}">${option.active?'Ocultar':'Publicar'}</button>
+        <button data-extra-delete="${option.id}" class="danger">Eliminar</button>
+      </div>
+    </article>
+  `).join('');
+
+  $$('[data-extra-edit]').forEach(btn=>btn.onclick=()=>editExtraOption(btn.dataset.extraEdit));
+  $$('[data-extra-toggle]').forEach(btn=>btn.onclick=()=>toggleExtraOption(btn.dataset.extraToggle));
+  $$('[data-extra-delete]').forEach(btn=>btn.onclick=()=>deleteExtraOption(btn.dataset.extraDelete));
+}
+
+function resetExtraOptionForm(){
+  $('#extraOptionForm')?.reset();
+  if($('#extraOptionId'))$('#extraOptionId').value='';
+  if($('#extraOptionActive'))$('#extraOptionActive').checked=true;
+  if($('#extraOptionOrder'))$('#extraOptionOrder').value=0;
+}
+
+function editExtraOption(id){
+  const option=extraOptions.find(x=>String(x.id)===String(id));
+  if(!option)return;
+
+  $('#extraOptionId').value=option.id;
+  $('#extraOptionName').value=option.name||'';
+  $('#extraOptionType').value=option.option_type||'extra';
+  $('#extraOptionPrice').value=option.price||0;
+  $('#extraOptionCategory').value=option.category_id||'';
+  $('#extraOptionDescription').value=option.description||'';
+  $('#extraOptionOrder').value=option.sort_order||0;
+  $('#extraOptionActive').checked=option.active!==false;
+  $('#extraOptionFeatured').checked=!!option.featured;
+}
+
+async function toggleExtraOption(id){
+  const option=extraOptions.find(x=>String(x.id)===String(id));
+  if(!option)return;
+  const {error}=await db.from('extra_options').update({active:!option.active}).eq('id',id);
+  if(error)return toast(error.message);
+  await loadExtraOptions();
+}
+
+async function deleteExtraOption(id){
+  if(!confirm('¿Eliminar esta opción?'))return;
+  const {error}=await db.from('extra_options').delete().eq('id',id);
+  if(error)return toast(error.message);
+  await loadExtraOptions();
+}
+
+$('#extraOptionForm')?.addEventListener('submit',async event=>{
+  event.preventDefault();
+
+  const id=$('#extraOptionId').value;
+  const row={
+    name:$('#extraOptionName').value.trim(),
+    option_type:$('#extraOptionType').value,
+    price:Number($('#extraOptionPrice').value||0),
+    category_id:$('#extraOptionCategory').value||null,
+    description:$('#extraOptionDescription').value.trim(),
+    sort_order:Number($('#extraOptionOrder').value||0),
+    active:$('#extraOptionActive').checked,
+    featured:$('#extraOptionFeatured').checked
+  };
+
+  const query=id
+    ? db.from('extra_options').update(row).eq('id',id)
+    : db.from('extra_options').insert(row);
+
+  const {error}=await query;
+  if(error)return toast(error.message);
+
+  toast('Opción guardada');
+  resetExtraOptionForm();
+  await loadExtraOptions();
+});
+
+$('#clearExtraOption')?.addEventListener('click',resetExtraOptionForm);
+
+/* Cargar extras junto con el resto del administrador */
+const _originalLoadCategoriesForExtras=loadCategories;
+loadCategories=async function(){
+  await _originalLoadCategoriesForExtras();
+  fillExtraCategoryOptions();
+};
+
+document.addEventListener('DOMContentLoaded',loadExtraOptions);

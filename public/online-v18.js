@@ -259,3 +259,106 @@ if(document.readyState==='loading'){
 }else{
   loadOnlineWhatsapp();
 }
+
+
+/* ===== EXTRAS Y EMPAQUES EN PEDIDOS ===== */
+async function loadOnlineExtraOptions(){
+  const node=document.querySelector('#onlineExtraOptions');
+  if(!node)return;
+
+  try{
+    const {data,error}=await db
+      .from('extra_options')
+      .select('*,categories(id,name)')
+      .eq('active',true)
+      .order('featured',{ascending:false})
+      .order('sort_order',{ascending:true})
+      .order('name',{ascending:true});
+
+    if(error)throw error;
+
+    onlineExtraOptions=data||[];
+    renderOnlineExtraOptions();
+  }catch(error){
+    console.warn('Extras:',error);
+    node.innerHTML='<div class="onlineExtraLoading">No hay extras disponibles en este momento.</div>';
+  }
+}
+
+function renderOnlineExtraOptions(){
+  const node=document.querySelector('#onlineExtraOptions');
+  if(!node)return;
+
+  if(!onlineExtraOptions.length){
+    node.innerHTML='<div class="onlineExtraLoading">No hay extras disponibles.</div>';
+    return;
+  }
+
+  const groups=[
+    {type:'extra',label:'Extras'},
+    {type:'packaging',label:'Empaques especiales'}
+  ];
+
+  node.innerHTML=groups.map(group=>{
+    const options=onlineExtraOptions.filter(x=>x.option_type===group.type);
+    if(!options.length)return '';
+
+    return `<div class="onlineExtraGroup">
+      <h4>${group.label}</h4>
+      ${options.map(option=>`
+        <label class="onlineExtraOption">
+          <input
+            type="checkbox"
+            data-extra-option="${option.id}"
+            data-extra-price="${Number(option.price||0)}"
+            data-extra-name="${safe(option.name)}"
+          >
+          <span>
+            <strong>${safe(option.name)}</strong>
+            <small>${safe(option.description||'')}</small>
+          </span>
+          <span class="onlineExtraPrice">+${money(option.price)}</span>
+        </label>
+      `).join('')}
+    </div>`;
+  }).join('');
+
+  node.querySelectorAll('[data-extra-option]').forEach(input=>{
+    input.addEventListener('change',renderCart);
+  });
+}
+
+function selectedOnlineExtras(){
+  return [...document.querySelectorAll('[data-extra-option]:checked')].map(input=>({
+    id:input.dataset.extraOption,
+    name:input.dataset.extraName,
+    price:Number(input.dataset.extraPrice||0)
+  }));
+}
+
+function onlineExtrasTotal(){
+  return selectedOnlineExtras().reduce((sum,item)=>sum+item.price,0);
+}
+
+/* Integrar extras al total existente */
+const _originalCartTotal=cartTotal;
+cartTotal=function(){
+  return _originalCartTotal()+onlineExtrasTotal();
+};
+
+/* Integrar extras al pedido enviado */
+const _originalOnlineSubmit=document.querySelector("#onlineForm")?.onsubmit;
+if(_originalOnlineSubmit){
+  document.querySelector("#onlineForm").onsubmit=async function(event){
+    const extras=selectedOnlineExtras();
+    const notes=document.querySelector("#onlineNotes");
+    if(extras.length && notes){
+      const extraText='Extras seleccionados: '+extras.map(x=>`${x.name} (+$${x.price.toFixed(2)})`).join(', ');
+      const original=notes.value.trim();
+      notes.value=original ? `${original}\n${extraText}` : extraText;
+    }
+    return _originalOnlineSubmit.call(this,event);
+  };
+}
+
+document.addEventListener('DOMContentLoaded',loadOnlineExtraOptions);
