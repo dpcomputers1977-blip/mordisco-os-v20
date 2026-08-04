@@ -1,277 +1,74 @@
-<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#0a0a0a">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Mordisco">
-  <meta name="format-detection" content="telephone=no">
-  <meta name="description" content="Mordisco Fast Food: hamburguesas intensas, promociones y pedidos en línea.">
-  <title>Mordisco Fast Food</title>
-  <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="icon" href="/mordisco-logo.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="/public-site.css?v=staff-access-1">
-</head>
-<body>
-  <div class="promo-bar">
-    <span>🔥 SABOR QUE SE SIENTE</span>
-    <span class="promo-dot">•</span>
-    <span>PEDIDOS EN LÍNEA DISPONIBLES</span>
-  </div>
-
-  <header class="site-header">
-    <a class="brand" href="/" aria-label="Mordisco Fast Food">
-      <img src="/mordisco-logo.png" alt="Mordisco Fast Food">
-      <span><strong>MORDISCO</strong><small>FAST FOOD</small></span>
-    </a>
-
-    <button class="menu-toggle" type="button" aria-label="Abrir menú" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
-
-    <nav class="main-nav" aria-label="Navegación principal">
-      <a href="#inicio">Inicio</a>
-      <a href="#menu">Menú completo</a>
-      <a href="/promociones">Promociones</a>
-      <a href="#nosotros">Nosotros</a>
-      <a href="#contacto">Contacto</a>
-    </nav>
-
-    <div class="header-actions">
-      <a class="btn btn-outline employee-link" href="/acceso-admin">Empleados</a>
-      <a class="btn btn-primary" href="/pedir">Pedir ahora <span>→</span></a>
-    </div>
-  </header>
-
-  <main>
-    <section class="hero" id="inicio">
-      <div class="hero-grid">
-        <div class="hero-copy reveal">
-          <div class="eyebrow"><span></span>MORDISCO FAST FOOD</div>
-          <h1>
-            <span>EL SABOR</span>
-            <span>QUE TE HACE</span>
-            <strong>VOLVER.</strong>
-          </h1>
-          <p>Hamburguesas intensas, ingredientes frescos y pedidos en línea sin complicaciones.</p>
-
-          <div class="hero-actions">
-            <a class="btn btn-primary btn-xl" href="/pedir">Ordenar ahora</a>
-            <a class="btn btn-dark btn-xl" href="#menu">Ver menú</a>
-          </div>
-
-          <div class="hero-proof">
-            <article><b>100%</b><small>Sabor artesanal</small></article>
-            <article><b>Rápido</b><small>Pedido en línea</small></article>
-            <article><b>Fresco</b><small>Hecho al momento</small></article>
-          </div>
-        </div>
-
-        <div class="hero-visual reveal">
-          <div class="hero-glow"></div>
-          <div class="hero-circle"></div>
-          <div class="orbit orbit-one"></div>
-          <div class="orbit orbit-two"></div>
-          <img class="hero-burger" src="/media/hamburguesa.png" alt="Hamburguesa premium Mordisco">
-          <div class="product-badge badge-one"><span>🔥</span><b>La favorita</b></div>
-          <div class="product-badge badge-two"><span>⭐</span><b>Sabor premium</b></div>
-          <div class="price-bubble"><small>Desde</small><strong>$3,50</strong></div>
-        </div>
-      </div>
-
-      <div class="scroll-hint"><span></span>Descubre el menú</div>
-    </section>
-
-    <div class="category-marquee" aria-hidden="true">
-      <div>
-        <span>HAMBURGUESAS</span><i>✦</i><span>SÁNDWICHES</span><i>✦</i>
-        <span>PAPAS</span><i>✦</i><span>BEBIDAS</span><i>✦</i><span>COMBOS</span><i>✦</i>
-        <span>HAMBURGUESAS</span><i>✦</i><span>SÁNDWICHES</span><i>✦</i>
-        <span>PAPAS</span><i>✦</i><span>BEBIDAS</span><i>✦</i><span>COMBOS</span>
-      </div>
-    </div>
-
-    <section class="menu-section section" id="menu">
-      <div class="section-heading reveal">
-        <div class="eyebrow dark"><span></span>NUESTRO MENÚ</div>
-        <h2>Elige tu próximo Mordisco</h2>
-        <p>Productos preparados al momento, con sabor intenso y calidad que se nota.</p>
-        <div id="menuCatalogSummary" class="menu-catalog-summary">Cargando el menú completo…</div>
-      </div>
-
-      <div class="category-pills reveal" id="category-filters">
-        <button class="active" data-category="all">Todos</button>
-      </div>
-
-      <div class="products-grid" id="featured-products">
-        <article class="product-card loading">
-          <div class="product-image skeleton"></div>
-          <div class="product-body"><div class="line"></div><div class="line short"></div></div>
-        </article>
-      </div>
-
-      <div class="section-action reveal">
-        <a class="btn btn-primary btn-xl" href="#menu">Menú completo en esta página</a>
-        <a class="btn btn-dark btn-xl" href="/pedir">Abrir pedidos y carrito</a>
-      </div>
-    </section>
-
-    <section class="promo-section section" id="promos">
-      <div class="promo-card reveal">
-        <div class="promo-content">
-          <div class="eyebrow"><span></span>OFERTA DE LA CASA</div>
-          <h2>El combo que<br><strong>no perdona.</strong></h2>
-          <p>Hamburguesa, papas y bebida. Todo lo que necesitas para matar el antojo.</p>
-          <a class="btn btn-light btn-xl" href="/promociones">Ver promociones</a>
-        </div>
-        <div class="promo-visual">
-          <div class="promo-number">20%</div>
-          <img src="/media/hamburguesa.png" alt="Combo promocional Mordisco">
-        </div>
-      </div>
-    </section>
-
-    <section class="experience-section" id="nosotros">
-      <div class="experience-photo reveal">
-        <img src="/media/hamburguesa.png" alt="Hamburguesa artesanal Mordisco">
-        <span class="stamp">HECHO<br>AL MOMENTO</span>
-      </div>
-      <div class="experience-copy reveal">
-        <div class="eyebrow dark"><span></span>LA EXPERIENCIA MORDISCO</div>
-        <h2>No es comida rápida.<br>Es un antojo serio.</h2>
-        <p>Carne jugosa, queso derretido, ingredientes frescos y combinaciones diseñadas para que cada mordisco se sienta.</p>
-        <div class="experience-list">
-          <div><span>01</span><p><b>Ingredientes frescos</b><small>Seleccionados para cada preparación.</small></p></div>
-          <div><span>02</span><p><b>Preparado al momento</b><small>Porque el sabor no se recalienta.</small></p></div>
-          <div><span>03</span><p><b>Pedido sin complicaciones</b><small>Desde el celular, rápido y directo.</small></p></div>
-        </div>
-      </div>
-    </section>
-
-    
-    <section class="hours-section section" id="horarios">
-      <div class="hours-card reveal">
-        <div class="hours-copy">
-          <div class="eyebrow dark"><span></span>HORARIOS DE ATENCIÓN</div>
-          <h2>¿Cuándo puedes pedir?</h2>
-          <p>Consulta nuestros horarios actualizados. Los pedidos en línea se habilitan automáticamente cuando estamos abiertos.</p>
-          <div id="publicBusinessStatus" class="business-status loading">Consultando horario…</div>
-        </div>
-        <div id="publicBusinessHours" class="public-hours-list">
-          <div class="hours-loading">Cargando horarios…</div>
-        </div>
-      </div>
-    </section>
-
-<section class="reviews-section section">
-      <div class="section-heading reveal">
-        <div class="eyebrow dark"><span></span>LO QUE DICEN</div>
-        <h2>Clientes con ganas de volver</h2>
-      </div>
-      <div class="reviews-grid">
-        <article class="review reveal">
-          <div class="stars">★★★★★</div>
-          <p>“La hamburguesa llegó caliente, grande y con muchísimo sabor. Se volvió mi favorita.”</p>
-          <b>— Cliente Mordisco</b>
-        </article>
-        <article class="review reveal">
-          <div class="stars">★★★★★</div>
-          <p>“El pedido en línea fue rápido y sencillo. Las papas estaban perfectas.”</p>
-          <b>— Cliente frecuente</b>
-        </article>
-        <article class="review reveal">
-          <div class="stars">★★★★★</div>
-          <p>“Se siente artesanal y la presentación está al nivel de una cadena grande.”</p>
-          <b>— Fan del sabor</b>
-        </article>
-      </div>
-    </section>
-
-    <section class="order-cta" id="contacto">
-      <div class="cta-content reveal">
-        <div class="eyebrow"><span></span>¿LISTO PARA MORDER?</div>
-        <h2>Tu próxima hamburguesa está a un clic.</h2>
-        <p>Haz tu pedido ahora y nosotros nos encargamos del resto.</p>
-      </div>
-      <a class="btn btn-light btn-xl reveal" href="/pedir">Pedir ahora →</a>
-    </section>
-  </main>
-
-  <a class="whatsapp-button" href="https://wa.me/" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp">✆</a>
-
-  <footer>
-    <div class="footer-brand">
-      <div class="brand">
-        <img src="/mordisco-logo.png" alt="Mordisco">
-        <span><strong>MORDISCO</strong><small>FAST FOOD</small></span>
-      </div>
-      <p>El sabor que te hace volver.</p>
-    </div>
-    <div class="footer-links">
-      <a href="#menu">Menú completo</a>
-      <a href="/promociones">Promociones</a>
-      <a href="/pedir">Pedir ahora</a>
-      <a href="/acceso-admin">Administración</a>
-    </div>
-    <p class="copyright">© 2026 Mordisco Fast Food.</p>
-  
-      <div class="staff-access-footer">
-        <a href="/staff" aria-label="Acceso del personal">Acceso del personal</a>
-      </div>
-</footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    window.MORDISCO_SUPABASE = {
-      url: 'https://nmmjthqflxwucpmmmrks.supabase.co',
-      anonKey: 'sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0'
-    };
-    window.mordiscoSupabaseClient = window.supabase.createClient(
-      window.MORDISCO_SUPABASE.url,
-      window.MORDISCO_SUPABASE.anonKey
-    );
-  </script>
-  <script src="/public-site.js?v=install-premium-final-1"></script>
-
-  <button id="installMordiscoApp" class="install-app-button" type="button" aria-label="Instalar aplicación Mordisco">
-    <span class="install-icon">⇩</span>
-    <span>Instalar app</span>
-  </button>
-
-  <nav class="mobile-bottom-nav" aria-label="Navegación móvil">
-    <a href="#inicio"><span>⌂</span><small>Inicio</small></a>
-    <a href="#menu"><span>🍔</span><small>Menú</small></a>
-    <a class="mobile-order-main" href="/pedir"><span>＋</span><small>Pedir</small></a>
-    <a href="/promociones"><span>★</span><small>Promos</small></a>
-  </nav>
-
-
-  <div id="mordiscoSplash" class="mordisco-splash" aria-hidden="true">
-    <div class="mordisco-splash-card">
-      <img src="/mordisco-logo.png" alt="Mordisco Fast Food">
-      <strong>MORDISCO FAST FOOD</strong>
-      <span>El sabor que te hace volver.</span>
-    </div>
-  </div>
-
-  <div id="installHelpModal" class="install-help-modal hidden" role="dialog" aria-modal="true" aria-labelledby="installHelpTitle">
-    <div class="install-help-card">
-      <button id="closeInstallHelp" class="install-help-close" type="button" aria-label="Cerrar">×</button>
-      <div class="install-help-icon">📲</div>
-      <h2 id="installHelpTitle">Instala Mordisco</h2>
-      <p>Ten el menú y los pedidos siempre a mano.</p>
-      <ol id="installHelpSteps">
-        <li>Abre el menú <b>⋮</b> de Chrome.</li>
-        <li>Selecciona <b>Instalar aplicación</b>.</li>
-        <li>Confirma pulsando <b>Instalar</b>.</li>
-      </ol>
-      <button id="retryInstallButton" class="btn btn-primary btn-xl" type="button">Intentar instalar ahora</button>
-      <button id="dismissInstallHelp" class="btn btn-dark btn-xl" type="button">Más tarde</button>
-    </div>
-  </div>
-
-</body>
-</html>
+{
+  "name": "Mordisco Fast Food",
+  "short_name": "Mordisco",
+  "description": "Aplicación oficial de Mordisco Fast Food para consultar el menú y realizar pedidos.",
+  "id": "/",
+  "start_url": "/?source=app",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone"
+  ],
+  "background_color": "#0d0d0d",
+  "theme_color": "#ff7a00",
+  "orientation": "portrait-primary",
+  "categories": [
+    "food",
+    "shopping",
+    "lifestyle"
+  ],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Pedir ahora",
+      "short_name": "Pedir",
+      "description": "Abrir pedidos en línea",
+      "url": "/pedir",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Promociones",
+      "short_name": "Promos",
+      "description": "Ver promociones activas",
+      "url": "/promociones",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Horarios",
+      "short_name": "Horarios",
+      "description": "Consultar horarios de atención",
+      "url": "/#horarios",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "version": "1.0.0"
+}

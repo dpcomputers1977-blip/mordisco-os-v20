@@ -1,34 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Comandas | Mordisco</title>
+<link rel="manifest" href="/comandas-manifest.webmanifest">
+<link rel="stylesheet" href="/comandas.css?v=20.0.0">
+<meta name="theme-color" content="#171512">
+</head>
+<body>
+<header><img src="/mordisco-logo.png" alt="Mordisco"><div><b>MORDISCO</b><span>Comandas</span></div><button id="logoutCommand">Salir</button></header>
 
-:root{--dark:#171512;--gold:#ffc400;--cream:#f6f0e6;--red:#c9362b;--green:#239b55}
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--cream);color:#211e19}
-header{height:68px;background:var(--dark);color:white;display:flex;align-items:center;padding:10px 16px;gap:10px;position:sticky;top:0;z-index:10}header img{width:48px;height:48px;object-fit:contain}header div{display:flex;flex-direction:column}header span{font-size:.8rem;color:#d7ccbd}header button{margin-left:auto;background:#fff1;border:1px solid #fff3;color:white;border-radius:9px;padding:9px 12px}
-main{padding:14px}.hidden{display:none!important}.loginCard{max-width:420px;margin:8vh auto;background:white;border-radius:22px;padding:24px;box-shadow:0 16px 45px #0002;text-align:center}.loginCard img{width:120px;height:100px;object-fit:contain}.loginCard input,.loginCard select,.loginCard button{width:100%;padding:14px;margin-top:10px;border-radius:12px;border:1px solid #d9d0c3;font-size:1rem}.loginCard button,#sendCommand{background:var(--gold);border:0;font-weight:900}
-.welcome,.orderTop{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.welcome h2{margin:2px 0}.welcome button,.orderTop button{border:0;background:var(--dark);color:white;border-radius:10px;padding:10px}
-.commandTables{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.commandTable{border:0;border-radius:18px;padding:18px;text-align:left;min-height:135px;box-shadow:0 8px 25px #0001}.commandTable.free{background:#e9f8ee}.commandTable.occupied{background:#fff3ce}.commandTable.preparing{background:#ffe7d7}.commandTable.payment{background:#ffe0dc}.commandTable h3{margin:0;font-size:1.3rem}.commandTable strong{display:block;margin-top:18px}
-.commandSearch{display:grid;grid-template-columns:1fr 180px;gap:8px;margin-bottom:12px}.commandSearch input,.commandSearch select,.commandCart input,.commandCart textarea{width:100%;padding:12px;border:1px solid #d8cec0;border-radius:10px}
-.commandProducts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-bottom:260px}.commandProduct{background:white;border:0;border-radius:15px;overflow:hidden;text-align:left;box-shadow:0 6px 18px #0001}.commandProduct img{width:100%;height:110px;object-fit:cover}.commandProduct div{padding:10px}.commandProduct b{display:block}.commandProduct strong{color:#8b6500}
-.commandCart{position:fixed;left:0;right:0;bottom:0;background:white;border-radius:20px 20px 0 0;padding:14px;box-shadow:0 -8px 30px #0002;max-height:250px;overflow:auto}.commandCart h3{margin:0 0 8px}.cartLine{display:flex;justify-content:space-between;gap:8px;align-items:center;margin:7px 0}.cartLine button{border:0;border-radius:8px;padding:5px 9px}.commandCart textarea{height:55px;margin-top:7px}.commandCart input{margin-top:7px}#sendCommand{width:100%;padding:13px;border-radius:11px;margin-top:8px}
-#commandToast{position:fixed;top:82px;left:50%;transform:translateX(-50%);background:#171512;color:white;padding:11px 16px;border-radius:10px;display:none;z-index:50}
-@media(max-width:720px){.commandTables{grid-template-columns:repeat(2,1fr)}.commandProducts{grid-template-columns:repeat(2,1fr)}.commandSearch{grid-template-columns:1fr}}
+<main>
+<section id="commandLogin" class="screen">
+  <div class="loginCard">
+    <img src="/mordisco-logo.png" alt="Mordisco">
+    <h1>Acceso del personal</h1>
+    <select id="commandEmployee"></select>
+    <input id="commandPin" type="password" inputmode="numeric" maxlength="6" placeholder="PIN">
+    <button id="commandLoginBtn">Entrar</button>
+  </div>
+</section>
 
-.commandTable small{display:block;margin-top:7px;color:#6c5a32;font-weight:700}
-.commandCurrentAccount{margin-top:10px;padding:12px;border-radius:13px;background:#171512;color:white;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
-.commandCurrentAccount div{display:flex;flex-direction:column;gap:3px}
-.commandCurrentAccount small{color:#ffc400;font-weight:900}
-.commandCurrentAccount>strong{font-size:1.25rem}
+<section id="commandApp" class="screen hidden">
+  <div class="welcome"><div><small>Empleado</small><h2 id="commandEmployeeName"></h2></div><button id="refreshCommand">Actualizar</button></div>
+  <div id="commandTables" class="commandTables"></div>
+</section>
 
-.commandCurrentAccount{
-  grid-template-columns:1fr auto;
-}
-.commandCurrentAccount::after{
-  content:"Cobro disponible únicamente en POS / Caja";
-  grid-column:1/-1;
-  display:block;
-  padding:9px 10px;
-  border-radius:9px;
-  background:#fff3bf;
-  color:#6c5200;
-  font-size:.78rem;
-  font-weight:900;
-  text-align:center;
-}
+<section id="commandOrder" class="screen hidden">
+  <div class="orderTop"><button id="backTables">← Mesas</button><h2 id="commandTableName"></h2><span id="commandCartTotal">$0.00</span></div>
+  <div class="commandSearch"><input id="commandSearch" placeholder="Buscar producto"><select id="commandCategory"><option value="all">Todas</option></select></div>
+  <div id="commandProducts" class="commandProducts"></div>
+  <aside class="commandCart">
+    <h3>Comanda</h3>
+    <div id="commandCartItems"></div>
+    <input id="commandCustomer" placeholder="Nombre del cliente (opcional)">
+    <textarea id="commandNotes" placeholder="Notas para cocina"></textarea>
+    <button id="sendCommand">Enviar a cocina</button>
+    <section id="commandCurrentAccount" class="commandCurrentAccount hidden">
+      <div>
+        <small>CUENTA ACTUAL</small>
+        <b id="commandCurrentOrderNumber"></b>
+        <span id="commandCurrentOrderStatus"></span>
+      </div>
+      <strong id="commandCurrentOrderTotal">$0.00</strong>
+    </section>
+  </aside>
+</section>
+</main>
+<div id="commandToast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/comandas.js?v=20.0.0"></script>
+</body>
+</html>
