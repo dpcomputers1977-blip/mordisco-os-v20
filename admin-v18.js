@@ -13,7 +13,7 @@ const SUPABASE_URL='https://nmmjthqflxwucpmmmrks.supabase.co';
 const SUPABASE_KEY='sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0';
 const db=window.mordiscoSupabaseClient||window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 window.mordiscoSupabaseClient=db;
-let products=[],categories=[],settings={},orders=[],cart=[],posCart=[],ingredients=[],inventoryMovements=[],recipes=[],staffMembers=[],tables=[],tableCart=[],currentTable=null,currentEmployee=null,currentShift=null,shifts=[],financeMovements=[],financeAccounts=[],businessHours=[],customers=[],promotions=[],contentPages=[],extraOptions=[],cashRegisterState=null,isAdminSession=false,shiftAction='start',selectedCategory='Todos',editingImage='',adminProductQuery='',adminProductFilter='all',orderStatusFilter='all',ordersChannel=null,lastKnownOrderIds=new Set(),kitchenTimerHandle=null,lastReceiptOrder=null,paymentOrderId=null,posDiscountType='none',posDiscountValue=0;
+let products=[],categories=[],settings={},orders=[],cart=[],posCart=[],ingredients=[],inventoryMovements=[],recipes=[],staffMembers=[],tables=[],tableCart=[],kitchenPollHandle=null,kitchenAudioContext=null,kitchenKnownPendingNumbers=new Set(),currentTable=null,currentEmployee=null,currentShift=null,shifts=[],financeMovements=[],financeAccounts=[],businessHours=[],customers=[],promotions=[],contentPages=[],extraOptions=[],cashRegisterState=null,isAdminSession=false,shiftAction='start',selectedCategory='Todos',editingImage='',adminProductQuery='',adminProductFilter='all',orderStatusFilter='all',ordersChannel=null,lastKnownOrderIds=new Set(),kitchenTimerHandle=null,lastReceiptOrder=null,paymentOrderId=null,posDiscountType='none',posDiscountValue=0;
 const $$=s=>[...document.querySelectorAll(s)];
 const missingElementProxy=new Proxy({},{
   get(_target,property){
@@ -771,7 +771,10 @@ function kitchenCard(o){
     <div class="kitchenCardHead"><h3>#${o.order_number}</h3><span class="kitchenTimer" data-created-at="${o.created_at}">${elapsedLabel(o.created_at)}</span></div>
     <p class="kitchenCustomer">${esc(o.customer_name)}</p>
     <p class="kitchenMeta">${orderTypeLabel(o.order_type)} · ${new Date(o.created_at).toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'})}</p>
-    <ul class="kitchenItems">${(o.order_items||[]).map(i=>`<li>${i.quantity} × ${esc(i.product_name)}${i.notes?`<small> — ${esc(i.notes)}</small>`:''}</li>`).join('')}</ul>
+    <ul class="kitchenItems">${(o.order_items||[]).length
+      ? (o.order_items||[]).map(i=>`<li><b>${Number(i.quantity||1)} × ${esc(i.product_name||i.name||'Producto')}</b>${i.notes?`<small> — ${esc(i.notes)}</small>`:''}</li>`).join('')
+      : '<li class="kitchenNoItems">Sin detalle de productos</li>'
+    }</ul>
     ${o.notes?`<div class="kitchenNotes"><b>Nota:</b> ${esc(o.notes)}</div>`:''}
     <div class="kitchenCardActions">${actions}</div>
   </article>`;
@@ -836,7 +839,7 @@ async function updateKitchenStatus(orderNumber,status,button=null){
   }
 
   toast(`Pedido #${orderNumber} actualizado: ${statusLabels[status]||status}`);
-  await loadOrders();
+  await loadKitchenOrdersReliable({notify:false});
 
   const confirmed=orders.find(order=>
     Number(order.order_number)===Number(orderNumber)
@@ -853,14 +856,7 @@ function startKitchenClock(){
   },30000);
 }
 function playKitchenAlert(){
-  if(!$('#kitchenSound')?.checked)return;
-  try{
-    const ctx=new (window.AudioContext||window.webkitAudioContext)();
-    const osc=ctx.createOscillator(),gain=ctx.createGain();
-    osc.connect(gain);gain.connect(ctx.destination);
-    osc.frequency.value=880;gain.gain.value=.08;osc.start();
-    setTimeout(()=>{osc.stop();ctx.close()},220);
-  }catch{}
+  kitchenPlaySound(false);
 }
 function subscribeOrdersRealtime(){
   if(ordersChannel)db.removeChannel(ordersChannel);
@@ -2822,12 +2818,14 @@ $('#posCustomer')?.addEventListener('input',()=>{
 });
 
 
-/* ===== VALIDACIÓN ÚNICA DE PERMISOS ACTUALES ===== */
-function mordiscoCurrentEmployeePermissions(){
-  const employee=currentEmployee||(()=>{
-    try{return JSON.parse(localStorage.getItem('mordisco_employee')||'null')}catch{return null}
-  })();
 
+
+/* ===== PERMISOS SOLO PARA NAVEGACIÓN LATERAL ===== */
+function mordiscoEmployeeAllowedTabs(){
+  let employee=currentEmployee||null;
+  if(!employee){
+    try{employee=JSON.parse(localStorage.getItem('mordisco_employee')||'null')}catch{}
+  }
   if(!employee)return [];
 
   const defaults={
@@ -2844,15 +2842,160 @@ function mordiscoCurrentEmployeePermissions(){
 document.addEventListener('click',event=>{
   if(!document.body.classList.contains('employeeMode'))return;
 
-  const button=event.target.closest?.('.sidebar [data-tab]');
-  if(!button)return;
+  // Solo bloquea enlaces/botones del menú lateral.
+  const navButton=event.target.closest?.('.sidebar > [data-tab], .sidebar nav [data-tab]');
+  if(!navButton)return;
 
-  const allowed=mordiscoCurrentEmployeePermissions();
-  const tab=button.dataset.tab;
-
-  if(!allowed.includes(tab)){
+  const allowed=mordiscoEmployeeAllowedTabs();
+  if(!allowed.includes(navButton.dataset.tab)){
     event.preventDefault();
     event.stopImmediatePropagation();
     toast('No tienes permiso para abrir esta sección');
   }
 },true);
+
+
+/* BOTONES DE COCINA NO PARTICIPAN EN LA VALIDACIÓN DEL MENÚ */
+document.addEventListener('click',event=>{
+  const kitchenButton=event.target.closest?.('[data-kitchen-order]');
+  if(!kitchenButton)return;
+  event.stopPropagation();
+},false);
+
+
+/* ===== COCINA: ACTUALIZACIÓN AUTOMÁTICA, DETALLE Y SONIDO ===== */
+function kitchenIsVisible(){
+  const tab=$('#tab-kitchen');
+  return !!tab&&!tab.classList.contains('hidden');
+}
+
+async function kitchenUnlockSound(showTest=true){
+  try{
+    if(!kitchenAudioContext){
+      kitchenAudioContext=new (window.AudioContext||window.webkitAudioContext)();
+    }
+    if(kitchenAudioContext.state==='suspended'){
+      await kitchenAudioContext.resume();
+    }
+    localStorage.setItem('mordisco_kitchen_sound','1');
+    if($('#kitchenSound'))$('#kitchenSound').checked=true;
+    if(showTest)kitchenPlaySound(true);
+  }catch(error){
+    console.warn('No se pudo activar sonido:',error);
+    toast('El navegador bloqueó el sonido. Sube el volumen y toca Sonido otra vez.');
+  }
+}
+
+function kitchenPlaySound(test=false){
+  if(!test&&!$('#kitchenSound')?.checked)return;
+  try{
+    const ctx=kitchenAudioContext||new (window.AudioContext||window.webkitAudioContext)();
+    kitchenAudioContext=ctx;
+
+    const now=ctx.currentTime;
+    [880,1175,880].forEach((frequency,index)=>{
+      const osc=ctx.createOscillator();
+      const gain=ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value=frequency;
+      gain.gain.setValueAtTime(0.0001,now+index*0.20);
+      gain.gain.exponentialRampToValueAtTime(0.22,now+index*0.20+0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001,now+index*0.20+0.16);
+      osc.start(now+index*0.20);
+      osc.stop(now+index*0.20+0.18);
+    });
+
+    if(navigator.vibrate&&!test)navigator.vibrate([180,90,180]);
+  }catch(error){
+    console.warn('Error de sonido:',error);
+  }
+}
+
+async function loadKitchenOrdersReliable({notify=true}={}){
+  const {data,error}=await db.rpc('kitchen_get_active_orders');
+
+  if(error){
+    console.warn('Lectura segura de Cocina:',error);
+    // Mantener el método normal como respaldo.
+    await loadOrders();
+    return;
+  }
+
+  const active=Array.isArray(data)?data:[];
+  const activeNumbers=new Set(active.map(order=>Number(order.order_number)));
+  const previousPending=new Set(kitchenKnownPendingNumbers);
+
+  // Conservar órdenes históricas/no activas ya cargadas y sustituir las activas.
+  orders=[
+    ...orders.filter(order=>!activeNumbers.has(Number(order.order_number))&&
+      !['pending','confirmed','preparing','ready'].includes(order.status)),
+    ...active
+  ].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+
+  const pendingNumbers=new Set(
+    active
+      .filter(order=>['pending','confirmed'].includes(order.status))
+      .map(order=>Number(order.order_number))
+  );
+
+  const newNumbers=[...pendingNumbers].filter(number=>!previousPending.has(number));
+  kitchenKnownPendingNumbers=pendingNumbers;
+
+  renderKitchen();
+  renderPosPendingOrders();
+
+  if(notify&&newNumbers.length){
+    kitchenPlaySound(false);
+    toast(`Nuevo pedido #${newNumbers.sort((a,b)=>a-b).join(', #')}`);
+  }
+}
+
+function startKitchenAutoRefresh(){
+  clearInterval(kitchenPollHandle);
+
+  // La primera carga establece la referencia sin sonar por pedidos antiguos.
+  loadKitchenOrdersReliable({notify:false}).then(()=>{
+    kitchenKnownPendingNumbers=new Set(
+      orders
+        .filter(order=>['pending','confirmed'].includes(order.status))
+        .map(order=>Number(order.order_number))
+    );
+  });
+
+  kitchenPollHandle=setInterval(()=>{
+    if(document.visibilityState==='visible'&&kitchenIsVisible()){
+      loadKitchenOrdersReliable({notify:true});
+    }
+  },4000);
+}
+
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&kitchenIsVisible()){
+    loadKitchenOrdersReliable({notify:true});
+  }
+});
+
+window.addEventListener('focus',()=>{
+  if(kitchenIsVisible())loadKitchenOrdersReliable({notify:true});
+});
+
+$('#kitchenSound')?.addEventListener('change',event=>{
+  if(event.target.checked){
+    kitchenUnlockSound(true);
+  }else{
+    localStorage.removeItem('mordisco_kitchen_sound');
+  }
+});
+
+$('#kitchenSound')?.addEventListener('click',()=>{
+  if($('#kitchenSound')?.checked)kitchenUnlockSound(false);
+});
+
+if($('#kitchenSound')){
+  $('#kitchenSound').checked=localStorage.getItem('mordisco_kitchen_sound')==='1';
+}
+
+$('#refreshKitchen')?.addEventListener('click',()=>{
+  loadKitchenOrdersReliable({notify:false});
+});

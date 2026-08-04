@@ -1442,3 +1442,20 @@ body:not(.modal-open){overflow:auto!important}
   opacity:.65;
   cursor:wait;
 }
+
+/* COCINA: DETALLE DE ORDEN Y ACTUALIZACIÓN AUTOMÁTICA */
+.kitchenItems{
+  display:grid;
+  gap:7px;
+  margin:14px 0;
+  padding:0;
+  list-style:none;
+}
+.kitchenItems li{
+  padding:10px 12px;
+  border-radius:9px;
+  background:#f6f1e8;
+  line-height:1.25;
+}
+.kitchenItems small{display:block;margin-top:4px}
+.kitchenNoItems{color:#8a7863;font-style:italic}
