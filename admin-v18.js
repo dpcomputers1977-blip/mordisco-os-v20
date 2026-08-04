@@ -786,11 +786,46 @@ function renderKitchen(){
   $('#kitchenPending').innerHTML=pending.length?pending.map(kitchenCard).join(''):'<div class="kitchenEmpty">Sin pedidos nuevos</div>';
   $('#kitchenPreparing').innerHTML=preparing.length?preparing.map(kitchenCard).join(''):'<div class="kitchenEmpty">Nada en preparación</div>';
   $('#kitchenReady').innerHTML=ready.length?ready.map(kitchenCard).join(''):'<div class="kitchenEmpty">No hay pedidos listos</div>';
-  $$('[data-kitchen-status]').forEach(b=>b.onclick=()=>updateKitchenStatus(b.dataset.kitchenStatus,b.dataset.nextStatus));
+  $$('[data-kitchen-status]').forEach(b=>b.onclick=()=>updateKitchenStatus(b.dataset.kitchenStatus,b.dataset.nextStatus,b));
 }
-async function updateKitchenStatus(id,status){
-  const {error}=await db.from('orders').update({status}).eq('id',id);
-  if(error)return toast(error.message);
+async function updateKitchenStatus(id,status,button=null){
+  const allowedStatuses=['preparing','ready','delivered','cancelled'];
+  if(!allowedStatuses.includes(status)){
+    return toast('Estado de cocina no permitido');
+  }
+
+  const originalText=button?.textContent||'';
+  if(button){
+    button.disabled=true;
+    button.textContent='Procesando...';
+  }
+
+  const orderIndex=orders.findIndex(order=>String(order.id)===String(id));
+  const previousStatus=orderIndex>=0?orders[orderIndex].status:null;
+
+  // Movimiento inmediato en pantalla para que Cocina no parezca congelada.
+  if(orderIndex>=0){
+    orders[orderIndex]={...orders[orderIndex],status};
+    renderKitchen();
+  }
+
+  const {error}=await db.rpc('kitchen_update_order_status',{
+    p_order_id:id,
+    p_new_status:status
+  });
+
+  if(error){
+    if(orderIndex>=0){
+      orders[orderIndex]={...orders[orderIndex],status:previousStatus};
+      renderKitchen();
+    }
+    if(button){
+      button.disabled=false;
+      button.textContent=originalText;
+    }
+    return toast('No se pudo actualizar: '+error.message);
+  }
+
   toast(`Pedido actualizado: ${statusLabels[status]||status}`);
   await loadOrders();
 }

@@ -1436,3 +1436,9 @@ body:not(.modal-open){overflow:auto!important}
 
 /* CLIENTES REGISTRADOS EN POS */
 #posCustomer{background:#fff}
+
+/* ACCIONES DE COCINA */
+.kitchenCardActions button:disabled{
+  opacity:.65;
+  cursor:wait;
+}
