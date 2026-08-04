@@ -1,0 +1,33 @@
+MORDISCO — CORRECCIÓN URGENTE DE ESTADOS DE COCINA
+
+CAMBIO CLAVE
+- Cocina actualiza por el número visible del pedido (#26, #27).
+- Solo muestra éxito si Supabase confirma que modificó la fila.
+- Si no actualiza, muestra el error real.
+- Preparando, Listo, Entregado y Cancelado quedan guardados.
+
+PUBLICAR
+1. Extrae el ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Corregir estados reales de cocina
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+
+SUPABASE
+1. Abre SQL Editor.
+2. Ejecuta UNA SOLA VEZ:
+   12_COCINA_ESTADOS_REALES.sql
+
+PRUEBA
+- Cierra sesión en Cocina.
+- Entra de nuevo desde:
+  https://mordiscofastfood.com/staff?v=kitchen-real-status
+- Pulsa Empezar preparación.
+- Verifica que el pedido pase a Preparando.
+
+No contiene imágenes.
+No modifica Caja, productos, clientes, turnos ni ventas.

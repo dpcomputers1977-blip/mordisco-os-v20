@@ -761,11 +761,11 @@ function kitchenCard(o){
   const late=mins>=20&&o.status!=='ready';
   let actions='';
   if(o.status==='pending'||o.status==='confirmed'){
-    actions=`<button class="primary" data-kitchen-status="${o.id}" data-next-status="preparing">Empezar preparación</button><button class="danger" data-kitchen-status="${o.id}" data-next-status="cancelled">Cancelar</button>`;
+    actions=`<button class="primary" data-kitchen-order="${o.order_number}" data-next-status="preparing">Empezar preparación</button><button class="danger" data-kitchen-order="${o.order_number}" data-next-status="cancelled">Cancelar</button>`;
   }else if(o.status==='preparing'){
-    actions=`<button class="success" data-kitchen-status="${o.id}" data-next-status="ready">Marcar como listo</button>`;
+    actions=`<button class="success" data-kitchen-order="${o.order_number}" data-next-status="ready">Marcar como listo</button>`;
   }else if(o.status==='ready'){
-    actions=`<button class="dark" data-kitchen-status="${o.id}" data-next-status="delivered">Entregar pedido</button>`;
+    actions=`<button class="dark" data-kitchen-order="${o.order_number}" data-next-status="delivered">Entregar pedido</button>`;
   }
   return `<article class="kitchenCard ${late?'isLate':''}">
     <div class="kitchenCardHead"><h3>#${o.order_number}</h3><span class="kitchenTimer" data-created-at="${o.created_at}">${elapsedLabel(o.created_at)}</span></div>
@@ -786,12 +786,16 @@ function renderKitchen(){
   $('#kitchenPending').innerHTML=pending.length?pending.map(kitchenCard).join(''):'<div class="kitchenEmpty">Sin pedidos nuevos</div>';
   $('#kitchenPreparing').innerHTML=preparing.length?preparing.map(kitchenCard).join(''):'<div class="kitchenEmpty">Nada en preparación</div>';
   $('#kitchenReady').innerHTML=ready.length?ready.map(kitchenCard).join(''):'<div class="kitchenEmpty">No hay pedidos listos</div>';
-  $$('[data-kitchen-status]').forEach(b=>b.onclick=()=>updateKitchenStatus(b.dataset.kitchenStatus,b.dataset.nextStatus,b));
+  $$('[data-kitchen-order]').forEach(b=>b.onclick=()=>updateKitchenStatus(Number(b.dataset.kitchenOrder),b.dataset.nextStatus,b));
 }
-async function updateKitchenStatus(id,status,button=null){
+async function updateKitchenStatus(orderNumber,status,button=null){
   const allowedStatuses=['preparing','ready','delivered','cancelled'];
   if(!allowedStatuses.includes(status)){
     return toast('Estado de cocina no permitido');
+  }
+
+  if(!Number.isFinite(Number(orderNumber))){
+    return toast('Número de pedido inválido');
   }
 
   const originalText=button?.textContent||'';
@@ -800,25 +804,17 @@ async function updateKitchenStatus(id,status,button=null){
     button.textContent='Procesando...';
   }
 
-  const orderIndex=orders.findIndex(order=>String(order.id)===String(id));
+  const orderIndex=orders.findIndex(order=>
+    Number(order.order_number)===Number(orderNumber)
+  );
   const previousStatus=orderIndex>=0?orders[orderIndex].status:null;
 
-  // Movimiento inmediato en pantalla para que Cocina no parezca congelada.
-  if(orderIndex>=0){
-    orders[orderIndex]={...orders[orderIndex],status};
-    renderKitchen();
-  }
-
-  const {error}=await db.rpc('kitchen_update_order_status',{
-    p_order_id:id,
+  const {data,error}=await db.rpc('kitchen_set_status_by_number',{
+    p_order_number:Number(orderNumber),
     p_new_status:status
   });
 
   if(error){
-    if(orderIndex>=0){
-      orders[orderIndex]={...orders[orderIndex],status:previousStatus};
-      renderKitchen();
-    }
     if(button){
       button.disabled=false;
       button.textContent=originalText;
@@ -826,8 +822,29 @@ async function updateKitchenStatus(id,status,button=null){
     return toast('No se pudo actualizar: '+error.message);
   }
 
-  toast(`Pedido actualizado: ${statusLabels[status]||status}`);
+  if(!data||data.updated!==true){
+    if(button){
+      button.disabled=false;
+      button.textContent=originalText;
+    }
+    return toast('Supabase no confirmó el cambio del pedido');
+  }
+
+  if(orderIndex>=0){
+    orders[orderIndex]={...orders[orderIndex],status:data.status||status};
+    renderKitchen();
+  }
+
+  toast(`Pedido #${orderNumber} actualizado: ${statusLabels[status]||status}`);
   await loadOrders();
+
+  const confirmed=orders.find(order=>
+    Number(order.order_number)===Number(orderNumber)
+  );
+
+  if(!confirmed||confirmed.status!==(data.status||status)){
+    toast('El pedido cambió, pero la pantalla necesita actualizarse');
+  }
 }
 function startKitchenClock(){
   clearInterval(kitchenTimerHandle);
