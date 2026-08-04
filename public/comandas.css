@@ -1,34 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#11100e">
+  <title>Pedir | Mordisco Fast Food</title>
+  <link rel="stylesheet" href="/online-v18.css?v=20.0.0">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header class="orderTopbar">
+  <a href="/" class="orderBrand"><img src="/mordisco-logo.png"><span>MORDISCO <small>FAST FOOD</small></span></a>
+  <a href="/" class="backStore">← Volver</a>
+</header>
 
-:root{--dark:#171512;--gold:#ffc400;--cream:#f6f0e6;--red:#c9362b;--green:#239b55}
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--cream);color:#211e19}
-header{height:68px;background:var(--dark);color:white;display:flex;align-items:center;padding:10px 16px;gap:10px;position:sticky;top:0;z-index:10}header img{width:48px;height:48px;object-fit:contain}header div{display:flex;flex-direction:column}header span{font-size:.8rem;color:#d7ccbd}header button{margin-left:auto;background:#fff1;border:1px solid #fff3;color:white;border-radius:9px;padding:9px 12px}
-main{padding:14px}.hidden{display:none!important}.loginCard{max-width:420px;margin:8vh auto;background:white;border-radius:22px;padding:24px;box-shadow:0 16px 45px #0002;text-align:center}.loginCard img{width:120px;height:100px;object-fit:contain}.loginCard input,.loginCard select,.loginCard button{width:100%;padding:14px;margin-top:10px;border-radius:12px;border:1px solid #d9d0c3;font-size:1rem}.loginCard button,#sendCommand{background:var(--gold);border:0;font-weight:900}
-.welcome,.orderTop{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.welcome h2{margin:2px 0}.welcome button,.orderTop button{border:0;background:var(--dark);color:white;border-radius:10px;padding:10px}
-.commandTables{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.commandTable{border:0;border-radius:18px;padding:18px;text-align:left;min-height:135px;box-shadow:0 8px 25px #0001}.commandTable.free{background:#e9f8ee}.commandTable.occupied{background:#fff3ce}.commandTable.preparing{background:#ffe7d7}.commandTable.payment{background:#ffe0dc}.commandTable h3{margin:0;font-size:1.3rem}.commandTable strong{display:block;margin-top:18px}
-.commandSearch{display:grid;grid-template-columns:1fr 180px;gap:8px;margin-bottom:12px}.commandSearch input,.commandSearch select,.commandCart input,.commandCart textarea{width:100%;padding:12px;border:1px solid #d8cec0;border-radius:10px}
-.commandProducts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-bottom:260px}.commandProduct{background:white;border:0;border-radius:15px;overflow:hidden;text-align:left;box-shadow:0 6px 18px #0001}.commandProduct img{width:100%;height:110px;object-fit:cover}.commandProduct div{padding:10px}.commandProduct b{display:block}.commandProduct strong{color:#8b6500}
-.commandCart{position:fixed;left:0;right:0;bottom:0;background:white;border-radius:20px 20px 0 0;padding:14px;box-shadow:0 -8px 30px #0002;max-height:250px;overflow:auto}.commandCart h3{margin:0 0 8px}.cartLine{display:flex;justify-content:space-between;gap:8px;align-items:center;margin:7px 0}.cartLine button{border:0;border-radius:8px;padding:5px 9px}.commandCart textarea{height:55px;margin-top:7px}.commandCart input{margin-top:7px}#sendCommand{width:100%;padding:13px;border-radius:11px;margin-top:8px}
-#commandToast{position:fixed;top:82px;left:50%;transform:translateX(-50%);background:#171512;color:white;padding:11px 16px;border-radius:10px;display:none;z-index:50}
-@media(max-width:720px){.commandTables{grid-template-columns:repeat(2,1fr)}.commandProducts{grid-template-columns:repeat(2,1fr)}.commandSearch{grid-template-columns:1fr}}
+<main class="orderLayout">
+  <section class="orderCatalog">
+    <div class="orderHeading">
+      <span>PEDIDO EN LÍNEA</span>
+      <h1>Arma tu próximo Mordisco</h1>
+      <p>Selecciona los productos y envía tu pedido. El pago se coordina al recibirlo o retirarlo.</p>
+    </div>
+    <div class="orderSearch"><input id="onlineSearch" placeholder="Buscar productos…"></div>
+    <div id="onlineCategories" class="onlineCategories"></div>
+    <div id="onlineProducts" class="onlineProducts"><p>Cargando menú…</p></div>
+  </section>
 
-.commandTable small{display:block;margin-top:7px;color:#6c5a32;font-weight:700}
-.commandCurrentAccount{margin-top:10px;padding:12px;border-radius:13px;background:#171512;color:white;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
-.commandCurrentAccount div{display:flex;flex-direction:column;gap:3px}
-.commandCurrentAccount small{color:#ffc400;font-weight:900}
-.commandCurrentAccount>strong{font-size:1.25rem}
+  <aside class="onlineCart">
+    <h2>Tu pedido</h2>
+    <div id="onlineCartItems" class="onlineCartItems"><p>Tu carrito está vacío.</p></div>
+    <div class="onlineTotals"><span>Total</span><b id="onlineTotal">$0,00</b></div>
 
-.commandCurrentAccount{
-  grid-template-columns:1fr auto;
-}
-.commandCurrentAccount::after{
-  content:"Cobro disponible únicamente en POS / Caja";
-  grid-column:1/-1;
-  display:block;
-  padding:9px 10px;
-  border-radius:9px;
-  background:#fff3bf;
-  color:#6c5200;
-  font-size:.78rem;
-  font-weight:900;
-  text-align:center;
-}
+    <form id="onlineOrderForm">
+      <label>Nombre<input id="onlineName" required></label>
+      <label>Teléfono<input id="onlinePhone" required></label>
+      <label>Tipo de pedido
+        <select id="onlineType">
+          <option value="pickup">Retiro en el local</option>
+          <option value="delivery">Delivery</option>
+        </select>
+      </label>
+      <label id="onlineAddressWrap" class="hidden">Dirección<input id="onlineAddress"></label>
+      <label>Notas<textarea id="onlineNotes" placeholder="Sin cebolla, punto de referencia…"></textarea></label>
+      <button id="sendOnlineOrder" type="submit">Enviar pedido</button>
+      <p class="onlineNotice">El pago se realiza al recibir o retirar el pedido.</p>
+    </form>
+  </aside>
+</main>
+
+<div id="onlineToast" class="onlineToast"></div>
+<script src="/online-v18.js?v=20.0.0"></script>
+</body>
+</html>
