@@ -243,7 +243,10 @@ $$('.sidebar [data-tab]').forEach(b=>b.onclick=async()=>{const tab=b.dataset.tab
     if($('#staffSearch'))$('#staffSearch').value='';
     if($('#staffRoleFilter'))$('#staffRoleFilter').value='all';
     await loadStaff();
-  }if(tab==='tables')await loadTables();if(tab==='shifts')await loadShifts();if(tab==='finance')await loadFinance();if(tab==='customers')await loadCustomers();if(tab==='promotions')await loadPromotions();if(tab==='pages')await loadContentPages()});
+  }if(tab==='tables')await loadTables();if(tab==='shifts'){
+    await loadStaff();
+    await loadShifts();
+  }if(tab==='finance')await loadFinance();if(tab==='customers')await loadCustomers();if(tab==='promotions')await loadPromotions();if(tab==='pages')await loadContentPages()});
 function fillCategorySelect(){$('#pCategory').innerHTML=categories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}
 
 function updatePreview(src){
@@ -1200,6 +1203,100 @@ $$('[data-inventory-view]').forEach(b=>b.onclick=()=>{
 
 
 
+
+function fillAdminShiftEmployees(){
+  const select=$('#adminShiftEmployee');
+  if(!select||!isAdminSession)return;
+
+  const eligible=staffMembers.filter(member=>
+    member.active&&['cashier','kitchen','waiter'].includes(member.role)
+  );
+
+  const previous=select.value;
+  select.innerHTML='<option value="">Selecciona un empleado</option>'+
+    eligible.map(member=>`<option value="${member.id}">${esc(member.name)} — ${staffRoleLabel(member.role)}</option>`).join('');
+
+  if(eligible.some(member=>String(member.id)===String(previous))){
+    select.value=previous;
+  }
+}
+
+function selectedAdminShift(){
+  const employeeId=$('#adminShiftEmployee').value;
+  return shifts.find(shift=>
+    String(shift.staff_id)===String(employeeId)&&shift.status==='open'
+  )||null;
+}
+
+function renderAdminShiftManager(){
+  if(!isAdminSession||!$('#adminShiftEmployee'))return;
+
+  fillAdminShiftEmployees();
+  const employeeId=$('#adminShiftEmployee').value;
+  const employee=staffMembers.find(member=>String(member.id)===String(employeeId));
+  const openShift=selectedAdminShift();
+  const status=$('#adminShiftStatus');
+
+  if(!employee){
+    status.textContent='Selecciona un empleado.';
+    $('#adminOpenShiftBtn').disabled=true;
+    $('#adminCloseShiftBtn').disabled=true;
+    return;
+  }
+
+  if(openShift){
+    status.innerHTML=`Turno abierto para <strong>${esc(employee.name)}</strong> desde ${new Date(openShift.started_at).toLocaleString('es-EC')}. Efectivo inicial: ${money(openShift.opening_cash||0)}.`;
+    $('#adminOpenShiftBtn').disabled=true;
+    $('#adminCloseShiftBtn').disabled=false;
+  }else{
+    status.innerHTML=`<strong>${esc(employee.name)}</strong> no tiene un turno abierto.`;
+    $('#adminOpenShiftBtn').disabled=false;
+    $('#adminCloseShiftBtn').disabled=true;
+  }
+}
+
+async function adminOpenEmployeeShift(){
+  if(!isAdminSession)return toast('Solo el administrador puede abrir turnos');
+
+  const employeeId=$('#adminShiftEmployee').value;
+  if(!employeeId)return toast('Selecciona un empleado');
+
+  const openingCash=Math.max(Number($('#adminShiftOpeningCash').value||0),0);
+  const {error}=await db.rpc('admin_open_work_shift',{
+    p_employee_id:employeeId,
+    p_initial_cash:openingCash
+  });
+
+  if(error)return toast(error.message);
+  toast('Turno abierto. El empleado ya puede trabajar y cobrar.');
+  await loadShifts();
+}
+
+async function adminCloseEmployeeShift(){
+  if(!isAdminSession)return toast('Solo el administrador puede cerrar turnos');
+
+  const employeeId=$('#adminShiftEmployee').value;
+  if(!employeeId)return toast('Selecciona un empleado');
+
+  const closingCash=Math.max(Number($('#adminShiftClosingCash').value||0),0);
+  const accepted=confirm('¿Cerrar el turno del empleado seleccionado?');
+  if(!accepted)return;
+
+  const {error}=await db.rpc('admin_close_work_shift',{
+    p_employee_id:employeeId,
+    p_counted_cash:closingCash
+  });
+
+  if(error)return toast(error.message);
+  toast('Turno cerrado correctamente.');
+  await loadShifts();
+}
+
+$('#adminShiftEmployee')?.addEventListener('change',renderAdminShiftManager);
+$('#adminOpenShiftBtn')?.addEventListener('click',adminOpenEmployeeShift);
+$('#adminCloseShiftBtn')?.addEventListener('click',adminCloseEmployeeShift);
+$('#adminRefreshShiftBtn')?.addEventListener('click',loadShifts);
+
 async function loadShifts(){
   const today=new Date();today.setHours(0,0,0,0);
   const {data,error}=await db.from('work_shifts').select('*,staff(name,role)').gte('started_at',today.toISOString()).order('started_at',{ascending:false});
@@ -1207,6 +1304,7 @@ async function loadShifts(){
   shifts=data||[];
   currentShift=currentEmployee?shifts.find(s=>s.staff_id===currentEmployee.id&&s.status==='open')||null:null;
   renderShifts();
+  renderAdminShiftManager();
 }
 function renderShifts(){
   if(!$('#shiftHistoryBody'))return;
@@ -1217,7 +1315,9 @@ function renderShifts(){
   const c=$('#currentShiftCard');
   if(!currentEmployee){
     c.className='panel currentShiftCard closed';
-    c.innerHTML='<h3>Inicia sesión como empleado para administrar tu turno.</h3>';
+    c.innerHTML=isAdminSession
+      ? '<h3>El administrador controla los turnos desde el panel superior.</h3><p>Selecciona un empleado para abrir o cerrar su turno.</p>'
+      : '<h3>Inicia sesión como empleado para administrar tu turno.</h3>';
   }else if(currentShift){
     c.className='panel currentShiftCard active';
     c.innerHTML=`<h3>Turno activo — ${esc(currentEmployee.name)}</h3>

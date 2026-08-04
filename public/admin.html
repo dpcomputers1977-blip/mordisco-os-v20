@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=v21-permisos-final">
+<link rel="stylesheet" href="/admin-v18.css?v=admin-shifts-1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 </head>
@@ -466,7 +466,37 @@
           <div><span>Total cobrado</span><strong id="shiftSalesTotal">$0.00</strong></div>
         </div>
       </div>
-      <div class="panel shiftToolbar">
+      
+      <section id="adminShiftManager" class="panel adminShiftManager">
+        <div class="panelTitle">
+          <div>
+            <span class="eyebrow">CONTROL DEL ADMINISTRADOR</span>
+            <h3>Abrir y cerrar turnos de empleados</h3>
+            <p>Selecciona al empleado que podrá trabajar y cobrar durante este turno.</p>
+          </div>
+        </div>
+        <div class="adminShiftGrid">
+          <label>Empleado
+            <select id="adminShiftEmployee">
+              <option value="">Selecciona un empleado</option>
+            </select>
+          </label>
+          <label>Efectivo inicial
+            <input id="adminShiftOpeningCash" type="number" min="0" step="0.01" value="0">
+          </label>
+          <label>Efectivo contado al cierre
+            <input id="adminShiftClosingCash" type="number" min="0" step="0.01" value="0">
+          </label>
+          <div class="adminShiftActions">
+            <button id="adminOpenShiftBtn" class="primary" type="button">Abrir turno</button>
+            <button id="adminCloseShiftBtn" class="danger" type="button">Cerrar turno</button>
+            <button id="adminRefreshShiftBtn" class="dark" type="button">Actualizar</button>
+          </div>
+        </div>
+        <div id="adminShiftStatus" class="adminShiftStatus">Selecciona un empleado.</div>
+      </section>
+
+<div class="panel shiftToolbar employeeShiftToolbar">
         <button class="primary" id="startShiftBtn">Iniciar turno</button>
         <button class="danger" id="closeShiftBtn">Cerrar mi turno</button>
         <button class="dark" id="refreshShiftsBtn">Actualizar</button>
@@ -986,7 +1016,7 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=v21-permisos-final"></script>
+<script src="/admin-v18.js?v=admin-shifts-1"></script>
 
 
 

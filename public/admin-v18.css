@@ -1386,3 +1386,41 @@ body.employeeMode .sidebar [data-tab]{
 body.employeeMode .sidebar [data-tab].employeeAllowed{
   display:flex!important;
 }
+
+/* ADMINISTRADOR ABRE Y CIERRA TURNOS */
+.adminShiftManager{margin-bottom:18px}
+.adminShiftManager .panelTitle p{margin:6px 0 0;color:var(--muted)}
+.adminShiftGrid{
+  display:grid;
+  grid-template-columns:2fr 1fr 1fr;
+  gap:12px;
+  align-items:end;
+}
+.adminShiftGrid label{display:grid;gap:7px;font-weight:800}
+.adminShiftGrid select,
+.adminShiftGrid input{
+  min-height:44px;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#fff;
+}
+.adminShiftActions{
+  grid-column:1/-1;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.adminShiftStatus{
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:10px;
+  background:#f6f1e8;
+  font-weight:800;
+}
+body:not(.employeeMode) .employeeShiftToolbar{display:none!important}
+body.employeeMode #adminShiftManager{display:none!important}
+@media(max-width:800px){
+  .adminShiftGrid{grid-template-columns:1fr}
+  .adminShiftActions{grid-column:auto}
+}
