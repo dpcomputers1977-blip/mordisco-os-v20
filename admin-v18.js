@@ -169,6 +169,15 @@ async function init(){
       return;
     }
     savedEmployee=freshEmployee;
+    if(!Array.isArray(savedEmployee.permissions)||!savedEmployee.permissions.length){
+      savedEmployee.permissions=savedEmployee.role==='cashier'
+        ? ['pos']
+        : savedEmployee.role==='kitchen'
+          ? ['kitchen']
+          : savedEmployee.role==='waiter'
+            ? ['comandas']
+            : [];
+    }
 
     if(savedEmployee.role==='waiter'){
       location.replace('/comandas');
@@ -1499,7 +1508,7 @@ function applyEmployeePermissions(employee){
   document.body.classList.add('employeeMode');
   document.body.dataset.employeeRole=employee.role;
 
-  if(employee.role==='waiter'||employee.permissions.includes('comandas')){
+  if(employee.role==='waiter'){
     location.replace('/comandas');
     return;
   }
@@ -1514,7 +1523,15 @@ function applyEmployeePermissions(employee){
     },0);
   }
 
-  const allowed=employee.permissions.filter(permission=>permission!=='comandas');
+  const roleDefaults={
+    cashier:['pos'],
+    kitchen:['kitchen'],
+    waiter:['comandas']
+  };
+  const allowed=(Array.isArray(employee.permissions)&&employee.permissions.length
+    ? employee.permissions
+    : (roleDefaults[employee.role]||[])
+  ).filter(permission=>permission!=='comandas');
 
   $$('.sidebar [data-tab]').forEach(button=>{
     const permitted=allowed.includes(button.dataset.tab);
@@ -1534,8 +1551,15 @@ function applyEmployeePermissions(employee){
   });
 
   $('#logoutBtn').textContent='Cerrar sesión';
-  const first=$(`.sidebar [data-tab="${allowed[0]}"]`);
-  if(first)first.click();
+  const fallback=employee.role==='cashier'?'pos':employee.role==='kitchen'?'kitchen':allowed[0];
+  const first=$(`.sidebar [data-tab="${fallback}"]`);
+  if(first){
+    first.hidden=false;
+    first.style.setProperty('display','flex','important');
+    first.click();
+  }else{
+    toast('No se encontró el módulo autorizado. Cierra sesión y vuelve a entrar.');
+  }
 }
 async function loginEmployee(){
   const id=$('#employeeLoginStaff').value,pin=$('#employeeLoginPin').value.trim();
@@ -2488,3 +2512,32 @@ document.addEventListener('click',event=>{
     toast('La caja está cerrada. Solicita al administrador que la abra.');
   }
 },true);
+
+
+/* PARCHE FINAL DE PERMISOS */
+function enforceEmployeeMenu(){
+  if(!document.body.classList.contains('employeeMode'))return;
+  let employee=null;
+  try{employee=JSON.parse(localStorage.getItem('mordisco_employee')||'null')}catch{}
+  if(!employee?.role)return;
+
+  const defaults={
+    cashier:['pos'],
+    kitchen:['kitchen'],
+    waiter:['comandas']
+  };
+  const allowed=(Array.isArray(employee.permissions)&&employee.permissions.length
+    ? employee.permissions
+    : (defaults[employee.role]||[])
+  ).filter(item=>item!=='comandas');
+
+  $$('.sidebar [data-tab]').forEach(button=>{
+    const permitted=allowed.includes(button.dataset.tab);
+    button.hidden=!permitted;
+    button.style.setProperty('display',permitted?'flex':'none','important');
+    button.classList.toggle('employeeAllowed',permitted);
+  });
+}
+
+window.addEventListener('load',()=>setTimeout(enforceEmployeeMenu,300));
+window.addEventListener('pageshow',()=>setTimeout(enforceEmployeeMenu,300));

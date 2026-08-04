@@ -118,6 +118,10 @@
   }
 
   function redirectEmployee(employee) {
+    const defaults={cashier:['pos'],kitchen:['kitchen'],waiter:['comandas']};
+    employee.permissions=Array.isArray(employee.permissions)&&employee.permissions.length
+      ? employee.permissions
+      : (defaults[employee.role]||[]);
     localStorage.setItem('mordisco_employee', JSON.stringify(employee));
 
     const destinations = {
