@@ -1424,3 +1424,12 @@ body.employeeMode #adminShiftManager{display:none!important}
   .adminShiftGrid{grid-template-columns:1fr}
   .adminShiftActions{grid-column:auto}
 }
+
+/* CORRECCIÓN MODAL DE COBRO */
+.modal.hidden,
+.overlay.hidden,
+.dialogBackdrop.hidden{
+  display:none!important;
+  pointer-events:none!important;
+}
+body:not(.modal-open){overflow:auto!important}

@@ -1,0 +1,33 @@
+MORDISCO — CORRECCIÓN DE VENTANA DE COBRO
+
+CORRIGE
+- La X cierra el cobro y el comprobante.
+- Nueva venta limpia y habilita inmediatamente otra venta.
+- Clic fuera del cuadro cierra el modal.
+- Escape cierra el modal.
+- No queda la pantalla bloqueada después del cobro.
+
+NO MODIFICA
+- Productos
+- Ventas guardadas
+- Pedidos
+- Permisos
+- Turnos
+- Empleados
+- Página pública
+- Inventario
+
+APLICAR
+1. Extrae este ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Corregir ventana de cobro y nueva venta
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Prueba con:
+   https://mordiscofastfood.com/admin?employee=1&tab=pos&v=modal-final
+
+NO ejecutes SQL.

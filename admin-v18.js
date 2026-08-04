@@ -2676,3 +2676,135 @@ function enforceStrictEmployeeMenu(){
 
 window.addEventListener('load',()=>setTimeout(enforceStrictEmployeeMenu,250));
 window.addEventListener('pageshow',()=>setTimeout(enforceStrictEmployeeMenu,250));
+
+
+/* ===== CORRECCIÓN DEFINITIVA: MODALES DE COBRO Y NUEVA VENTA ===== */
+function mordiscoCloseOverlay(node){
+  if(!node)return;
+  node.classList.add('hidden');
+  node.classList.remove('show','open','active');
+  node.setAttribute('aria-hidden','true');
+  node.style.removeProperty('display');
+  document.body.classList.remove('modal-open','no-scroll');
+  document.documentElement.classList.remove('modal-open','no-scroll');
+}
+
+function mordiscoClosePaymentModals(){
+  [
+    '#chargeModal',
+    '#paymentModal',
+    '#receiptModal',
+    '#saleReceiptModal',
+    '#posChargeModal',
+    '#orderReceiptModal'
+  ].forEach(selector=>mordiscoCloseOverlay($(selector)));
+
+  $$('.modal,.overlay,.dialogBackdrop').forEach(node=>{
+    const text=(node.textContent||'').toLowerCase();
+    if(
+      text.includes('cobro de venta')||
+      text.includes('comprobante de venta')||
+      text.includes('confirmar cobro')||
+      text.includes('nueva venta')
+    ){
+      mordiscoCloseOverlay(node);
+    }
+  });
+}
+
+function mordiscoResetPosAfterSale(){
+  try{
+    if(Array.isArray(posCart))posCart.length=0;
+  }catch{}
+  try{
+    if(typeof posCart!=='undefined')posCart=[];
+  }catch{}
+  try{
+    if(typeof currentPosOrder!=='undefined')currentPosOrder=null;
+  }catch{}
+  try{
+    if(typeof selectedOrderForCharge!=='undefined')selectedOrderForCharge=null;
+  }catch{}
+
+  [
+    '#posCustomerName',
+    '#posCustomerPhone',
+    '#posNotes',
+    '#posDiscountValue'
+  ].forEach(selector=>{
+    const input=$(selector);
+    if(input)input.value='';
+  });
+
+  const discountType=$('#posDiscountType');
+  if(discountType)discountType.value='none';
+
+  if(typeof renderPosCart==='function'){
+    try{renderPosCart()}catch(error){console.warn('Reinicio POS:',error)}
+  }
+  if(typeof renderPOS==='function'){
+    try{renderPOS()}catch(error){console.warn('Reinicio POS:',error)}
+  }
+
+  mordiscoClosePaymentModals();
+  setTimeout(()=>mordiscoClosePaymentModals(),60);
+  setTimeout(()=>mordiscoClosePaymentModals(),250);
+}
+
+/* Cerrar con cualquier X dentro de un modal de cobro/comprobante */
+document.addEventListener('click',event=>{
+  const closeButton=event.target.closest?.(
+    '[data-close-modal],.modalClose,.closeModal,.receiptClose,.dialogClose,button[aria-label="Cerrar"]'
+  );
+
+  if(closeButton){
+    const modal=closeButton.closest('.modal,.overlay,.dialogBackdrop,[role="dialog"]');
+    const text=(modal?.textContent||'').toLowerCase();
+    if(
+      text.includes('cobro de venta')||
+      text.includes('comprobante de venta')||
+      text.includes('confirmar cobro')||
+      text.includes('nueva venta')
+    ){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      mordiscoCloseOverlay(modal);
+    }
+  }
+
+  const newSaleButton=event.target.closest?.(
+    '#newSaleBtn,#newOrderBtn,#receiptNewSale,.newSaleBtn,[data-action="new-sale"]'
+  );
+
+  if(newSaleButton){
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    mordiscoResetPosAfterSale();
+    toast('Lista una nueva venta');
+  }
+},true);
+
+/* Cerrar al pulsar el fondo oscuro */
+document.addEventListener('click',event=>{
+  const overlay=event.target;
+  if(!overlay?.matches?.('.modal,.overlay,.dialogBackdrop'))return;
+  const text=(overlay.textContent||'').toLowerCase();
+  if(
+    text.includes('cobro de venta')||
+    text.includes('comprobante de venta')||
+    text.includes('confirmar cobro')||
+    text.includes('nueva venta')
+  ){
+    mordiscoCloseOverlay(overlay);
+  }
+});
+
+/* Escape también cierra */
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape')mordiscoClosePaymentModals();
+});
+
+/* Después de un cobro exitoso, garantizar que el modal de cobro se retire */
+document.addEventListener('mordisco:sale-completed',()=>{
+  mordiscoClosePaymentModals();
+});
