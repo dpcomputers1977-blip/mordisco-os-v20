@@ -2554,28 +2554,6 @@ document.querySelector('#changeAdminPasswordForm')?.addEventListener('submit',as
 });
 
 
-/* ===== BLOQUEO ESTRICTO POR CARGO ===== */
-document.addEventListener('click',event=>{
-  const button=event.target.closest?.('.sidebar [data-tab]');
-  if(!button||!document.body.classList.contains('employeeMode'))return;
-
-  let employee=null;
-  try{employee=JSON.parse(localStorage.getItem('mordisco_employee')||'null')}catch{}
-  if(!employee?.role)return;
-
-  const allowed={
-    cashier:['pos'],
-    kitchen:['kitchen'],
-    admin:['dashboard','products','categories','orders','kitchen','pos','inventory','tables','shifts','finance','customers','promotions','pages','staff','extras','settings']
-  }[employee.role]||[];
-
-  if(!allowed.includes(button.dataset.tab)){
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    toast('No tienes permiso para abrir esta sección');
-  }
-},true);
-
 
 /* ===== CONTROL ADMINISTRATIVO DE CAJA ===== */
 async function loadCashRegisterState(){
@@ -2648,65 +2626,6 @@ document.addEventListener('click',event=>{
   }
 },true);
 
-
-/* ===== V21: BLOQUEO ESTRICTO DE MÓDULOS POR CARGO ===== */
-document.addEventListener('click',event=>{
-  if(!document.body.classList.contains('employeeMode'))return;
-
-  const button=event.target.closest?.('.sidebar [data-tab]');
-  if(!button)return;
-
-  let employee=null;
-  try{
-    employee=JSON.parse(localStorage.getItem('mordisco_employee')||'null');
-  }catch{}
-
-  const allowed={
-    cashier:['pos'],
-    kitchen:['kitchen'],
-    waiter:['comandas'],
-    admin:[
-      'dashboard','products','categories','orders','kitchen','pos',
-      'inventory','tables','shifts','finance','customers',
-      'promotions','pages','staff','extras','settings'
-    ]
-  }[employee?.role]||[];
-
-  if(!allowed.includes(button.dataset.tab)){
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    toast('No tienes permiso para abrir esta sección.');
-  }
-},true);
-
-function enforceStrictEmployeeMenu(){
-  if(!document.body.classList.contains('employeeMode'))return;
-
-  let employee=null;
-  try{
-    employee=JSON.parse(localStorage.getItem('mordisco_employee')||'null');
-  }catch{}
-
-  const allowed={
-    cashier:['pos'],
-    kitchen:['kitchen'],
-    waiter:['comandas'],
-    admin:[
-      'dashboard','products','categories','orders','kitchen','pos',
-      'inventory','tables','shifts','finance','customers',
-      'promotions','pages','staff','extras','settings'
-    ]
-  }[employee?.role]||[];
-
-  $$('.sidebar [data-tab]').forEach(button=>{
-    const permitted=allowed.includes(button.dataset.tab);
-    button.hidden=!permitted;
-    button.style.setProperty('display',permitted?'flex':'none','important');
-  });
-}
-
-window.addEventListener('load',()=>setTimeout(enforceStrictEmployeeMenu,250));
-window.addEventListener('pageshow',()=>setTimeout(enforceStrictEmployeeMenu,250));
 
 
 /* ===== CORRECCIÓN DEFINITIVA: MODALES DE COBRO Y NUEVA VENTA ===== */
@@ -2849,3 +2768,39 @@ $('#posCustomer')?.addEventListener('input',()=>{
   );
   if(exact)syncSelectedPosCustomer();
 });
+
+
+/* ===== VALIDACIÓN ÚNICA DE PERMISOS ACTUALES ===== */
+function mordiscoCurrentEmployeePermissions(){
+  const employee=currentEmployee||(()=>{
+    try{return JSON.parse(localStorage.getItem('mordisco_employee')||'null')}catch{return null}
+  })();
+
+  if(!employee)return [];
+
+  const defaults={
+    cashier:['pos'],
+    kitchen:['kitchen'],
+    waiter:['comandas']
+  };
+
+  return Array.isArray(employee.permissions)&&employee.permissions.length
+    ? [...new Set(employee.permissions)]
+    : (defaults[employee.role]||[]);
+}
+
+document.addEventListener('click',event=>{
+  if(!document.body.classList.contains('employeeMode'))return;
+
+  const button=event.target.closest?.('.sidebar [data-tab]');
+  if(!button)return;
+
+  const allowed=mordiscoCurrentEmployeePermissions();
+  const tab=button.dataset.tab;
+
+  if(!allowed.includes(tab)){
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    toast('No tienes permiso para abrir esta sección');
+  }
+},true);

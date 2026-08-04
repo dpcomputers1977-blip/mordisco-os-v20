@@ -1,0 +1,31 @@
+MORDISCO — CORRECCIÓN DEL BLOQUEO INTERNO DE PERMISOS
+
+CORRIGE
+- Los módulos visibles ya no mostrarán “No tienes permiso”.
+- La validación usa exactamente los permisos actuales guardados en Supabase.
+- Se elimina la validación antigua que entraba en conflicto.
+
+NO MODIFICA
+- Productos
+- Ventas
+- Pedidos
+- Turnos
+- Clientes
+- Empleados
+- Inventario
+- Página pública
+
+APLICAR
+1. Extrae el ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Corregir bloqueo interno de permisos
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. El empleado debe cerrar sesión y volver a entrar desde:
+   https://mordiscofastfood.com/staff?v=permission-guard-final
+
+NO ejecutes SQL.
