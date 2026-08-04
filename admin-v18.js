@@ -169,15 +169,6 @@ async function init(){
       return;
     }
     savedEmployee=freshEmployee;
-    if(!Array.isArray(savedEmployee.permissions)||!savedEmployee.permissions.length){
-      savedEmployee.permissions=savedEmployee.role==='cashier'
-        ? ['pos']
-        : savedEmployee.role==='kitchen'
-          ? ['kitchen']
-          : savedEmployee.role==='waiter'
-            ? ['comandas']
-            : [];
-    }
 
     if(savedEmployee.role==='waiter'){
       location.replace('/comandas');
@@ -1503,10 +1494,23 @@ function fillEmployeeLogin(){
 }
 function applyEmployeePermissions(employee){
   currentEmployee=employee;
-  employee.permissions=normalizePermissions(employee.permissions,employee.role);
   localStorage.setItem('mordisco_employee',JSON.stringify(employee));
+
   document.body.classList.add('employeeMode');
   document.body.dataset.employeeRole=employee.role;
+
+  const strictPermissions={
+    cashier:['pos'],
+    kitchen:['kitchen'],
+    waiter:['comandas'],
+    admin:[
+      'dashboard','products','categories','orders','kitchen','pos',
+      'inventory','tables','shifts','finance','customers',
+      'promotions','pages','staff','extras','settings'
+    ]
+  };
+
+  const allowed=strictPermissions[employee.role]||[];
 
   if(employee.role==='waiter'){
     location.replace('/comandas');
@@ -1519,46 +1523,46 @@ function applyEmployeePermissions(employee){
         $('#posCashier').value=employee.id;
         $('#posCashier').disabled=true;
       }
-      if($('#activeCashierName'))$('#activeCashierName').textContent=employee.name;
+      if($('#activeCashierName')){
+        $('#activeCashierName').textContent=employee.name;
+      }
     },0);
   }
 
-  const roleDefaults={
-    cashier:['pos'],
-    kitchen:['kitchen'],
-    waiter:['comandas']
-  };
-  const allowed=(Array.isArray(employee.permissions)&&employee.permissions.length
-    ? employee.permissions
-    : (roleDefaults[employee.role]||[])
-  ).filter(permission=>permission!=='comandas');
-
   $$('.sidebar [data-tab]').forEach(button=>{
     const permitted=allowed.includes(button.dataset.tab);
+    button.hidden=!permitted;
     button.classList.toggle('employeeAllowed',permitted);
     button.classList.toggle('roleRestricted',!permitted);
-    button.hidden=!permitted;
     button.style.setProperty('display',permitted?'flex':'none','important');
     button.setAttribute('aria-hidden',String(!permitted));
+    button.tabIndex=permitted?0:-1;
   });
 
   $$('#adminView .tab').forEach(section=>{
     const tabName=section.id?.replace(/^tab-/,'');
-    if(tabName&&!allowed.includes(tabName)){
+    const permitted=tabName&&allowed.includes(tabName);
+    if(!permitted){
       section.classList.add('hidden');
       section.setAttribute('aria-hidden','true');
     }
   });
 
   $('#logoutBtn').textContent='Cerrar sesión';
-  const fallback=employee.role==='cashier'?'pos':employee.role==='kitchen'?'kitchen':allowed[0];
-  const first=$(`.sidebar [data-tab="${fallback}"]`);
+
+  const target=employee.role==='cashier'
+    ? 'pos'
+    : employee.role==='kitchen'
+      ? 'kitchen'
+      : allowed[0];
+
+  const first=$(`.sidebar [data-tab="${target}"]`);
   if(first){
     first.hidden=false;
     first.style.setProperty('display','flex','important');
     first.click();
   }else{
-    toast('No se encontró el módulo autorizado. Cierra sesión y vuelve a entrar.');
+    toast('No se encontró el módulo autorizado.');
   }
 }
 async function loginEmployee(){
@@ -2514,30 +2518,61 @@ document.addEventListener('click',event=>{
 },true);
 
 
-/* PARCHE FINAL DE PERMISOS */
-function enforceEmployeeMenu(){
+/* ===== V21: BLOQUEO ESTRICTO DE MÓDULOS POR CARGO ===== */
+document.addEventListener('click',event=>{
   if(!document.body.classList.contains('employeeMode'))return;
-  let employee=null;
-  try{employee=JSON.parse(localStorage.getItem('mordisco_employee')||'null')}catch{}
-  if(!employee?.role)return;
 
-  const defaults={
+  const button=event.target.closest?.('.sidebar [data-tab]');
+  if(!button)return;
+
+  let employee=null;
+  try{
+    employee=JSON.parse(localStorage.getItem('mordisco_employee')||'null');
+  }catch{}
+
+  const allowed={
     cashier:['pos'],
     kitchen:['kitchen'],
-    waiter:['comandas']
-  };
-  const allowed=(Array.isArray(employee.permissions)&&employee.permissions.length
-    ? employee.permissions
-    : (defaults[employee.role]||[])
-  ).filter(item=>item!=='comandas');
+    waiter:['comandas'],
+    admin:[
+      'dashboard','products','categories','orders','kitchen','pos',
+      'inventory','tables','shifts','finance','customers',
+      'promotions','pages','staff','extras','settings'
+    ]
+  }[employee?.role]||[];
+
+  if(!allowed.includes(button.dataset.tab)){
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    toast('No tienes permiso para abrir esta sección.');
+  }
+},true);
+
+function enforceStrictEmployeeMenu(){
+  if(!document.body.classList.contains('employeeMode'))return;
+
+  let employee=null;
+  try{
+    employee=JSON.parse(localStorage.getItem('mordisco_employee')||'null');
+  }catch{}
+
+  const allowed={
+    cashier:['pos'],
+    kitchen:['kitchen'],
+    waiter:['comandas'],
+    admin:[
+      'dashboard','products','categories','orders','kitchen','pos',
+      'inventory','tables','shifts','finance','customers',
+      'promotions','pages','staff','extras','settings'
+    ]
+  }[employee?.role]||[];
 
   $$('.sidebar [data-tab]').forEach(button=>{
     const permitted=allowed.includes(button.dataset.tab);
     button.hidden=!permitted;
     button.style.setProperty('display',permitted?'flex':'none','important');
-    button.classList.toggle('employeeAllowed',permitted);
   });
 }
 
-window.addEventListener('load',()=>setTimeout(enforceEmployeeMenu,300));
-window.addEventListener('pageshow',()=>setTimeout(enforceEmployeeMenu,300));
+window.addEventListener('load',()=>setTimeout(enforceStrictEmployeeMenu,250));
+window.addEventListener('pageshow',()=>setTimeout(enforceStrictEmployeeMenu,250));

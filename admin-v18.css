@@ -1378,3 +1378,11 @@ body.employeeMode #adminCashControl{display:none!important}
   .staffPermissionGrid{grid-template-columns:1fr}
   .adminCashControl{align-items:flex-start;flex-direction:column}
 }
+
+/* V21 — VISIBILIDAD ESTRICTA DE EMPLEADOS */
+body.employeeMode .sidebar [data-tab]{
+  display:none!important;
+}
+body.employeeMode .sidebar [data-tab].employeeAllowed{
+  display:flex!important;
+}

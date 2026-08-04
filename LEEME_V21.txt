@@ -1,0 +1,36 @@
+MORDISCO V21 — CORRECCIÓN MÍNIMA DE PERMISOS
+
+NO BORRA NI CAMBIA:
+- Productos
+- Ventas
+- Pedidos
+- Empleados
+- Inventario
+- Contabilidad
+- Página pública
+- Imágenes
+- Promociones
+
+SOLO CORRIGE:
+- Administrador: acceso completo.
+- Cajero: únicamente POS / Caja.
+- Cocina: únicamente Cocina.
+- Mesero: únicamente Comandas.
+- Bloqueo de módulos por URL y por menú.
+
+APLICAR:
+1. Extrae este ZIP.
+2. Copia TODO dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Pulsa “Reemplazar archivos en el destino”.
+4. Abre GitHub Desktop.
+5. Summary:
+   Mordisco V21 corregir permisos sin cambiar diseño
+6. Commit to main.
+7. Push origin.
+8. Espera Vercel Ready.
+9. El empleado debe cerrar sesión y volver a entrar desde:
+   https://mordiscofastfood.com/staff?v=v21
+
+NO ejecutes SQL.
+NO cambies otros archivos.
