@@ -1527,3 +1527,185 @@ body:not(.modal-open){overflow:auto!important}
   .receiptActions{flex-direction:column}
   .receiptActions button{width:100%}
 }
+
+/* ===== MESAS: VENTANA LIMPIA Y ORDENADA ===== */
+#tableOrderModal{
+  align-items:center!important;
+  justify-content:center!important;
+  padding:18px!important;
+  overflow:hidden!important;
+}
+
+#tableOrderModal .tableOrderCard{
+  width:min(1180px,calc(100vw - 280px))!important;
+  max-width:1180px!important;
+  height:min(820px,calc(100vh - 36px))!important;
+  max-height:calc(100vh - 36px)!important;
+  padding:22px!important;
+  border-radius:22px!important;
+  overflow:hidden!important;
+  display:flex!important;
+  flex-direction:column!important;
+  box-shadow:0 30px 90px rgba(0,0,0,.32)!important;
+}
+
+#tableOrderModal .close{
+  width:42px!important;
+  height:42px!important;
+  display:grid!important;
+  place-items:center!important;
+  top:14px!important;
+  right:14px!important;
+  border:2px solid #111!important;
+  border-radius:10px!important;
+  background:#fff!important;
+  color:#111!important;
+  font-size:28px!important;
+  line-height:1!important;
+  z-index:20!important;
+}
+
+#tableOrderModal .tableOrderHead{
+  flex:0 0 auto!important;
+  min-height:62px!important;
+  padding:0 58px 14px 2px!important;
+  margin:0 0 14px!important;
+  border-bottom:1px solid #e8dfd2!important;
+}
+
+#tableOrderModal .tableOrderHead h2{
+  font-size:1.8rem!important;
+  margin:2px 0 0!important;
+}
+
+#tableOrderModal .tableOrderLayout{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1.55fr) minmax(280px,.75fr)!important;
+  gap:18px!important;
+  overflow:hidden!important;
+}
+
+#tableOrderModal .tableCatalog{
+  min-width:0!important;
+  min-height:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+}
+
+#tableOrderModal .tableCatalogToolbar{
+  flex:0 0 auto!important;
+  display:grid!important;
+  grid-template-columns:minmax(180px,1fr) minmax(180px,260px)!important;
+  gap:10px!important;
+  margin-bottom:12px!important;
+}
+
+#tableOrderModal .tableCatalogToolbar input,
+#tableOrderModal .tableCatalogToolbar select{
+  width:100%!important;
+  min-height:44px!important;
+  padding:10px 12px!important;
+  border:1px solid #cfc2b0!important;
+  border-radius:10px!important;
+  background:#fff!important;
+  font-size:.95rem!important;
+}
+
+#tableOrderModal #tableProducts{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  padding:2px 6px 16px 2px!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  align-content:start!important;
+}
+
+#tableOrderModal #tableProducts .posProduct img,
+#tableOrderModal #tableProducts .posProductNoImage{
+  height:105px!important;
+}
+
+#tableOrderModal .tableTicket{
+  min-width:0!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  background:#f7f2e9!important;
+  border:1px solid #e3d8c8!important;
+  border-radius:16px!important;
+  padding:16px!important;
+}
+
+#tableOrderModal .tableTicket .posCart{
+  max-height:210px!important;
+  overflow-y:auto!important;
+  margin-bottom:10px!important;
+}
+
+#tableOrderModal .tableTicket textarea{
+  min-height:72px!important;
+  resize:vertical!important;
+}
+
+#tableOrderModal .tableTicket button{
+  min-height:44px!important;
+  border-radius:10px!important;
+}
+
+#tableOrderModal .tableCloseBottom{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #c8baa6!important;
+}
+
+@media(max-width:1180px){
+  #tableOrderModal .tableOrderCard{
+    width:calc(100vw - 32px)!important;
+  }
+  #tableOrderModal #tableProducts{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+}
+
+@media(max-width:760px){
+  #tableOrderModal{
+    padding:0!important;
+    align-items:stretch!important;
+  }
+  #tableOrderModal .tableOrderCard{
+    width:100vw!important;
+    height:100vh!important;
+    max-height:100vh!important;
+    border-radius:0!important;
+    padding:16px!important;
+  }
+  #tableOrderModal .tableOrderLayout{
+    grid-template-columns:1fr!important;
+    overflow-y:auto!important;
+  }
+  #tableOrderModal .tableCatalog{
+    min-height:520px!important;
+  }
+  #tableOrderModal .tableCatalogToolbar{
+    grid-template-columns:1fr!important;
+  }
+  #tableOrderModal #tableProducts{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    max-height:460px!important;
+  }
+  #tableOrderModal .tableTicket{
+    overflow:visible!important;
+  }
+}
+
+@media(max-width:430px){
+  #tableOrderModal #tableProducts{
+    grid-template-columns:1fr 1fr!important;
+  }
+  #tableOrderModal #tableProducts .posProduct img,
+  #tableOrderModal #tableProducts .posProductNoImage{
+    height:90px!important;
+  }
+}

@@ -1,0 +1,35 @@
+MORDISCO — VENTANA LIMPIA DE MESAS
+
+CORRIGE
+- La ventana ya no ocupa una página blanca desordenada.
+- Encabezado visible con mesa y estado.
+- Catálogo desplazable a la izquierda.
+- Pedido de la mesa visible a la derecha.
+- Buscador y categorías compactos.
+- X visible y botón Cerrar ventana.
+- Diseño adaptable a computadora y teléfono.
+
+NO MODIFICA
+- Caja
+- Cocina
+- Turnos
+- Clientes
+- Productos
+- Ventas
+- Permisos
+- Página pública
+
+APLICAR
+1. Extrae este ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Arreglar ventana de mesas
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Prueba:
+   https://mordiscofastfood.com/admin?session=ok&tab=tables&v=tables-clean-window
+
+NO ejecutes SQL.

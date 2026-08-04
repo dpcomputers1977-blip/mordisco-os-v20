@@ -3099,3 +3099,8 @@ document.addEventListener('keydown',event=>{
     closeReceiptModal();
   }
 });
+
+/* CIERRE INFERIOR DE LA VENTANA DE MESAS */
+$('#closeTableOrderBottom')?.addEventListener('click',()=>{
+  $('#tableOrderModal')?.classList.add('hidden');
+});
