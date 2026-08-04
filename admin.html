@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=modal-cobro-final-1">
+<link rel="stylesheet" href="/admin-v18.css?v=permissions-customers-final">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 </head>
@@ -268,7 +268,7 @@
 
           <div class="posForm">
             <label>Cliente
-              <input id="posCustomer" placeholder="Consumidor final">
+              <input id="posCustomer" list="posCustomerList" autocomplete="off" placeholder="Buscar o seleccionar cliente"><datalist id="posCustomerList"></datalist>
             </label>
             <label>Teléfono
               <input id="posPhone" placeholder="Opcional">
@@ -1016,7 +1016,7 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=modal-cobro-final-1"></script>
+<script src="/admin-v18.js?v=permissions-customers-final"></script>
 
 
 

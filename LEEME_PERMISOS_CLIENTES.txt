@@ -1,0 +1,32 @@
+MORDISCO — PERMISOS REALES Y CLIENTES EN POS
+
+CORRIGE
+- Respeta exactamente los permisos marcados por el administrador.
+- Si no existen permisos personalizados, aplica el permiso básico del cargo.
+- Carga los clientes activos en el campo Cliente de POS.
+- Al seleccionar un cliente, completa automáticamente su teléfono.
+
+NO MODIFICA
+- Productos
+- Ventas
+- Pedidos
+- Turnos abiertos
+- Empleados
+- Inventario
+- Página pública
+- Diseño principal
+
+APLICAR
+1. Extrae el ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza los archivos.
+4. GitHub Desktop:
+   Summary: Corregir permisos reales y clientes en POS
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. El empleado debe cerrar sesión y volver a entrar:
+   https://mordiscofastfood.com/staff?v=permissions-customers-final
+
+NO ejecutes SQL.

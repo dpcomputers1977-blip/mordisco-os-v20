@@ -239,7 +239,7 @@ function totals(){const subtotal=cart.reduce((s,x)=>{const p=products.find(y=>y.
 function renderCart(){$('#cartCount').textContent=cart.reduce((s,x)=>s+x.qty,0);$('#cartItems').innerHTML=cart.length?cart.map(x=>{const p=products.find(y=>y.id===x.id);if(!p)return'';return`<div class="cartItem">${p.image_url?`<img src="${esc(p.image_url)}">`:'<div></div>'}<div><b>${esc(p.name)}</b><small>${money(p.price)}</small><div class="qty"><button data-minus="${p.id}">−</button><span>${x.qty}</span><button data-plus="${p.id}">+</button></div></div><b>${money(Number(p.price)*x.qty)}</b></div>`}).join(''):'<p class="notice">Tu carrito está vacío.</p>';$$('[data-minus]').forEach(b=>b.onclick=()=>changeQty(b.dataset.minus,-1));$$('[data-plus]').forEach(b=>b.onclick=()=>changeQty(b.dataset.plus,1));const t=totals();$('#subtotal').textContent=money(t.subtotal);$('#deliveryTotal').textContent=money(t.delivery);$('#grandTotal').textContent=money(t.total)}
 function openCart(){$('#cartDrawer').classList.add('open')} if(document.querySelector('#cartBtn'))document.querySelector('#cartBtn').onclick=openCart;if(document.querySelector('#orderNowBtn'))document.querySelector('#orderNowBtn').onclick=openCart;if(document.querySelector('#closeCart'))document.querySelector('#closeCart').onclick=()=>$('#cartDrawer').classList.remove('open');if(document.querySelector('#orderType'))document.querySelector('#orderType').onchange=()=>{renderCart();$('#customerAddress').classList.toggle('hidden',$('#orderType').value!=='delivery')};
 
-$$('.sidebar [data-tab]').forEach(b=>b.onclick=async()=>{const tab=b.dataset.tab;$$('.sidebar [data-tab]').forEach(x=>x.classList.toggle('active',x===b));$$('.tab').forEach(x=>x.classList.add('hidden'));$('#tab-'+tab).classList.remove('hidden');$('#adminTitle').textContent={dashboard:'Resumen',products:'Productos',categories:'Categorías',orders:'Pedidos web',kitchen:'Cocina',pos:'POS / Caja',inventory:'Inventario',tables:'Mesas',shifts:'Turnos',staff:'Personal',finance:'Contabilidad',customers:'Clientes',promotions:'Promociones',pages:'Páginas',settings:'Negocio'}[tab];if(tab==='orders'||tab==='kitchen')await loadOrders();if(tab==='dashboard'){await loadOrders();renderMetrics()}if(tab==='kitchen')startKitchenClock();if(tab==='pos'){fillPosCategories();renderPosProducts();renderPosCart();await loadOrders();renderPosPendingOrders()}if(tab==='inventory')await loadInventoryData();if(tab==='staff'){
+$$('.sidebar [data-tab]').forEach(b=>b.onclick=async()=>{const tab=b.dataset.tab;$$('.sidebar [data-tab]').forEach(x=>x.classList.toggle('active',x===b));$$('.tab').forEach(x=>x.classList.add('hidden'));$('#tab-'+tab).classList.remove('hidden');$('#adminTitle').textContent={dashboard:'Resumen',products:'Productos',categories:'Categorías',orders:'Pedidos web',kitchen:'Cocina',pos:'POS / Caja',inventory:'Inventario',tables:'Mesas',shifts:'Turnos',staff:'Personal',finance:'Contabilidad',customers:'Clientes',promotions:'Promociones',pages:'Páginas',settings:'Negocio'}[tab];if(tab==='orders'||tab==='kitchen')await loadOrders();if(tab==='dashboard'){await loadOrders();renderMetrics()}if(tab==='kitchen')startKitchenClock();if(tab==='pos'){fillPosCategories();renderPosProducts();renderPosCart();await Promise.all([loadOrders(),loadCustomers()]);fillPosCustomers();renderPosPendingOrders()}if(tab==='inventory')await loadInventoryData();if(tab==='staff'){
     if($('#staffSearch'))$('#staffSearch').value='';
     if($('#staffRoleFilter'))$('#staffRoleFilter').value='all';
     await loadStaff();
@@ -1594,12 +1594,8 @@ function fillEmployeeLogin(){
 }
 function applyEmployeePermissions(employee){
   currentEmployee=employee;
-  localStorage.setItem('mordisco_employee',JSON.stringify(employee));
 
-  document.body.classList.add('employeeMode');
-  document.body.dataset.employeeRole=employee.role;
-
-  const strictPermissions={
+  const roleDefaults={
     cashier:['pos'],
     kitchen:['kitchen'],
     waiter:['comandas'],
@@ -1610,9 +1606,19 @@ function applyEmployeePermissions(employee){
     ]
   };
 
-  const allowed=strictPermissions[employee.role]||[];
+  const savedPermissions=Array.isArray(employee.permissions)
+    ? employee.permissions.filter(Boolean)
+    : [];
 
-  if(employee.role==='waiter'){
+  employee.permissions=savedPermissions.length
+    ? [...new Set(savedPermissions)]
+    : (roleDefaults[employee.role]||[]);
+
+  localStorage.setItem('mordisco_employee',JSON.stringify(employee));
+  document.body.classList.add('employeeMode');
+  document.body.dataset.employeeRole=employee.role;
+
+  if(employee.role==='waiter'&&employee.permissions.includes('comandas')){
     location.replace('/comandas');
     return;
   }
@@ -1629,6 +1635,8 @@ function applyEmployeePermissions(employee){
     },0);
   }
 
+  const allowed=employee.permissions.filter(permission=>permission!=='comandas');
+
   $$('.sidebar [data-tab]').forEach(button=>{
     const permitted=allowed.includes(button.dataset.tab);
     button.hidden=!permitted;
@@ -1641,8 +1649,7 @@ function applyEmployeePermissions(employee){
 
   $$('#adminView .tab').forEach(section=>{
     const tabName=section.id?.replace(/^tab-/,'');
-    const permitted=tabName&&allowed.includes(tabName);
-    if(!permitted){
+    if(tabName&&!allowed.includes(tabName)){
       section.classList.add('hidden');
       section.setAttribute('aria-hidden','true');
     }
@@ -1650,19 +1657,19 @@ function applyEmployeePermissions(employee){
 
   $('#logoutBtn').textContent='Cerrar sesión';
 
-  const target=employee.role==='cashier'
+  const preferred=employee.role==='cashier'&&allowed.includes('pos')
     ? 'pos'
-    : employee.role==='kitchen'
+    : employee.role==='kitchen'&&allowed.includes('kitchen')
       ? 'kitchen'
       : allowed[0];
 
-  const first=$(`.sidebar [data-tab="${target}"]`);
+  const first=preferred?$(`.sidebar [data-tab="${preferred}"]`):null;
   if(first){
     first.hidden=false;
     first.style.setProperty('display','flex','important');
     first.click();
   }else{
-    toast('No se encontró el módulo autorizado.');
+    toast('Este empleado no tiene módulos habilitados. Asigna permisos desde Personal.');
   }
 }
 async function loginEmployee(){
@@ -1718,9 +1725,33 @@ if($('#financeMonth')){$('#financeMonth').value=new Date().toISOString().slice(0
 if($('#financeDate'))$('#financeDate').value=isoToday();
 
 /* CLIENTES */
+
+function fillPosCustomers(){
+  const list=$('#posCustomerList');
+  if(!list)return;
+
+  const activeCustomers=customers.filter(customer=>customer.active!==false);
+  list.innerHTML=activeCustomers.map(customer=>
+    `<option value="${esc(customer.full_name)}" data-phone="${esc(customer.phone||'')}">${esc(customer.phone||customer.email||'Cliente registrado')}</option>`
+  ).join('');
+}
+
+function syncSelectedPosCustomer(){
+  const name=$('#posCustomer')?.value.trim().toLowerCase();
+  if(!name)return;
+
+  const customer=customers.find(item=>
+    String(item.full_name||'').trim().toLowerCase()===name
+  );
+
+  if(customer&&$('#posPhone')){
+    $('#posPhone').value=customer.phone||'';
+  }
+}
+
 async function loadCustomers(){
   const {data,error}=await db.from('customers').select('*').order('updated_at',{ascending:false});
-  if(error)return toast('Error cargando clientes: '+error.message);customers=data||[];renderCustomers();
+  if(error)return toast('Error cargando clientes: '+error.message);customers=data||[];renderCustomers();fillPosCustomers();
 }
 function filteredCustomers(){const q=($('#customerAdminSearch')?.value||'').toLowerCase();return customers.filter(c=>`${c.full_name} ${c.phone||''} ${c.email||''}`.toLowerCase().includes(q))}
 function renderCustomers(){
@@ -2807,4 +2838,14 @@ document.addEventListener('keydown',event=>{
 /* Después de un cobro exitoso, garantizar que el modal de cobro se retire */
 document.addEventListener('mordisco:sale-completed',()=>{
   mordiscoClosePaymentModals();
+});
+
+
+$('#posCustomer')?.addEventListener('change',syncSelectedPosCustomer);
+$('#posCustomer')?.addEventListener('input',()=>{
+  const exact=customers.some(customer=>
+    String(customer.full_name||'').trim().toLowerCase()===
+    String($('#posCustomer').value||'').trim().toLowerCase()
+  );
+  if(exact)syncSelectedPosCustomer();
 });

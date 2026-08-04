@@ -1433,3 +1433,6 @@ body.employeeMode #adminShiftManager{display:none!important}
   pointer-events:none!important;
 }
 body:not(.modal-open){overflow:auto!important}
+
+/* CLIENTES REGISTRADOS EN POS */
+#posCustomer{background:#fff}
