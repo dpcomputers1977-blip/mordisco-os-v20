@@ -1709,3 +1709,108 @@ body:not(.modal-open){overflow:auto!important}
     height:90px!important;
   }
 }
+
+/* ===== MESAS: TARJETAS COMPLETAS, SIN FRANJAS ===== */
+#tableOrderModal .tableOrderCard{
+  width:min(1160px,calc(100vw - 36px))!important;
+  height:min(780px,calc(100vh - 30px))!important;
+  padding:20px!important;
+}
+
+#tableOrderModal .tableOrderLayout{
+  grid-template-columns:minmax(520px,1.45fr) minmax(300px,.75fr)!important;
+  gap:16px!important;
+}
+
+#tableOrderModal #tableProducts{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(155px,1fr))!important;
+  grid-auto-rows:max-content!important;
+  align-items:start!important;
+  align-content:start!important;
+  gap:12px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  padding:4px 8px 20px 2px!important;
+}
+
+#tableOrderModal #tableProducts .posProduct{
+  display:flex!important;
+  flex-direction:column!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:205px!important;
+  height:auto!important;
+  overflow:hidden!important;
+  border-radius:14px!important;
+  background:#fff!important;
+  border:1px solid #e1d7c8!important;
+}
+
+#tableOrderModal #tableProducts .posProduct img,
+#tableOrderModal #tableProducts .posProductNoImage{
+  display:block!important;
+  flex:0 0 112px!important;
+  width:100%!important;
+  height:112px!important;
+  min-height:112px!important;
+  max-height:112px!important;
+  object-fit:contain!important;
+  background:#f3eee5!important;
+}
+
+#tableOrderModal #tableProducts .posProductInfo{
+  display:flex!important;
+  flex-direction:column!important;
+  flex:1 1 auto!important;
+  min-height:90px!important;
+  padding:10px 11px!important;
+  overflow:visible!important;
+}
+
+#tableOrderModal #tableProducts .posProductInfo small{
+  display:block!important;
+  margin:0 0 4px!important;
+  color:#776d61!important;
+}
+
+#tableOrderModal #tableProducts .posProductInfo b{
+  display:block!important;
+  min-height:38px!important;
+  line-height:1.15!important;
+  white-space:normal!important;
+  overflow:visible!important;
+}
+
+#tableOrderModal #tableProducts .posProductInfo strong{
+  display:block!important;
+  margin-top:auto!important;
+  padding-top:8px!important;
+  font-size:1.05rem!important;
+}
+
+#tableOrderModal .tableTicket{
+  max-height:100%!important;
+}
+
+@media(max-width:1050px){
+  #tableOrderModal .tableOrderLayout{
+    grid-template-columns:minmax(420px,1.2fr) minmax(280px,.8fr)!important;
+  }
+  #tableOrderModal #tableProducts{
+    grid-template-columns:repeat(2,minmax(165px,1fr))!important;
+  }
+}
+
+@media(max-width:760px){
+  #tableOrderModal .tableOrderLayout{
+    grid-template-columns:1fr!important;
+  }
+  #tableOrderModal #tableProducts{
+    grid-template-columns:repeat(2,minmax(135px,1fr))!important;
+    max-height:none!important;
+  }
+  #tableOrderModal #tableProducts .posProduct{
+    min-height:190px!important;
+  }
+}

@@ -2922,27 +2922,50 @@ async function kitchenUnlockSound(showTest=true){
 
 function kitchenPlaySound(test=false){
   if(!test&&!$('#kitchenSound')?.checked)return;
+
   try{
-    const ctx=kitchenAudioContext||new (window.AudioContext||window.webkitAudioContext)();
-    kitchenAudioContext=ctx;
+    const AudioCtx=window.AudioContext||window.webkitAudioContext;
+    if(!kitchenAudioContext)kitchenAudioContext=new AudioCtx();
+    const ctx=kitchenAudioContext;
+
+    if(ctx.state==='suspended')ctx.resume();
 
     const now=ctx.currentTime;
-    [880,1175,880].forEach((frequency,index)=>{
+    const master=ctx.createGain();
+    master.gain.setValueAtTime(0.95,now);
+    master.connect(ctx.destination);
+
+    const sequence=[
+      [880,0.00,.28],
+      [1175,0.32,.28],
+      [1480,0.64,.34],
+      [1175,1.05,.28],
+      [1480,1.37,.40]
+    ];
+
+    sequence.forEach(([frequency,offset,duration])=>{
       const osc=ctx.createOscillator();
       const gain=ctx.createGain();
+
+      osc.type='square';
+      osc.frequency.setValueAtTime(frequency,now+offset);
       osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.frequency.value=frequency;
-      gain.gain.setValueAtTime(0.0001,now+index*0.20);
-      gain.gain.exponentialRampToValueAtTime(0.22,now+index*0.20+0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001,now+index*0.20+0.16);
-      osc.start(now+index*0.20);
-      osc.stop(now+index*0.20+0.18);
+      gain.connect(master);
+
+      gain.gain.setValueAtTime(0.0001,now+offset);
+      gain.gain.exponentialRampToValueAtTime(0.72,now+offset+.025);
+      gain.gain.setValueAtTime(0.72,now+offset+duration-.05);
+      gain.gain.exponentialRampToValueAtTime(0.0001,now+offset+duration);
+
+      osc.start(now+offset);
+      osc.stop(now+offset+duration+.02);
     });
 
-    if(navigator.vibrate&&!test)navigator.vibrate([180,90,180]);
+    if(navigator.vibrate&&!test){
+      navigator.vibrate([300,120,300,120,500]);
+    }
   }catch(error){
-    console.warn('Error de sonido:',error);
+    console.warn('Error de sonido de Cocina:',error);
   }
 }
 
@@ -2998,14 +3021,22 @@ function startKitchenAutoRefresh(){
   });
 
   kitchenPollHandle=setInterval(()=>{
-    if(document.visibilityState==='visible'&&kitchenIsVisible()){
+    if(document.visibilityState==='visible'&&(
+      kitchenIsVisible()||
+      currentEmployee?.role==='kitchen'||
+      document.body.dataset.employeeRole==='kitchen'
+    )){
       loadKitchenOrdersReliable({notify:true});
     }
-  },4000);
+  },2000);
 }
 
 document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible'&&kitchenIsVisible()){
+  if(document.visibilityState==='visible'&&(
+      kitchenIsVisible()||
+      currentEmployee?.role==='kitchen'||
+      document.body.dataset.employeeRole==='kitchen'
+    )){
     loadKitchenOrdersReliable({notify:true});
   }
 });
@@ -3103,4 +3134,35 @@ document.addEventListener('keydown',event=>{
 /* CIERRE INFERIOR DE LA VENTANA DE MESAS */
 $('#closeTableOrderBottom')?.addEventListener('click',()=>{
   $('#tableOrderModal')?.classList.add('hidden');
+});
+
+
+/* REFRESCO DE RESPALDO PARA EL DISPOSITIVO DE COCINA */
+let mordiscoKitchenBackupPoll=null;
+
+function startKitchenBackupPoll(){
+  clearInterval(mordiscoKitchenBackupPoll);
+
+  mordiscoKitchenBackupPoll=setInterval(()=>{
+    const employeeRole=currentEmployee?.role||document.body.dataset.employeeRole;
+    if(employeeRole!=='kitchen')return;
+    if(document.visibilityState!=='visible')return;
+
+    if(typeof loadKitchenOrdersReliable==='function'){
+      loadKitchenOrdersReliable({notify:true});
+    }else if(typeof loadOrders==='function'){
+      loadOrders();
+    }
+  },2000);
+}
+
+window.addEventListener('load',startKitchenBackupPoll);
+window.addEventListener('pageshow',startKitchenBackupPoll);
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'){
+    startKitchenBackupPoll();
+    if(typeof loadKitchenOrdersReliable==='function'){
+      loadKitchenOrdersReliable({notify:true});
+    }
+  }
 });

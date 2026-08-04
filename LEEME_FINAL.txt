@@ -1,0 +1,35 @@
+MORDISCO — MESAS Y COCINA CORREGIDAS
+
+CORRIGE:
+- Productos completos en la ventana de Mesas.
+- Elimina las franjas y recortes.
+- Ventana ajustada y ordenada.
+- Cocina revisa pedidos cada 2 segundos.
+- Refresco de respaldo independiente de Realtime.
+- Alarma más fuerte, larga y con vibración.
+
+IMPORTANTE PARA EL SONIDO:
+- Volumen multimedia del teléfono al máximo.
+- Desactivar modo silencio y ahorro de batería.
+- Abrir Cocina y tocar una vez la casilla Sonido.
+- Mantener Chrome abierto o la pantalla encendida.
+  Android puede pausar páginas cuando la pantalla está apagada.
+
+APLICAR:
+1. Extrae este ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Corregir Mesas y reforzar Cocina
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+
+PRUEBA:
+https://mordiscofastfood.com/admin?session=ok&tab=tables&v=tables-kitchen-final-2
+
+Cocina debe cerrar sesión y volver a entrar:
+https://mordiscofastfood.com/staff?v=tables-kitchen-final-2
+
+NO ejecuta SQL.
