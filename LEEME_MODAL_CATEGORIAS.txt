@@ -1,0 +1,33 @@
+MORDISCO — COMPROBANTE Y CATEGORÍAS LIMPIAS
+
+CORRIGE
+- La X cierra el comprobante.
+- Nueva venta cierra, limpia y deja Caja lista.
+- Tocar el fondo cierra el comprobante.
+- Escape cierra el comprobante.
+- Elimina la lista gigante y fea de categorías.
+- Usa botones compactos y desplazables.
+
+NO MODIFICA
+- Cocina
+- Turnos
+- Clientes
+- Productos
+- Ventas guardadas
+- Permisos
+- Página pública
+
+APLICAR
+1. Extrae este ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Corregir comprobante y categorías
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Prueba:
+   https://mordiscofastfood.com/admin?employee=1&tab=pos&v=receipt-category-clean
+
+NO ejecutes SQL.

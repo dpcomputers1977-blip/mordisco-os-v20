@@ -903,7 +903,41 @@ function fillPosCategories(){
   if(!$('#posCategory'))return;
   $('#posCategory').innerHTML='<option value="all">Todas las categorías</option>'+categories.filter(c=>c.active).map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
   $('#posCategory').value=[...$('#posCategory').options].some(o=>o.value===current)?current:'all';
+  renderPosCategoryChips();
 }
+
+/* ===== CATEGORÍAS COMPACTAS EN POS ===== */
+function renderPosCategoryChips(){
+  const container=$('#posCategoryChips');
+  const select=$('#posCategory');
+  if(!container||!select)return;
+
+  const current=select.value||'all';
+  const options=[
+    {id:'all',name:'Todos'},
+    ...categories.filter(category=>category.active).map(category=>({
+      id:String(category.id),
+      name:category.name
+    }))
+  ];
+
+  container.innerHTML=options.map(option=>`
+    <button type="button"
+      class="categoryChip ${String(option.id)===String(current)?'active':''}"
+      data-pos-category-chip="${esc(option.id)}">
+      ${esc(option.name)}
+    </button>
+  `).join('');
+
+  $$('[data-pos-category-chip]').forEach(button=>{
+    button.onclick=()=>{
+      select.value=button.dataset.posCategoryChip;
+      renderPosCategoryChips();
+      renderPosProducts();
+    };
+  });
+}
+
 function getPosProducts(){
   const q=($('#posSearch')?.value||'').trim().toLowerCase();
   const category=$('#posCategory')?.value||'all';
@@ -2998,4 +3032,70 @@ if($('#kitchenSound')){
 
 $('#refreshKitchen')?.addEventListener('click',()=>{
   loadKitchenOrdersReliable({notify:false});
+});
+
+
+/* ===== COMPROBANTE: CIERRE Y NUEVA VENTA DEFINITIVOS ===== */
+function closeReceiptModal(){
+  const modal=$('#receiptModal');
+  if(!modal)return;
+  modal.classList.add('hidden');
+  modal.classList.remove('show','open','active');
+  modal.setAttribute('aria-hidden','true');
+  document.body.classList.remove('modal-open','no-scroll');
+  document.documentElement.classList.remove('modal-open','no-scroll');
+}
+
+function resetPosForNewSale(){
+  try{posCart=[]}catch{}
+  try{selectedOrderForCharge=null}catch{}
+  try{lastReceiptOrder=null}catch{}
+
+  const fields={
+    '#posCustomer':'Consumidor final',
+    '#posPhone':'',
+    '#posNotes':'',
+    '#posDiscountValue':'0'
+  };
+
+  Object.entries(fields).forEach(([selector,value])=>{
+    const node=$(selector);
+    if(node)node.value=value;
+  });
+
+  const discountType=$('#posDiscountType');
+  if(discountType)discountType.value='none';
+
+  const orderType=$('#posOrderType');
+  if(orderType&&!orderType.value)orderType.value='local';
+
+  closeReceiptModal();
+
+  if(typeof renderPosCart==='function')renderPosCart();
+  if(typeof renderPosPendingOrders==='function')renderPosPendingOrders();
+
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+$('#receiptCloseBtn')?.addEventListener('click',event=>{
+  event.preventDefault();
+  event.stopPropagation();
+  closeReceiptModal();
+});
+
+$('#receiptNewSaleBtn')?.addEventListener('click',event=>{
+  event.preventDefault();
+  event.stopPropagation();
+  resetPosForNewSale();
+  toast('Caja lista para una nueva venta');
+});
+
+$('#receiptModal')?.addEventListener('click',event=>{
+  if(event.target===$('#receiptModal'))closeReceiptModal();
+});
+
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape'&&!$('#receiptModal')?.classList.contains('hidden')){
+    closeReceiptModal();
+  }
 });

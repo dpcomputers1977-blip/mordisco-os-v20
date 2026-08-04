@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=kitchen-auto-detail-sound">
+<link rel="stylesheet" href="/admin-v18.css?v=receipt-category-clean">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 </head>
@@ -224,7 +224,7 @@
         <section class="posCatalog panel">
           <div class="posCatalogTop">
             <input id="posSearch" placeholder="Buscar producto...">
-            <select id="posCategory"><option value="all">Todas las categorías</option></select>
+            <select id="posCategory" class="categoryNativeHidden" aria-hidden="true" tabindex="-1"><option value="all">Todas las categorías</option></select><div id="posCategoryChips" class="categoryChips" aria-label="Categorías"></div>
           </div>
           <div id="posProducts" class="posProductGrid"></div>
         </section>
@@ -952,11 +952,11 @@
 
 <div id="receiptModal" class="modal hidden">
   <div class="modalCard receiptModalCard">
-    <button class="close" data-close="receiptModal">×</button>
+    <button class="close" id="receiptCloseBtn" type="button" aria-label="Cerrar comprobante">×</button>
     <div id="receiptContent" class="receiptPaper"></div>
     <div class="receiptActions">
       <button class="dark" id="printReceipt">Imprimir comprobante</button>
-      <button class="primary" data-close="receiptModal">Nueva venta</button>
+      <button class="primary" id="receiptNewSaleBtn" type="button">Nueva venta</button>
     </div>
   </div>
 </div>
@@ -1016,7 +1016,7 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=kitchen-auto-detail-sound"></script>
+<script src="/admin-v18.js?v=receipt-category-clean"></script>
 
 
 

@@ -1459,3 +1459,71 @@ body:not(.modal-open){overflow:auto!important}
 }
 .kitchenItems small{display:block;margin-top:4px}
 .kitchenNoItems{color:#8a7863;font-style:italic}
+
+/* COMPROBANTE LIMPIO */
+#receiptModal.hidden{display:none!important;pointer-events:none!important}
+#receiptModal:not(.hidden){display:grid!important;pointer-events:auto!important}
+.receiptModalCard{
+  max-height:calc(100vh - 32px);
+  overflow:auto;
+}
+#receiptCloseBtn{
+  position:absolute;
+  top:10px;
+  right:10px;
+  z-index:4;
+}
+.receiptActions{
+  position:sticky;
+  bottom:0;
+  background:#fff;
+  padding:12px 0 2px;
+}
+
+/* CATEGORÍAS COMPACTAS */
+.categoryNativeHidden{
+  position:absolute!important;
+  width:1px!important;
+  height:1px!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+.posCatalogTop{
+  grid-template-columns:minmax(180px,1fr)!important;
+}
+.categoryChips{
+  grid-column:1/-1;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:3px 2px 8px;
+  scrollbar-width:thin;
+  scroll-snap-type:x proximity;
+}
+.categoryChip{
+  flex:0 0 auto;
+  scroll-snap-align:start;
+  border:1px solid #d8c9b4;
+  background:#fff;
+  color:#16120d;
+  border-radius:999px;
+  padding:9px 14px;
+  font-weight:900;
+  white-space:nowrap;
+  box-shadow:none;
+}
+.categoryChip.active{
+  background:#111;
+  color:#fff;
+  border-color:#111;
+}
+.categoryChip:hover{
+  transform:none;
+  box-shadow:none;
+}
+@media(max-width:650px){
+  .categoryChips{padding-bottom:10px}
+  .categoryChip{padding:10px 15px}
+  .receiptActions{flex-direction:column}
+  .receiptActions button{width:100%}
+}
