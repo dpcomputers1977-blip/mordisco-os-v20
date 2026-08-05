@@ -1,0 +1,29 @@
+MORDISCO V21 — CIERRE DEFINITIVO DE TURNOS
+
+ERROR CORREGIDO
+El sistema solo consultaba los turnos iniciados hoy. Un turno abierto ayer
+o días anteriores no aparecía y no podía cerrarse.
+
+AHORA
+- Carga todos los turnos abiertos sin importar la fecha.
+- También carga el historial de hoy.
+- Al seleccionar al empleado con turno abierto se habilita Cerrar turno.
+- Después de cerrar actualiza el estado inmediatamente.
+
+APLICAR
+1. Extrae este ZIP.
+2. Copia TODO dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Corregir cierre de turnos antiguos
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Abre:
+   https://mordiscofastfood.com/admin?session=ok&tab=shifts&v=v21-close-old-shifts
+9. Pulsa Actualizar.
+10. Selecciona al empleado; Cerrar turno debe quedar habilitado.
+
+NO ejecuta SQL.
+NO modifica datos ni elimina turnos.

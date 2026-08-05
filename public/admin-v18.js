@@ -1427,7 +1427,13 @@ async function adminCloseEmployeeShift(){
 
   if(error)return toast(error.message);
   toast('Turno cerrado correctamente.');
+
+  if($('#adminShiftClosingCash')){
+    $('#adminShiftClosingCash').value='0';
+  }
+
   await loadShifts();
+  await renderAdminShiftManager();
 }
 
 $('#adminShiftEmployee')?.addEventListener('change',()=>renderAdminShiftManager());
@@ -1440,11 +1446,47 @@ $('#adminRefreshShiftBtn')?.addEventListener('click',async()=>{
 });
 
 async function loadShifts(){
-  const today=new Date();today.setHours(0,0,0,0);
-  const {data,error}=await db.from('work_shifts').select('*,staff(name,role)').gte('started_at',today.toISOString()).order('started_at',{ascending:false});
-  if(error){console.error(error);return toast('Error cargando turnos: '+error.message)}
-  shifts=data||[];
-  currentShift=currentEmployee?shifts.find(s=>s.staff_id===currentEmployee.id&&s.status==='open')||null:null;
+  const today=new Date();
+  today.setHours(0,0,0,0);
+
+  // Carga todos los turnos abiertos, aunque hayan empezado en días anteriores.
+  const [openResult,todayResult]=await Promise.all([
+    db
+      .from('work_shifts')
+      .select('*,staff(name,role)')
+      .eq('status','open')
+      .order('started_at',{ascending:false}),
+    db
+      .from('work_shifts')
+      .select('*,staff(name,role)')
+      .gte('started_at',today.toISOString())
+      .order('started_at',{ascending:false})
+  ]);
+
+  const error=openResult.error||todayResult.error;
+  if(error){
+    console.error(error);
+    return toast('Error cargando turnos: '+error.message);
+  }
+
+  const merged=[...(openResult.data||[]),...(todayResult.data||[])];
+  const unique=new Map();
+
+  merged.forEach(shift=>{
+    unique.set(String(shift.id),shift);
+  });
+
+  shifts=[...unique.values()].sort(
+    (a,b)=>new Date(b.started_at)-new Date(a.started_at)
+  );
+
+  currentShift=currentEmployee
+    ? shifts.find(shift=>
+        String(shift.staff_id)===String(currentEmployee.id)&&
+        shift.status==='open'
+      )||null
+    : null;
+
   renderShifts();
   await renderAdminShiftManager();
 }

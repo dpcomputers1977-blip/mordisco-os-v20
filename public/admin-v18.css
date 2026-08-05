@@ -1820,3 +1820,6 @@ body:not(.modal-open){overflow:auto!important}
   opacity:.7;
   cursor:wait;
 }
+
+/* V21 — TURNO ABIERTO DE FECHAS ANTERIORES */
+#adminShiftStatus strong{font-weight:900}
