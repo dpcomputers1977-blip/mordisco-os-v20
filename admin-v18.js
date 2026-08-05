@@ -244,8 +244,9 @@ $$('.sidebar [data-tab]').forEach(b=>b.onclick=async()=>{const tab=b.dataset.tab
     if($('#staffRoleFilter'))$('#staffRoleFilter').value='all';
     await loadStaff();
   }if(tab==='tables')await loadTables();if(tab==='shifts'){
-    await loadStaff();
+    await fillAdminShiftEmployees({preserveSelection:true});
     await loadShifts();
+    await renderAdminShiftManager();
   }if(tab==='finance')await loadFinance();if(tab==='customers')await loadCustomers();if(tab==='promotions')await loadPromotions();if(tab==='pages')await loadContentPages()});
 function fillCategorySelect(){$('#pCategory').innerHTML=categories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}
 
@@ -1286,21 +1287,70 @@ $$('[data-inventory-view]').forEach(b=>b.onclick=()=>{
 
 
 
-function fillAdminShiftEmployees(){
+async function fillAdminShiftEmployees({preserveSelection=true}={}){
   const select=$('#adminShiftEmployee');
-  if(!select||!isAdminSession)return;
+  if(!select||!isAdminSession)return [];
 
-  const eligible=staffMembers.filter(member=>
-    member.active&&['cashier','kitchen','waiter'].includes(member.role)
-  );
+  const previous=preserveSelection?select.value:'';
+  select.disabled=true;
+  select.innerHTML='<option value="">Cargando empleados...</option>';
 
-  const previous=select.value;
+  const {data,error}=await db
+    .from('staff')
+    .select('id,name,role,phone,active,permissions,created_at,updated_at')
+    .eq('active',true)
+    .order('name');
+
+  if(error){
+    console.error('Error cargando empleados para Turnos:',error);
+    select.innerHTML='<option value="">No se pudieron cargar empleados</option>';
+    select.disabled=false;
+    $('#adminShiftStatus').textContent='Error cargando empleados: '+error.message;
+    return [];
+  }
+
+  const roleAliases={
+    cajero:'cashier',
+    cashier:'cashier',
+    cocina:'kitchen',
+    kitchen:'kitchen',
+    mesero:'waiter',
+    waiter:'waiter'
+  };
+
+  const eligible=(data||[])
+    .map(member=>({
+      ...member,
+      role:roleAliases[String(member.role||'').toLowerCase()]||member.role
+    }))
+    .filter(member=>member.active&&member.role!=='admin');
+
+  // Mantiene la misma fuente para Personal, Caja y Turnos.
+  staffMembers=[
+    ...staffMembers.filter(existing=>
+      !eligible.some(member=>String(member.id)===String(existing.id))
+    ),
+    ...eligible
+  ].sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'es'));
+
   select.innerHTML='<option value="">Selecciona un empleado</option>'+
-    eligible.map(member=>`<option value="${member.id}">${esc(member.name)} — ${staffRoleLabel(member.role)}</option>`).join('');
+    eligible.map(member=>`
+      <option value="${member.id}">
+        ${esc(member.name)} — ${staffRoleLabel(member.role)}
+      </option>
+    `).join('');
 
-  if(eligible.some(member=>String(member.id)===String(previous))){
+  if(previous&&eligible.some(member=>String(member.id)===String(previous))){
     select.value=previous;
   }
+
+  select.disabled=false;
+
+  if(!eligible.length){
+    $('#adminShiftStatus').textContent='No hay empleados activos disponibles.';
+  }
+
+  return eligible;
 }
 
 function selectedAdminShift(){
@@ -1310,17 +1360,23 @@ function selectedAdminShift(){
   )||null;
 }
 
-function renderAdminShiftManager(){
+async function renderAdminShiftManager({reloadEmployees=false}={}){
   if(!isAdminSession||!$('#adminShiftEmployee'))return;
 
-  fillAdminShiftEmployees();
+  if(reloadEmployees||!$('#adminShiftEmployee').options.length||
+     $('#adminShiftEmployee').options[0]?.textContent.includes('Cargando')){
+    await fillAdminShiftEmployees();
+  }
+
   const employeeId=$('#adminShiftEmployee').value;
   const employee=staffMembers.find(member=>String(member.id)===String(employeeId));
   const openShift=selectedAdminShift();
   const status=$('#adminShiftStatus');
 
   if(!employee){
-    status.textContent='Selecciona un empleado.';
+    status.textContent=$('#adminShiftEmployee').options.length>1
+      ? 'Selecciona un empleado.'
+      : 'No hay empleados activos disponibles.';
     $('#adminOpenShiftBtn').disabled=true;
     $('#adminCloseShiftBtn').disabled=true;
     return;
@@ -1374,10 +1430,14 @@ async function adminCloseEmployeeShift(){
   await loadShifts();
 }
 
-$('#adminShiftEmployee')?.addEventListener('change',renderAdminShiftManager);
+$('#adminShiftEmployee')?.addEventListener('change',()=>renderAdminShiftManager());
 $('#adminOpenShiftBtn')?.addEventListener('click',adminOpenEmployeeShift);
 $('#adminCloseShiftBtn')?.addEventListener('click',adminCloseEmployeeShift);
-$('#adminRefreshShiftBtn')?.addEventListener('click',loadShifts);
+$('#adminRefreshShiftBtn')?.addEventListener('click',async()=>{
+  await fillAdminShiftEmployees();
+  await loadShifts();
+  await renderAdminShiftManager();
+});
 
 async function loadShifts(){
   const today=new Date();today.setHours(0,0,0,0);
@@ -1386,7 +1446,7 @@ async function loadShifts(){
   shifts=data||[];
   currentShift=currentEmployee?shifts.find(s=>s.staff_id===currentEmployee.id&&s.status==='open')||null:null;
   renderShifts();
-  renderAdminShiftManager();
+  await renderAdminShiftManager();
 }
 function renderShifts(){
   if(!$('#shiftHistoryBody'))return;
@@ -1570,6 +1630,9 @@ async function loadStaff(){
   renderStaff();
   fillPosStaff();
   fillEmployeeLogin();
+  if($('#adminShiftEmployee')&&isAdminSession){
+    await fillAdminShiftEmployees({preserveSelection:true});
+  }
 }
 function renderStaff(){
   if(!$('#staffList'))return;

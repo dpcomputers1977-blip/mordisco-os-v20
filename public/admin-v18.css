@@ -1814,3 +1814,9 @@ body:not(.modal-open){overflow:auto!important}
     min-height:190px!important;
   }
 }
+
+/* V21 — SELECTOR DE TURNOS */
+#adminShiftEmployee:disabled{
+  opacity:.7;
+  cursor:wait;
+}

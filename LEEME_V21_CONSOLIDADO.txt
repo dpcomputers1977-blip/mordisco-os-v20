@@ -1,0 +1,36 @@
+MORDISCO OS V21 — CONSOLIDADO DE PRODUCCIÓN
+
+CORRECCIÓN PRINCIPAL
+- Turnos carga directamente los empleados activos desde Supabase.
+- No depende de abrir Personal primero.
+- Reconoce roles en español e inglés.
+- Actualiza empleados al entrar en Turnos y al pulsar Actualizar.
+- Muestra un error claro si Supabase rechaza la consulta.
+
+CONSERVA
+- Caja y comprobantes.
+- Permisos personalizados.
+- Clientes en POS.
+- Administrador abre/cierra turnos.
+- Cocina con estados reales, detalle, sonido y actualización automática.
+- Mesas mejoradas.
+- Productos, ventas, pedidos, empleados, inventario y página pública.
+
+APLICAR
+1. Extrae este ZIP.
+2. Copia TODO dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Selecciona Reemplazar archivos en el destino.
+4. Abre GitHub Desktop.
+5. Summary:
+   Mordisco OS V21 consolidado definitivo
+6. Commit to main.
+7. Push origin.
+8. Espera Vercel Ready.
+9. Abre:
+   https://mordiscofastfood.com/admin?session=ok&tab=shifts&v=v21-consolidated-shifts
+10. Pulsa Actualizar una vez.
+
+NO ejecuta SQL.
+NO contiene imágenes.
+NO modifica la base de datos.
