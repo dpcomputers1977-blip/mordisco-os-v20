@@ -1,0 +1,35 @@
+MORDISCO OS — ACTUALIZACIÓN REAL DE PRODUCCIÓN
+
+CAMBIOS
+- Caja consulta directamente en Supabase el turno abierto del cajero.
+- Mesas muestra hasta 5 productos por fila con tarjetas compactas.
+- Cocina comprueba pedidos cada 2 segundos.
+- El comprobante se cierra con X o Nueva venta.
+- Conserva el logo oficial que ya existe en el proyecto.
+
+NO CAMBIA
+- Página web pública.
+- Inicio, menú, promociones o pedidos en línea.
+- Productos, categorías, precios e imágenes.
+- Ventas, clientes, empleados, permisos o base de datos.
+
+APLICAR
+1. Extrae este ZIP.
+2. Copia TODO dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Selecciona Reemplazar archivos en el destino.
+4. Abre GitHub Desktop.
+5. Summary:
+   Actualización final panel Mordisco
+6. Commit to main.
+7. Push origin.
+8. Espera Vercel Ready.
+
+PRUEBA
+Administrador:
+https://mordiscofastfood.com/admin?session=ok&v=production-final
+
+Empleados:
+https://mordiscofastfood.com/staff?v=production-final
+
+NO ejecutes SQL.

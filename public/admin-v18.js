@@ -583,12 +583,73 @@ function updateChargeChange(){
   renderChargeCalculation();
 }
 
+
+/* ===== PRODUCCIÓN: VERIFICACIÓN REAL DEL TURNO DE CAJA ===== */
+async function refreshCurrentCashierShift(){
+  if(currentEmployee?.role!=='cashier')return null;
+
+  const employeeId=String(currentEmployee.id||'').trim();
+  if(!employeeId)return null;
+
+  const {data,error}=await db
+    .from('work_shifts')
+    .select('*')
+    .eq('staff_id',employeeId)
+    .eq('status','open')
+    .order('started_at',{ascending:false})
+    .limit(1)
+    .maybeSingle();
+
+  if(error){
+    console.error('Error comprobando turno del cajero:',error);
+    throw error;
+  }
+
+  currentShift=data||null;
+
+  if(currentShift){
+    const index=shifts.findIndex(shift=>String(shift.id)===String(currentShift.id));
+    if(index>=0){
+      shifts[index]=currentShift;
+    }else{
+      shifts.unshift(currentShift);
+    }
+  }
+
+  return currentShift;
+}
+
 async function confirmChargeOrder(){
   const order=orders.find(o=>String(o.id)===String(paymentOrderId));
   if(!order)return toast('No se encontró el pedido');
 
-  if(currentEmployee?.role==='cashier'&&!currentShift){
-    return toast('Debes iniciar tu turno antes de cobrar');
+  if(currentEmployee?.role==='cashier'){
+    const confirmButton=$('#confirmChargeOrder');
+    const previousText=confirmButton?.textContent||'Confirmar cobro';
+
+    if(confirmButton){
+      confirmButton.disabled=true;
+      confirmButton.textContent='Verificando turno...';
+    }
+
+    try{
+      await refreshCurrentCashierShift();
+    }catch(error){
+      if(confirmButton){
+        confirmButton.disabled=false;
+        confirmButton.textContent=previousText;
+      }
+      return toast('No se pudo comprobar el turno: '+(error.message||'Error de conexión'));
+    }
+
+    if(confirmButton){
+      confirmButton.disabled=false;
+      confirmButton.textContent=previousText;
+    }
+
+    if(!currentShift){
+      return toast('El administrador debe abrir tu turno antes de cobrar');
+    }
   }
 
   const calculation=getChargeCalculation();
@@ -3271,3 +3332,61 @@ document.addEventListener('visibilitychange',()=>{
     }
   }
 });
+
+
+/* ===== PRODUCCIÓN: RESPALDO DE ACTUALIZACIÓN DE COCINA ===== */
+let mordiscoProductionKitchenTimer=null;
+
+function startProductionKitchenTimer(){
+  clearInterval(mordiscoProductionKitchenTimer);
+
+  mordiscoProductionKitchenTimer=setInterval(()=>{
+    const role=currentEmployee?.role||document.body.dataset.employeeRole;
+
+    if(role!=='kitchen'||document.visibilityState!=='visible')return;
+
+    if(typeof loadKitchenOrdersReliable==='function'){
+      loadKitchenOrdersReliable({notify:true});
+    }else if(typeof loadOrders==='function'){
+      loadOrders();
+    }
+  },2000);
+}
+
+window.addEventListener('load',startProductionKitchenTimer);
+window.addEventListener('pageshow',startProductionKitchenTimer);
+
+
+/* ===== PRODUCCIÓN: CIERRE SEGURO DEL COMPROBANTE ===== */
+function mordiscoProductionCloseReceipt(){
+  const modal=$('#receiptModal');
+  if(!modal)return;
+
+  modal.classList.add('hidden');
+  modal.classList.remove('show','open','active');
+  modal.setAttribute('aria-hidden','true');
+  document.body.classList.remove('modal-open','no-scroll');
+}
+
+document.addEventListener('click',event=>{
+  const modal=$('#receiptModal');
+  if(!modal||modal.classList.contains('hidden'))return;
+
+  const close=event.target.closest?.(
+    '#receiptCloseBtn,#receiptNewSaleBtn,[data-close="receiptModal"],.receiptModal .close'
+  );
+
+  if(close){
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    mordiscoProductionCloseReceipt();
+
+    if(
+      close.id==='receiptNewSaleBtn'||
+      String(close.textContent||'').toLowerCase().includes('nueva venta')
+    ){
+      try{posCart=[]}catch{}
+      if(typeof renderPosCart==='function')renderPosCart();
+    }
+  }
+},true);

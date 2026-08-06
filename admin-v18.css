@@ -1941,3 +1941,115 @@ body:not(.modal-open){overflow:auto!important}
     grid-template-columns:repeat(2,minmax(125px,1fr))!important;
   }
 }
+
+/* ===== PRODUCCIÓN: MESAS MÁS COMPACTAS ===== */
+#tableOrderModal .tableOrderCard{
+  width:min(1240px,calc(100vw - 28px))!important;
+  height:min(790px,calc(100vh - 20px))!important;
+  max-height:calc(100vh - 20px)!important;
+  padding:16px!important;
+}
+
+#tableOrderModal .tableOrderLayout{
+  grid-template-columns:minmax(620px,1.75fr) minmax(270px,.65fr)!important;
+  gap:12px!important;
+}
+
+#tableOrderModal .tableOrderHead{
+  min-height:48px!important;
+  padding-bottom:8px!important;
+  margin-bottom:8px!important;
+}
+
+#tableOrderModal .tableCatalogToolbar{
+  grid-template-columns:minmax(170px,1fr) minmax(160px,230px)!important;
+  gap:7px!important;
+  margin-bottom:7px!important;
+}
+
+#tableOrderModal .tableCatalogToolbar input,
+#tableOrderModal .tableCatalogToolbar select{
+  min-height:36px!important;
+  padding:6px 9px!important;
+}
+
+#tableOrderModal #tableProducts{
+  grid-template-columns:repeat(5,minmax(108px,1fr))!important;
+  grid-auto-rows:max-content!important;
+  gap:7px!important;
+  padding:2px 7px 24px 2px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  align-content:start!important;
+}
+
+#tableOrderModal #tableProducts .posProduct{
+  min-height:132px!important;
+  height:auto!important;
+  border-radius:10px!important;
+}
+
+#tableOrderModal #tableProducts .posProduct img,
+#tableOrderModal #tableProducts .posProductNoImage{
+  flex:0 0 58px!important;
+  width:100%!important;
+  height:58px!important;
+  min-height:58px!important;
+  max-height:58px!important;
+  object-fit:contain!important;
+}
+
+#tableOrderModal #tableProducts .posProductInfo{
+  min-height:68px!important;
+  padding:6px 7px!important;
+}
+
+#tableOrderModal #tableProducts .posProductInfo small{
+  font-size:.65rem!important;
+  margin-bottom:1px!important;
+}
+
+#tableOrderModal #tableProducts .posProductInfo b{
+  min-height:27px!important;
+  font-size:.77rem!important;
+  line-height:1.05!important;
+}
+
+#tableOrderModal #tableProducts .posProductInfo strong{
+  padding-top:3px!important;
+  font-size:.86rem!important;
+}
+
+#tableOrderModal .tableTicket{
+  padding:12px!important;
+}
+
+#tableOrderModal .tableTicket textarea{
+  min-height:58px!important;
+}
+
+#tableOrderModal .tableTicket button{
+  min-height:39px!important;
+}
+
+@media(max-width:1180px){
+  #tableOrderModal #tableProducts{
+    grid-template-columns:repeat(4,minmax(112px,1fr))!important;
+  }
+}
+
+@media(max-width:930px){
+  #tableOrderModal #tableProducts{
+    grid-template-columns:repeat(3,minmax(120px,1fr))!important;
+  }
+}
+
+@media(max-width:760px){
+  #tableOrderModal .tableOrderLayout{
+    grid-template-columns:1fr!important;
+  }
+  #tableOrderModal #tableProducts{
+    grid-template-columns:repeat(2,minmax(125px,1fr))!important;
+    height:420px!important;
+  }
+}
