@@ -3773,7 +3773,7 @@ document.querySelector('#posDetailsToggle')?.addEventListener('click',()=>{
   const button=document.querySelector('#posDetailsToggle');
   if(!details||!button)return;
   const collapsed=details.classList.toggle('collapsed');
-  button.textContent=collapsed?'Datos del pedido ▾':'Datos del pedido ▴';
+  button.textContent=collapsed?'Más datos ▾':'Más datos ▴';
 });
 
 document.addEventListener('keydown',event=>{
@@ -3785,3 +3785,46 @@ document.addEventListener('keydown',event=>{
 
 window.addEventListener('load',activateMordiscoV21);
 window.addEventListener('pageshow',activateMordiscoV21);
+
+
+/* ============================================================
+   V21 — COBRO VISIBLE Y DATOS ESENCIALES DEL PEDIDO
+   ============================================================ */
+document.addEventListener('click',event=>{
+  const payButton=event.target.closest?.('[data-pos-pay]');
+  if(!payButton)return;
+
+  event.preventDefault();
+  event.stopPropagation();
+
+  const orderId=payButton.dataset.posPay;
+  if(typeof openChargeOrder==='function'){
+    openChargeOrder(orderId);
+    requestAnimationFrame(()=>{
+      const modal=document.querySelector('#chargeOrderModal');
+      if(modal){
+        modal.classList.remove('hidden');
+        modal.setAttribute('aria-hidden','false');
+      }
+    });
+  }
+},true);
+
+document.querySelectorAll('[data-close="chargeOrderModal"]').forEach(button=>{
+  button.addEventListener('click',event=>{
+    event.preventDefault();
+    document.querySelector('#chargeOrderModal')?.classList.add('hidden');
+  });
+});
+
+function ensureChargeModalVisibleV21(){
+  const modal=document.querySelector('#chargeOrderModal');
+  if(!modal||modal.classList.contains('hidden'))return;
+  modal.style.zIndex='12050';
+}
+
+const chargeModalObserverV21=new MutationObserver(ensureChargeModalVisibleV21);
+const chargeModalV21=document.querySelector('#chargeOrderModal');
+if(chargeModalV21){
+  chargeModalObserverV21.observe(chargeModalV21,{attributes:true,attributeFilter:['class']});
+}

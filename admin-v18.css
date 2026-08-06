@@ -4255,3 +4255,149 @@ body.moduleFocusV21 #adminView.adminV21 .tab:not(.hidden){
     grid-template-columns:1fr!important;
   }
 }
+
+/* ============================================================
+   V21 — POS: DATOS VISIBLES Y COBRO SIEMPRE ENCIMA
+   ============================================================ */
+
+body.posFocusMode #chargeOrderModal,
+body.posFocusMode #receiptModal,
+body.posFocusMode #quickCheckoutModal{
+  z-index:12000!important;
+}
+
+body.posFocusMode #chargeOrderModal:not(.hidden),
+body.posFocusMode #receiptModal:not(.hidden),
+body.posFocusMode #quickCheckoutModal:not(.hidden){
+  display:grid!important;
+  pointer-events:auto!important;
+}
+
+body.posFocusMode #chargeOrderModal .modalCard,
+body.posFocusMode #receiptModal .modalCard,
+body.posFocusMode #quickCheckoutModal .modalCard{
+  position:relative!important;
+  z-index:12010!important;
+}
+
+.posEssentialData{
+  flex:0 0 auto;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:5px;
+}
+
+.posEssentialData label,
+.posOptionalGrid label{
+  display:grid;
+  gap:3px;
+  min-width:0;
+  font-size:.73rem;
+  font-weight:900;
+}
+
+.posEssentialData input,
+.posEssentialData select,
+.posOptionalGrid input,
+.posOptionalGrid select,
+.posOptionalGrid textarea{
+  width:100%;
+  min-width:0;
+  min-height:33px;
+  padding:5px 7px;
+  border:1px solid #d7c9b5;
+  border-radius:8px;
+  background:#fff;
+}
+
+.posOptionalGrid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:6px;
+  padding:5px 0;
+}
+
+.posOptionalGrid textarea{
+  min-height:50px;
+  max-height:70px;
+  resize:vertical;
+}
+
+.compactPaymentNotice{
+  flex:0 0 auto!important;
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  gap:7px!important;
+  min-height:34px!important;
+  padding:6px 8px!important;
+  margin-top:5px!important;
+  font-size:.68rem!important;
+}
+
+.compactPaymentNotice b{
+  white-space:nowrap;
+}
+
+.posDetailsToggle{
+  flex:0 0 auto!important;
+  min-height:33px!important;
+  margin:5px 0 0!important;
+  padding:5px 8px!important;
+  font-size:.73rem!important;
+}
+
+body.posFocusMode #tab-pos .posTicket{
+  overflow-y:auto!important;
+  padding-bottom:10px!important;
+}
+
+body.posFocusMode #tab-pos .posCart{
+  min-height:72px!important;
+  max-height:150px!important;
+  flex:0 1 auto!important;
+}
+
+body.posFocusMode #tab-pos .posTotals{
+  margin-bottom:4px!important;
+  padding:7px 0!important;
+}
+
+body.posFocusMode #tab-pos .posPrimaryActions{
+  position:sticky!important;
+  bottom:0!important;
+  z-index:5!important;
+  padding-top:6px!important;
+  background:linear-gradient(to bottom,rgba(255,255,255,0),#fff 18%)!important;
+}
+
+.chargeOrderCard{
+  width:min(470px,calc(100vw - 24px))!important;
+  max-height:calc(100vh - 24px)!important;
+  overflow-y:auto!important;
+  box-shadow:0 28px 80px rgba(0,0,0,.42)!important;
+}
+
+.chargeOrderCard #chargePaymentMethod{
+  width:100%!important;
+  min-height:44px!important;
+  margin-top:5px!important;
+  padding:8px 10px!important;
+  border:1px solid #ccbda8!important;
+  border-radius:9px!important;
+  background:#fff!important;
+  font-weight:800!important;
+}
+
+#confirmChargeOrder{
+  min-height:50px!important;
+  margin-top:8px!important;
+  font-size:1rem!important;
+}
+
+@media(max-width:620px){
+  .posEssentialData{
+    grid-template-columns:1fr;
+  }
+}

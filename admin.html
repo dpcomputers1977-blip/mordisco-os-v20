@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=mordisco-v21-stable">
+<link rel="stylesheet" href="/admin-v18.css?v=v21-pos-payment-fixed">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 </head>
@@ -284,11 +284,9 @@
             <div><span>Total</span><strong id="posTotal">$0.00</strong></div>
           </div>
 
-          <button id="posDetailsToggle" class="posDetailsToggle" type="button">Datos del pedido ▾</button>
-          <div id="posOptionalDetails" class="posOptionalDetails collapsed">
-          <div class="posForm">
+          <div class="posEssentialData">
             <label>Cliente
-              <input id="posCustomer" list="posCustomerList" autocomplete="off" placeholder="Buscar o seleccionar cliente"><datalist id="posCustomerList"></datalist>
+              <input id="posCustomer" list="posCustomerList" autocomplete="off" placeholder="Consumidor final o buscar cliente"><datalist id="posCustomerList"></datalist>
             </label>
             <label>Teléfono
               <input id="posPhone" placeholder="Opcional">
@@ -296,20 +294,29 @@
             <label>Cajero
               <select id="posCashier"><option value="">Seleccionar cajero</option></select>
             </label>
-            <label>Mesero
-              <select id="posWaiter"><option value="">Sin mesero</option></select>
-            </label>
             <label>Tipo de pedido
               <select id="posOrderType">
                 <option value="local">En el local</option>
                 <option value="pickup">Para llevar</option>
               </select>
             </label>
-            <div class="paymentLaterNotice"><b>Pago pendiente</b><span>El cobro se realizará después en esta misma Caja.</span></div>
-            <label class="wide">Notas
-              <textarea id="posNotes" placeholder="Sin cebolla, extra salsa, etc."></textarea>
-            </label>
           </div>
+
+          <button id="posDetailsToggle" class="posDetailsToggle" type="button">Más datos ▾</button>
+          <div id="posOptionalDetails" class="posOptionalDetails collapsed">
+            <div class="posOptionalGrid">
+              <label>Mesero
+                <select id="posWaiter"><option value="">Sin mesero</option></select>
+              </label>
+              <label>Notas
+                <textarea id="posNotes" placeholder="Sin cebolla, extra salsa, etc."></textarea>
+              </label>
+            </div>
+          </div>
+
+          <div class="paymentLaterNotice compactPaymentNotice">
+            <b>Pago pendiente</b>
+            <span>Envía a cocina y cobra desde la lista inferior cuando el cliente esté listo.</span>
           </div>
 
           <div class="posPrimaryActions">
@@ -975,7 +982,7 @@
       <select id="chargePaymentMethod">
         <option value="cash">Efectivo</option>
         <option value="card">Tarjeta</option>
-        <option value="transfer">Transferencia</option>
+        <option value="transfer">Transferencia bancaria</option>
         <option value="deuna">DeUna</option>
         <option value="ahorita">Ahorita</option>
       </select>
@@ -1147,7 +1154,7 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=mordisco-v21-stable"></script>
+<script src="/admin-v18.js?v=v21-pos-payment-fixed"></script>
 
 
 
