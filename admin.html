@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=pos-floating-professional">
+<link rel="stylesheet" href="/admin-v18.css?v=pos-professional-focus">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 </head>
@@ -202,10 +202,13 @@
       </section>
 
       <div class="posHeader">
-        <div class="posHeaderTitle">
-          <span class="eyebrow">MORDISCO OS</span>
-          <h2>Caja rápida</h2>
-          <p>Selecciona productos, confirma el pedido y cobra en pocos pasos.</p>
+        <div class="posHeaderIntro">
+          <img class="posFocusLogo" src="media/logo.png" alt="Mordisco Fast Food">
+          <div>
+            <span class="eyebrow">MORDISCO OS</span>
+            <h2>Punto de venta</h2>
+            <p>Selecciona productos, envía la orden y cobra de forma rápida.</p>
+          </div>
         </div>
         <div class="posHeaderActions">
           <div class="posHeaderStats">
@@ -214,7 +217,9 @@
           <span>Venta actual</span>
           <strong id="posHeaderTotal">$0.00</strong>
           </div>
-          <button id="closePosFocusBtn" class="posFocusClose" type="button" aria-label="Cerrar Caja">×</button>
+          <button id="exitPosFocusBtn" class="posExitBtn" type="button">
+            <span>←</span> Volver al panel
+          </button>
         </div>
       </div>
 
@@ -1058,7 +1063,7 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=pos-floating-professional"></script>
+<script src="/admin-v18.js?v=pos-professional-focus"></script>
 
 
 

@@ -239,7 +239,15 @@ function totals(){const subtotal=cart.reduce((s,x)=>{const p=products.find(y=>y.
 function renderCart(){$('#cartCount').textContent=cart.reduce((s,x)=>s+x.qty,0);$('#cartItems').innerHTML=cart.length?cart.map(x=>{const p=products.find(y=>y.id===x.id);if(!p)return'';return`<div class="cartItem">${p.image_url?`<img src="${esc(p.image_url)}">`:'<div></div>'}<div><b>${esc(p.name)}</b><small>${money(p.price)}</small><div class="qty"><button data-minus="${p.id}">−</button><span>${x.qty}</span><button data-plus="${p.id}">+</button></div></div><b>${money(Number(p.price)*x.qty)}</b></div>`}).join(''):'<p class="notice">Tu carrito está vacío.</p>';$$('[data-minus]').forEach(b=>b.onclick=()=>changeQty(b.dataset.minus,-1));$$('[data-plus]').forEach(b=>b.onclick=()=>changeQty(b.dataset.plus,1));const t=totals();$('#subtotal').textContent=money(t.subtotal);$('#deliveryTotal').textContent=money(t.delivery);$('#grandTotal').textContent=money(t.total)}
 function openCart(){$('#cartDrawer').classList.add('open')} if(document.querySelector('#cartBtn'))document.querySelector('#cartBtn').onclick=openCart;if(document.querySelector('#orderNowBtn'))document.querySelector('#orderNowBtn').onclick=openCart;if(document.querySelector('#closeCart'))document.querySelector('#closeCart').onclick=()=>$('#cartDrawer').classList.remove('open');if(document.querySelector('#orderType'))document.querySelector('#orderType').onchange=()=>{renderCart();$('#customerAddress').classList.toggle('hidden',$('#orderType').value!=='delivery')};
 
-$$('.sidebar [data-tab]').forEach(b=>b.onclick=async()=>{const tab=b.dataset.tab;document.body.classList.toggle('posFocusMode',tab==='pos');$$('.sidebar [data-tab]').forEach(x=>x.classList.toggle('active',x===b));$$('.tab').forEach(x=>x.classList.add('hidden'));$('#tab-'+tab).classList.remove('hidden');$('#adminTitle').textContent={dashboard:'Resumen',products:'Productos',categories:'Categorías',orders:'Pedidos web',kitchen:'Cocina',pos:'POS / Caja',inventory:'Inventario',tables:'Mesas',shifts:'Turnos',staff:'Personal',finance:'Contabilidad',customers:'Clientes',promotions:'Promociones',pages:'Páginas',settings:'Negocio'}[tab];if(tab==='orders'||tab==='kitchen')await loadOrders();if(tab==='dashboard'){await loadOrders();renderMetrics()}if(tab==='kitchen')startKitchenClock();if(tab==='pos'){fillPosCategories();renderPosProducts();renderPosCart();await Promise.all([loadOrders(),loadCustomers()]);fillPosCustomers();renderPosPendingOrders()}if(tab==='inventory')await loadInventoryData();if(tab==='staff'){
+$$('.sidebar [data-tab]').forEach(b=>b.onclick=async()=>{const tab=b.dataset.tab;setPosFocusMode(tab==='pos');$$('.sidebar [data-tab]').forEach(x=>x.classList.toggle('active',x===b));$$('.tab').forEach(x=>x.classList.add('hidden'));$('#tab-'+tab).classList.remove('hidden');$('#adminTitle').textContent={dashboard:'Resumen',products:'Productos',categories:'Categorías',orders:'Pedidos web',kitchen:'Cocina',pos:'POS / Caja',inventory:'Inventario',tables:'Mesas',shifts:'Turnos',staff:'Personal',finance:'Contabilidad',customers:'Clientes',promotions:'Promociones',pages:'Páginas',settings:'Negocio'}[tab];if(tab==='orders'||tab==='kitchen')await loadOrders();if(tab==='dashboard'){await loadOrders();renderMetrics()}if(tab==='kitchen')startKitchenClock();if(tab==='pos'){
+      setPosFocusMode(true);
+      fillPosCategories();
+      renderPosProducts();
+      renderPosCart();
+      await Promise.all([loadOrders(),loadCustomers()]);
+      fillPosCustomers();
+      renderPosPendingOrders();
+    }if(tab==='inventory')await loadInventoryData();if(tab==='staff'){
     if($('#staffSearch'))$('#staffSearch').value='';
     if($('#staffRoleFilter'))$('#staffRoleFilter').value='all';
     await loadStaff();
@@ -3529,18 +3537,36 @@ document.addEventListener('click',event=>{
 },true);
 
 
-/* ===== POS / CAJA EN MODO FLOTANTE ===== */
-$('#closePosFocusBtn')?.addEventListener('click',()=>{
-  document.body.classList.remove('posFocusMode');
+/* ===== POS / CAJA: MODO DE VENTANA PROFESIONAL ===== */
+function setPosFocusMode(enabled){
+  document.body.classList.toggle('posFocusMode',Boolean(enabled));
+
+  if(enabled){
+    document.documentElement.classList.add('posFocusModeRoot');
+    requestAnimationFrame(()=>window.scrollTo({top:0,left:0,behavior:'instant'}));
+  }else{
+    document.documentElement.classList.remove('posFocusModeRoot');
+  }
+}
+
+function openPosFocusMode(){
+  setPosFocusMode(true);
+}
+
+function exitPosFocusMode(){
+  setPosFocusMode(false);
 
   const dashboardButton=$('.sidebar [data-tab="dashboard"]');
-  if(dashboardButton&&typeof dashboardButton.click==='function'){
+  if(dashboardButton){
     dashboardButton.click();
   }
-});
+}
+
+$('#exitPosFocusBtn')?.addEventListener('click',exitPosFocusMode);
 
 document.addEventListener('keydown',event=>{
   if(event.key==='Escape'&&document.body.classList.contains('posFocusMode')){
-    $('#closePosFocusBtn')?.click();
+    const openModal=document.querySelector('.modal:not(.hidden)');
+    if(!openModal)exitPosFocusMode();
   }
 });
