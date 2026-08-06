@@ -3321,3 +3321,537 @@ body.posFocusMode #tab-pos::after{
     position:relative!important;
   }
 }
+
+/* ============================================================
+   POS / CAJA — COBRO RÁPIDO PROFESIONAL
+   ============================================================ */
+
+body.posFocusMode #tab-pos .posTicket{
+  overflow:hidden!important;
+}
+
+.posDetailsToggle{
+  width:100%;
+  min-height:36px;
+  margin:6px 0;
+  border:1px solid #d5c6b2;
+  border-radius:9px;
+  background:#fff;
+  color:#17130f;
+  font-weight:900;
+  text-align:left;
+  padding:7px 10px;
+}
+
+.posOptionalDetails{
+  display:grid;
+  gap:6px;
+  overflow:hidden;
+  transition:max-height .2s ease,opacity .2s ease;
+  max-height:430px;
+  opacity:1;
+}
+
+.posOptionalDetails.collapsed{
+  max-height:0!important;
+  opacity:0;
+  pointer-events:none;
+  margin:0!important;
+}
+
+.posQuickCheckoutBtn{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  min-height:54px!important;
+  margin:7px 0 5px!important;
+  padding:10px 13px!important;
+  border:0!important;
+  border-radius:12px!important;
+  background:#111!important;
+  color:#fff!important;
+  font-size:1rem!important;
+  font-weight:900!important;
+  box-shadow:0 8px 18px rgba(0,0,0,.16)!important;
+}
+
+.posQuickCheckoutBtn strong{
+  color:#ffc400;
+  font-size:1.25rem;
+}
+
+.posQuickCheckoutBtn:hover{
+  transform:translateY(-1px);
+}
+
+.quickCheckoutCard{
+  width:min(470px,calc(100vw - 28px))!important;
+  max-height:calc(100vh - 24px)!important;
+  overflow-y:auto!important;
+  padding:24px!important;
+  border-radius:20px!important;
+}
+
+.quickCheckoutCard h2{
+  margin:4px 0 14px;
+  font-size:1.55rem;
+}
+
+.quickCheckoutSummary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  padding:14px 16px;
+  margin-bottom:14px;
+  border-radius:13px;
+  background:#14110d;
+  color:#fff;
+}
+
+.quickCheckoutSummary strong{
+  color:#ffc400;
+  font-size:1.65rem;
+}
+
+.quickCheckoutGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+
+.quickCheckoutCard label{
+  display:grid;
+  gap:6px;
+  font-weight:900;
+}
+
+.quickCheckoutCard input,
+.quickCheckoutCard select{
+  width:100%;
+  min-height:43px;
+  padding:8px 10px;
+  border:1px solid #cdbda8;
+  border-radius:9px;
+  background:#fff;
+}
+
+.quickDiscountButtons{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+  margin:10px 0 15px;
+}
+
+.quickDiscountButtons button{
+  min-height:40px;
+  border:1px solid #e0a900;
+  border-radius:9px;
+  background:#fff8dc;
+  font-weight:900;
+}
+
+.quickPaymentMethods{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+  margin-top:6px;
+}
+
+.quickPaymentMethods button{
+  min-height:45px;
+  padding:6px;
+  border:1px solid #cdbda8;
+  border-radius:9px;
+  background:#fff;
+  font-weight:900;
+}
+
+.quickPaymentMethods button.active{
+  background:#111;
+  color:#fff;
+  border-color:#111;
+}
+
+.quickCashFields{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-top:14px;
+  align-items:end;
+}
+
+.quickCashFields.hidden{
+  display:none!important;
+}
+
+.quickChangeBox{
+  min-height:68px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:9px 12px;
+  border-radius:10px;
+  background:#f3eee5;
+}
+
+.quickChangeBox span{
+  font-size:.75rem;
+  font-weight:800;
+}
+
+.quickChangeBox strong{
+  font-size:1.25rem;
+}
+
+.quickConfirmBtn{
+  min-height:52px!important;
+  margin-top:16px!important;
+  font-size:1rem!important;
+  border-radius:11px!important;
+}
+
+@media(max-width:560px){
+  .quickCheckoutGrid,
+  .quickCashFields{
+    grid-template-columns:1fr;
+  }
+
+  .quickPaymentMethods{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+/* ============================================================
+   CLIENTES — PANTALLA PROFESIONAL SIN PANEL LATERAL
+   ============================================================ */
+
+html.customersFocusModeRoot,
+body.customersFocusMode{
+  overflow:hidden!important;
+}
+
+body.customersFocusMode .sidebar,
+body.customersFocusMode .topbar{
+  display:none!important;
+}
+
+body.customersFocusMode .adminShell{
+  display:block!important;
+  min-height:100vh!important;
+}
+
+body.customersFocusMode .adminMain,
+body.customersFocusMode main{
+  width:100vw!important;
+  max-width:none!important;
+  height:100vh!important;
+  min-height:100vh!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  background:#eee8de!important;
+}
+
+body.customersFocusMode #tab-customers{
+  position:fixed!important;
+  inset:0!important;
+  z-index:7000!important;
+  display:flex!important;
+  flex-direction:column!important;
+  width:100vw!important;
+  height:100vh!important;
+  min-height:0!important;
+  padding:12px!important;
+  overflow:hidden!important;
+  background:#eee8de!important;
+}
+
+body.customersFocusMode #tab-customers.hidden{
+  display:none!important;
+}
+
+.customersFocusHeader{
+  flex:0 0 86px!important;
+  min-height:86px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:16px!important;
+  margin:0 0 10px!important;
+  padding:12px 15px!important;
+  border-radius:16px!important;
+  background:#211b14!important;
+  color:#fff!important;
+  box-shadow:0 9px 25px rgba(0,0,0,.12)!important;
+}
+
+.customersHeaderIntro{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  min-width:0;
+}
+
+.customersFocusLogo{
+  width:62px;
+  height:62px;
+  object-fit:contain;
+  flex:0 0 62px;
+  border-radius:12px;
+  background:#fff;
+  padding:4px;
+}
+
+.customersFocusHeader h2{
+  margin:1px 0 2px!important;
+  color:#fff!important;
+  font-size:1.45rem!important;
+}
+
+.customersFocusHeader p{
+  margin:0!important;
+  color:#e8ddce!important;
+  font-size:.8rem!important;
+}
+
+.customersHeaderRight{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.customersFocusHeader .tablesStats{
+  display:grid!important;
+  grid-template-columns:repeat(3,95px)!important;
+  gap:7px!important;
+}
+
+.customersFocusHeader .tablesStats > div{
+  padding:7px 9px!important;
+  border:1px solid rgba(255,255,255,.14)!important;
+  border-radius:10px!important;
+  background:rgba(255,255,255,.07)!important;
+}
+
+.customersFocusHeader .tablesStats span{
+  color:#e7ddcf!important;
+  font-size:.66rem!important;
+}
+
+.customersFocusHeader .tablesStats strong{
+  color:#ffc400!important;
+  font-size:1.15rem!important;
+}
+
+.customersExitBtn{
+  min-height:42px;
+  padding:8px 13px;
+  border:1px solid #cdbda8;
+  border-radius:10px;
+  background:#fff;
+  color:#111;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.customersExitBtn:hover{
+  background:#ffc400;
+  border-color:#ffc400;
+}
+
+body.customersFocusMode #tab-customers .customersGrid{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  height:auto!important;
+  display:grid!important;
+  grid-template-columns:minmax(360px,430px) minmax(0,1fr)!important;
+  gap:11px!important;
+  overflow:hidden!important;
+}
+
+body.customersFocusMode #tab-customers .customersGrid > .panel{
+  height:100%!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:16px!important;
+  border-radius:16px!important;
+  overflow:hidden!important;
+  background:#fff!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.06)!important;
+}
+
+body.customersFocusMode #customerFormAdmin{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:9px!important;
+  align-content:start!important;
+  overflow-y:auto!important;
+  padding-right:10px!important;
+}
+
+body.customersFocusMode #customerFormAdmin h3{
+  margin:0 0 3px!important;
+  font-size:1.2rem!important;
+}
+
+body.customersFocusMode #customerFormAdmin label{
+  display:grid!important;
+  gap:4px!important;
+  margin:0!important;
+  font-size:.76rem!important;
+  font-weight:900!important;
+}
+
+body.customersFocusMode #customerFormAdmin input,
+body.customersFocusMode #customerFormAdmin select,
+body.customersFocusMode #customerFormAdmin textarea{
+  width:100%!important;
+  min-height:37px!important;
+  padding:7px 9px!important;
+  border:1px solid #cebfa9!important;
+  border-radius:9px!important;
+  background:#fff!important;
+}
+
+body.customersFocusMode #customerFormAdmin textarea{
+  min-height:60px!important;
+  max-height:85px!important;
+  resize:vertical!important;
+}
+
+body.customersFocusMode #customerFormAdmin .check{
+  display:flex!important;
+  align-items:center!important;
+  gap:7px!important;
+  min-height:36px!important;
+}
+
+body.customersFocusMode #customerFormAdmin .check input{
+  width:18px!important;
+  min-height:18px!important;
+}
+
+.customerFormActions{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:8px!important;
+  position:sticky!important;
+  bottom:0!important;
+  padding-top:7px!important;
+  background:#fff!important;
+}
+
+.customerFormActions button{
+  min-height:43px!important;
+  border-radius:10px!important;
+}
+
+body.customersFocusMode #tab-customers .customersGrid > section.panel{
+  display:flex!important;
+  flex-direction:column!important;
+}
+
+body.customersFocusMode #tab-customers .panelTitle{
+  flex:0 0 auto!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  margin-bottom:8px!important;
+}
+
+body.customersFocusMode #tab-customers .panelTitle h3{
+  margin:0!important;
+  font-size:1.15rem!important;
+}
+
+body.customersFocusMode #customerAdminSearch{
+  width:min(340px,48%)!important;
+  min-height:39px!important;
+  padding:7px 10px!important;
+  border-radius:9px!important;
+}
+
+body.customersFocusMode #customerAdminList{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:9px!important;
+  align-content:start!important;
+  padding-right:5px!important;
+}
+
+body.customersFocusMode #customerAdminList .customerAdminCard,
+body.customersFocusMode #customerAdminList > article,
+body.customersFocusMode #customerAdminList > div{
+  min-width:0!important;
+}
+
+@media(max-width:1050px){
+  body.customersFocusMode #tab-customers .customersGrid{
+    grid-template-columns:360px minmax(0,1fr)!important;
+  }
+
+  body.customersFocusMode #customerAdminList{
+    grid-template-columns:1fr!important;
+  }
+
+  .customersFocusHeader .tablesStats{
+    grid-template-columns:repeat(3,78px)!important;
+  }
+}
+
+@media(max-width:760px){
+  html.customersFocusModeRoot,
+  body.customersFocusMode{
+    overflow:auto!important;
+  }
+
+  body.customersFocusMode #tab-customers{
+    position:relative!important;
+    height:auto!important;
+    min-height:100vh!important;
+    overflow:visible!important;
+  }
+
+  .customersFocusHeader{
+    height:auto!important;
+    flex-wrap:wrap!important;
+  }
+
+  .customersHeaderRight{
+    width:100%!important;
+    justify-content:space-between!important;
+  }
+
+  body.customersFocusMode #tab-customers .customersGrid{
+    display:flex!important;
+    flex-direction:column!important;
+    overflow:visible!important;
+  }
+
+  body.customersFocusMode #tab-customers .customersGrid > .panel{
+    height:auto!important;
+    overflow:visible!important;
+  }
+
+  body.customersFocusMode #customerFormAdmin{
+    grid-template-columns:1fr!important;
+    overflow:visible!important;
+  }
+
+  body.customersFocusMode #customerAdminList{
+    grid-template-columns:1fr!important;
+    max-height:none!important;
+    overflow:visible!important;
+  }
+
+  body.customersFocusMode #customerAdminSearch{
+    width:100%!important;
+  }
+}

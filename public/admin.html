@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=pos-focus-functional">
+<link rel="stylesheet" href="/admin-v18.css?v=customers-professional-focus">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 </head>
@@ -631,12 +631,24 @@
 </section>
 
 <section id="tab-customers" class="tab hidden">
-  <div class="tablesHeader">
-    <div><h2>Base de clientes</h2><p>Información, historial y fidelización.</p></div>
-    <div class="tablesStats">
+  <div class="tablesHeader customersFocusHeader">
+    <div class="customersHeaderIntro">
+      <img src="media/logo.png" alt="Mordisco Fast Food" class="customersFocusLogo">
+      <div>
+        <span class="eyebrow">MORDISCO OS</span>
+        <h2>Base de clientes</h2>
+        <p>Información, historial y fidelización.</p>
+      </div>
+    </div>
+    <div class="customersHeaderRight">
+      <div class="tablesStats">
       <div><span>Clientes</span><strong id="customerCount">0</strong></div>
       <div><span>Frecuentes</span><strong id="frequentCount">0</strong></div>
       <div><span>VIP</span><strong id="vipCount">0</strong></div>
+      </div>
+      <button id="exitCustomersFocusBtn" class="customersExitBtn" type="button">
+        ← Volver al panel
+      </button>
     </div>
   </div>
   <div class="dashboardGrid customersGrid">
@@ -652,7 +664,7 @@
       <label>Puntos<input id="customerPoints" type="number" min="0" value="0"></label>
       <label class="wide">Notas<textarea id="customerNotesAdmin"></textarea></label>
       <label class="check"><input id="customerActiveAdmin" type="checkbox" checked> Activo</label>
-      <div class="wide"><button class="primary">Guardar cliente</button><button type="button" class="dark" id="clearCustomerAdmin">Limpiar</button></div>
+      <div class="wide customerFormActions"><button class="primary">Guardar cliente</button><button type="button" class="dark" id="clearCustomerAdmin">Limpiar formulario</button></div>
     </form>
     <section class="panel">
       <div class="panelTitle"><h3>Clientes registrados</h3><input id="customerAdminSearch" placeholder="Buscar nombre, teléfono o correo"></div>
@@ -963,6 +975,64 @@
   </div>
 </div>
 
+
+  <div id="quickCheckoutModal" class="modal hidden">
+    <div class="modalCard quickCheckoutCard">
+      <button class="close" id="quickCheckoutClose" type="button">×</button>
+      <span class="eyebrow">COBRO RÁPIDO</span>
+      <h2 id="quickCheckoutTitle">Cobrar venta</h2>
+
+      <div class="quickCheckoutSummary">
+        <span>Total a cobrar</span>
+        <strong id="quickCheckoutAmount">$0,00</strong>
+      </div>
+
+      <div class="quickCheckoutGrid">
+        <label>Tipo de descuento
+          <select id="quickDiscountType">
+            <option value="none">Sin descuento</option>
+            <option value="percent">Porcentaje</option>
+            <option value="fixed">Valor fijo</option>
+          </select>
+        </label>
+
+        <label>Valor
+          <input id="quickDiscountValue" type="number" min="0" step="0.01" value="0">
+        </label>
+      </div>
+
+      <div class="quickDiscountButtons">
+        <button type="button" data-quick-discount="5">5%</button>
+        <button type="button" data-quick-discount="10">10%</button>
+        <button type="button" data-quick-discount="15">15%</button>
+        <button type="button" data-quick-discount="20">20%</button>
+      </div>
+
+      <label>Método de pago
+        <div class="quickPaymentMethods">
+          <button type="button" data-quick-payment="cash" class="active">Efectivo</button>
+          <button type="button" data-quick-payment="card">Tarjeta</button>
+          <button type="button" data-quick-payment="deuna">De una</button>
+          <button type="button" data-quick-payment="ahorita">Ahorita</button>
+        </div>
+      </label>
+
+      <div id="quickCashFields" class="quickCashFields">
+        <label>Recibido
+          <input id="quickCashReceived" type="number" min="0" step="0.01" value="0">
+        </label>
+        <div class="quickChangeBox">
+          <span>Cambio</span>
+          <strong id="quickCashChange">$0,00</strong>
+        </div>
+      </div>
+
+      <button id="confirmQuickCheckoutBtn" class="primary full quickConfirmBtn" type="button">
+        Confirmar cobro
+      </button>
+    </div>
+  </div>
+
 <div id="receiptModal" class="modal hidden">
   <div class="modalCard receiptModalCard">
     <button class="close" id="receiptCloseBtn" type="button" aria-label="Cerrar comprobante">×</button>
@@ -1063,7 +1133,7 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=pos-focus-functional"></script>
+<script src="/admin-v18.js?v=customers-professional-focus"></script>
 
 
 

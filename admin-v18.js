@@ -239,7 +239,7 @@ function totals(){const subtotal=cart.reduce((s,x)=>{const p=products.find(y=>y.
 function renderCart(){$('#cartCount').textContent=cart.reduce((s,x)=>s+x.qty,0);$('#cartItems').innerHTML=cart.length?cart.map(x=>{const p=products.find(y=>y.id===x.id);if(!p)return'';return`<div class="cartItem">${p.image_url?`<img src="${esc(p.image_url)}">`:'<div></div>'}<div><b>${esc(p.name)}</b><small>${money(p.price)}</small><div class="qty"><button data-minus="${p.id}">−</button><span>${x.qty}</span><button data-plus="${p.id}">+</button></div></div><b>${money(Number(p.price)*x.qty)}</b></div>`}).join(''):'<p class="notice">Tu carrito está vacío.</p>';$$('[data-minus]').forEach(b=>b.onclick=()=>changeQty(b.dataset.minus,-1));$$('[data-plus]').forEach(b=>b.onclick=()=>changeQty(b.dataset.plus,1));const t=totals();$('#subtotal').textContent=money(t.subtotal);$('#deliveryTotal').textContent=money(t.delivery);$('#grandTotal').textContent=money(t.total)}
 function openCart(){$('#cartDrawer').classList.add('open')} if(document.querySelector('#cartBtn'))document.querySelector('#cartBtn').onclick=openCart;if(document.querySelector('#orderNowBtn'))document.querySelector('#orderNowBtn').onclick=openCart;if(document.querySelector('#closeCart'))document.querySelector('#closeCart').onclick=()=>$('#cartDrawer').classList.remove('open');if(document.querySelector('#orderType'))document.querySelector('#orderType').onchange=()=>{renderCart();$('#customerAddress').classList.toggle('hidden',$('#orderType').value!=='delivery')};
 
-$$('.sidebar [data-tab]').forEach(b=>b.onclick=async()=>{const tab=b.dataset.tab;setPosFocusMode(tab==='pos');$$('.sidebar [data-tab]').forEach(x=>x.classList.toggle('active',x===b));$$('.tab').forEach(x=>x.classList.add('hidden'));$('#tab-'+tab).classList.remove('hidden');$('#adminTitle').textContent={dashboard:'Resumen',products:'Productos',categories:'Categorías',orders:'Pedidos web',kitchen:'Cocina',pos:'POS / Caja',inventory:'Inventario',tables:'Mesas',shifts:'Turnos',staff:'Personal',finance:'Contabilidad',customers:'Clientes',promotions:'Promociones',pages:'Páginas',settings:'Negocio'}[tab];if(tab==='orders'||tab==='kitchen')await loadOrders();if(tab==='dashboard'){await loadOrders();renderMetrics()}if(tab==='kitchen')startKitchenClock();if(tab==='pos'){
+$$('.sidebar [data-tab]').forEach(b=>b.onclick=async()=>{const tab=b.dataset.tab;setPosFocusMode(tab==='pos');setCustomersFocusMode(tab==='customers');$$('.sidebar [data-tab]').forEach(x=>x.classList.toggle('active',x===b));$$('.tab').forEach(x=>x.classList.add('hidden'));$('#tab-'+tab).classList.remove('hidden');$('#adminTitle').textContent={dashboard:'Resumen',products:'Productos',categories:'Categorías',orders:'Pedidos web',kitchen:'Cocina',pos:'POS / Caja',inventory:'Inventario',tables:'Mesas',shifts:'Turnos',staff:'Personal',finance:'Contabilidad',customers:'Clientes',promotions:'Promociones',pages:'Páginas',settings:'Negocio'}[tab];if(tab==='orders'||tab==='kitchen')await loadOrders();if(tab==='dashboard'){await loadOrders();renderMetrics()}if(tab==='kitchen')startKitchenClock();if(tab==='pos'){
       setPosFocusMode(true);
       fillPosCategories();
       renderPosProducts();
@@ -3568,5 +3568,143 @@ document.addEventListener('keydown',event=>{
   if(event.key==='Escape'&&document.body.classList.contains('posFocusMode')){
     const openModal=document.querySelector('.modal:not(.hidden)');
     if(!openModal)exitPosFocusMode();
+  }
+});
+
+
+/* ===== POS / CAJA: COBRO RÁPIDO SIN DESPLAZAMIENTO ===== */
+let quickPaymentMethod='cash';
+
+function getCurrentPosTotal(){
+  const text=$('#posHeaderTotal')?.textContent||$('#posTotal')?.textContent||'$0';
+  return Number(String(text).replace(/[^\d,.-]/g,'').replace(',','.'))||0;
+}
+
+function formatQuickMoney(value){
+  return money(Number(value||0));
+}
+
+function syncQuickCheckoutTotal(){
+  const total=getCurrentPosTotal();
+  if($('#quickCheckoutTotal'))$('#quickCheckoutTotal').textContent=formatQuickMoney(total);
+  if($('#quickCheckoutAmount'))$('#quickCheckoutAmount').textContent=formatQuickMoney(total);
+  updateQuickChange();
+}
+
+function updateQuickChange(){
+  const total=getCurrentPosTotal();
+  const received=Number($('#quickCashReceived')?.value||0);
+  if($('#quickCashChange')){
+    $('#quickCashChange').textContent=formatQuickMoney(Math.max(0,received-total));
+  }
+}
+
+$('#posDetailsToggle')?.addEventListener('click',()=>{
+  const box=$('#posOptionalDetails');
+  if(!box)return;
+  const collapsed=box.classList.toggle('collapsed');
+  $('#posDetailsToggle').textContent=collapsed?'Datos del pedido ▾':'Datos del pedido ▴';
+});
+
+$('#openQuickCheckoutBtn')?.addEventListener('click',()=>{
+  if(!posCart?.length)return toast('Selecciona productos para cobrar');
+  syncQuickCheckoutTotal();
+  $('#quickCheckoutModal')?.classList.remove('hidden');
+  setTimeout(()=>$('#quickCashReceived')?.focus(),80);
+});
+
+$('#quickCheckoutClose')?.addEventListener('click',()=>{
+  $('#quickCheckoutModal')?.classList.add('hidden');
+});
+
+$('#quickCheckoutModal')?.addEventListener('click',event=>{
+  if(event.target===$('#quickCheckoutModal')){
+    $('#quickCheckoutModal').classList.add('hidden');
+  }
+});
+
+$$('[data-quick-discount]').forEach(button=>{
+  button.onclick=()=>{
+    $('#quickDiscountType').value='percent';
+    $('#quickDiscountValue').value=button.dataset.quickDiscount;
+    syncQuickCheckoutTotal();
+  };
+});
+
+$$('[data-quick-payment]').forEach(button=>{
+  button.onclick=()=>{
+    quickPaymentMethod=button.dataset.quickPayment;
+    $$('[data-quick-payment]').forEach(item=>item.classList.toggle('active',item===button));
+    $('#quickCashFields')?.classList.toggle('hidden',quickPaymentMethod!=='cash');
+  };
+});
+
+$('#quickCashReceived')?.addEventListener('input',updateQuickChange);
+$('#quickDiscountType')?.addEventListener('change',syncQuickCheckoutTotal);
+$('#quickDiscountValue')?.addEventListener('input',syncQuickCheckoutTotal);
+
+$('#confirmQuickCheckoutBtn')?.addEventListener('click',async()=>{
+  const discountType=$('#quickDiscountType')?.value||'none';
+  const discountValue=Number($('#quickDiscountValue')?.value||0);
+
+  const originalType=$('#posDiscountType');
+  const originalValue=$('#posDiscountValue');
+  const paymentMethod=$('#paymentMethod');
+  const cashReceived=$('#cashReceived');
+
+  if(originalType)originalType.value=discountType;
+  if(originalValue)originalValue.value=discountValue;
+  if(paymentMethod)paymentMethod.value=quickPaymentMethod;
+  if(cashReceived)cashReceived.value=Number($('#quickCashReceived')?.value||0);
+
+  const button=$('#confirmQuickCheckoutBtn');
+  const previous=button.textContent;
+  button.disabled=true;
+  button.textContent='Procesando...';
+
+  try{
+    if(typeof confirmChargeOrder==='function'){
+      await confirmChargeOrder();
+    }else{
+      $('#confirmChargeOrder')?.click();
+    }
+    $('#quickCheckoutModal')?.classList.add('hidden');
+  }finally{
+    button.disabled=false;
+    button.textContent=previous;
+  }
+});
+
+// Mantener el total rápido sincronizado con cambios en la orden.
+const quickTotalObserver=new MutationObserver(syncQuickCheckoutTotal);
+['#posHeaderTotal','#posTotal'].forEach(selector=>{
+  const node=$(selector);
+  if(node)quickTotalObserver.observe(node,{childList:true,subtree:true,characterData:true});
+});
+syncQuickCheckoutTotal();
+
+
+/* ===== CLIENTES: PANTALLA PROFESIONAL SIN PANEL LATERAL ===== */
+function setCustomersFocusMode(enabled){
+  document.body.classList.toggle('customersFocusMode',Boolean(enabled));
+  document.documentElement.classList.toggle('customersFocusModeRoot',Boolean(enabled));
+
+  if(enabled){
+    requestAnimationFrame(()=>window.scrollTo({top:0,left:0,behavior:'auto'}));
+  }
+}
+
+function exitCustomersFocusMode(){
+  setCustomersFocusMode(false);
+  const dashboardButton=$('.sidebar [data-tab="dashboard"]');
+  if(dashboardButton)dashboardButton.click();
+}
+
+$('#exitCustomersFocusBtn')?.addEventListener('click',exitCustomersFocusMode);
+
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape'&&document.body.classList.contains('customersFocusMode')){
+    const openModal=document.querySelector('.modal:not(.hidden)');
+    if(!openModal)exitCustomersFocusMode();
   }
 });
