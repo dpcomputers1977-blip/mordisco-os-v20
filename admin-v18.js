@@ -4041,3 +4041,50 @@ document.addEventListener('click',event=>{
     showChargeOperationStatus('', 'info');
   }
 },true);
+
+
+/* ============================================================
+   V21 — SALIDA SEGURA DE POS / CAJA
+   ============================================================ */
+function exitPosToAdministratorV21(){
+  // Exit only the visual POS focus mode.
+  document.body.classList.remove(
+    'posFocusMode',
+    'moduleFocusV21'
+  );
+
+  document.documentElement.classList.remove(
+    'posFocusModeRoot'
+  );
+
+  document.body.dataset.focusTab='';
+
+  const moduleButton=document.querySelector('#toggleModuleFocus');
+  if(moduleButton)moduleButton.textContent='Pantalla amplia';
+
+  // Return to dashboard without closing register or employee shift.
+  const dashboardButton=document.querySelector(
+    '.sidebar [data-tab="dashboard"]'
+  );
+
+  if(dashboardButton){
+    dashboardButton.click();
+  }else{
+    document.querySelectorAll('#adminView .tab').forEach(tab=>{
+      tab.classList.add('hidden');
+    });
+    document.querySelector('#tab-dashboard')?.classList.remove('hidden');
+
+    const title=document.querySelector('#adminTitle');
+    if(title)title.textContent='Resumen';
+  }
+
+  window.scrollTo({top:0,left:0,behavior:'auto'});
+}
+
+document.querySelector('#exitPosToAdminV21')
+  ?.addEventListener('click',event=>{
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    exitPosToAdministratorV21();
+  });

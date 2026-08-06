@@ -1,0 +1,25 @@
+MORDISCO OS V21 — BOTÓN PARA SALIR DE CAJA
+
+AGREGA
+- Botón fijo Volver al administrador.
+- Visible siempre mientras POS / Caja está en pantalla completa.
+- Regresa al módulo Resumen.
+- No cierra la caja operativa.
+- No cierra el turno del empleado.
+- No elimina la venta actual.
+- No modifica la página pública.
+
+APLICAR
+1. Extrae el ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Agregar salida segura de Caja V21
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Prueba:
+   https://mordiscofastfood.com/admin?session=ok&tab=pos&v=v21-pos-exit
+
+NO ejecuta SQL.
