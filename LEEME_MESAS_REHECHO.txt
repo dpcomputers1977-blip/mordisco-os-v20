@@ -1,0 +1,33 @@
+MORDISCO — VENTANA DE MESAS REHECHA CORRECTAMENTE
+
+Esta corrección reemplaza únicamente la distribución visual de Mesas.
+
+CAMBIOS
+- Ventana ocupa todo el espacio disponible junto al menú lateral.
+- Cinco productos completos por fila.
+- Tarjetas de tamaño uniforme, sin recortes ni franjas.
+- Un solo desplazamiento dentro del catálogo.
+- Pedido fijo y visible a la derecha.
+- Buscador y categorías siempre visibles.
+- Adaptación a portátil, tableta y teléfono.
+
+NO CAMBIA
+- Página web pública.
+- Caja, Cocina, Turnos o permisos.
+- Productos, precios, imágenes o pedidos.
+- Base de datos.
+
+APLICAR
+1. Extrae el ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Rehacer correctamente ventana de Mesas
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Abre:
+   https://mordiscofastfood.com/admin?session=ok&tab=tables&v=table-layout-real-final
+
+NO ejecutes SQL.

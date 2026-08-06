@@ -2053,3 +2053,353 @@ body:not(.modal-open){overflow:auto!important}
     height:420px!important;
   }
 }
+
+/* ============================================================
+   MESAS — DISEÑO REAL FINAL
+   Aislado únicamente a #tableOrderModal
+   ============================================================ */
+
+#tableOrderModal.modal{
+  position:fixed!important;
+  inset:0!important;
+  z-index:9999!important;
+  display:flex!important;
+  align-items:stretch!important;
+  justify-content:flex-end!important;
+  padding:10px 10px 10px 198px!important;
+  overflow:hidden!important;
+  background:rgba(10,9,7,.48)!important;
+}
+
+#tableOrderModal.modal.hidden{
+  display:none!important;
+}
+
+#tableOrderModal .tableOrderCard{
+  position:relative!important;
+  width:100%!important;
+  max-width:none!important;
+  height:100%!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:13px!important;
+  border-radius:18px!important;
+  overflow:hidden!important;
+  display:flex!important;
+  flex-direction:column!important;
+  background:#fff!important;
+  box-shadow:0 24px 80px rgba(0,0,0,.30)!important;
+}
+
+#tableOrderModal .close{
+  position:absolute!important;
+  top:10px!important;
+  right:12px!important;
+  width:42px!important;
+  height:42px!important;
+  min-width:42px!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  border:2px solid #15120e!important;
+  border-radius:10px!important;
+  background:#fff!important;
+  color:#111!important;
+  font-size:28px!important;
+  line-height:1!important;
+  z-index:20!important;
+}
+
+#tableOrderModal .tableOrderHead{
+  flex:0 0 48px!important;
+  min-height:48px!important;
+  height:48px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  padding:0 58px 8px 3px!important;
+  margin:0 0 8px!important;
+  border-bottom:1px solid #eadfce!important;
+  overflow:hidden!important;
+}
+
+#tableOrderModal .tableOrderHead .eyebrow{
+  font-size:.68rem!important;
+}
+
+#tableOrderModal .tableOrderHead h2{
+  margin:0!important;
+  font-size:1.25rem!important;
+  line-height:1.1!important;
+}
+
+#tableOrderModal .tableOrderLayout{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  height:auto!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 282px!important;
+  gap:10px!important;
+  overflow:hidden!important;
+}
+
+#tableOrderModal .tableCatalog{
+  min-width:0!important;
+  min-height:0!important;
+  height:100%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+}
+
+#tableOrderModal .tableCatalogToolbar{
+  flex:0 0 38px!important;
+  height:38px!important;
+  display:grid!important;
+  grid-template-columns:minmax(140px,1fr) 210px!important;
+  gap:7px!important;
+  margin:0 0 7px!important;
+}
+
+#tableOrderModal .tableCatalogToolbar input,
+#tableOrderModal .tableCatalogToolbar select{
+  width:100%!important;
+  height:38px!important;
+  min-height:38px!important;
+  margin:0!important;
+  padding:6px 10px!important;
+  border:1px solid #ccbda8!important;
+  border-radius:10px!important;
+  background:#fff!important;
+  font-size:.88rem!important;
+}
+
+#tableOrderModal #tableProducts{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  height:auto!important;
+  max-height:none!important;
+  width:100%!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  grid-auto-rows:122px!important;
+  gap:6px!important;
+  align-content:start!important;
+  align-items:stretch!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  padding:1px 6px 18px 1px!important;
+  scroll-behavior:smooth!important;
+  overscroll-behavior:contain!important;
+}
+
+#tableOrderModal #tableProducts .posProduct{
+  width:100%!important;
+  min-width:0!important;
+  height:122px!important;
+  min-height:122px!important;
+  max-height:122px!important;
+  margin:0!important;
+  padding:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+  border:1px solid #e0d5c5!important;
+  border-radius:10px!important;
+  background:#fff!important;
+  box-shadow:none!important;
+  text-align:left!important;
+}
+
+#tableOrderModal #tableProducts .posProduct:hover{
+  transform:none!important;
+  border-color:#f0ad00!important;
+  box-shadow:0 3px 10px rgba(0,0,0,.08)!important;
+}
+
+#tableOrderModal #tableProducts .posProduct img,
+#tableOrderModal #tableProducts .posProductNoImage{
+  flex:0 0 52px!important;
+  display:block!important;
+  width:100%!important;
+  height:52px!important;
+  min-height:52px!important;
+  max-height:52px!important;
+  margin:0!important;
+  object-fit:contain!important;
+  background:#f4efe6!important;
+}
+
+#tableOrderModal #tableProducts .posProductInfo{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  min-height:0!important;
+  height:70px!important;
+  padding:5px 6px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+}
+
+#tableOrderModal #tableProducts .posProductInfo small{
+  display:block!important;
+  margin:0 0 1px!important;
+  color:#817568!important;
+  font-size:.60rem!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+#tableOrderModal #tableProducts .posProductInfo b{
+  display:-webkit-box!important;
+  min-height:25px!important;
+  max-height:25px!important;
+  margin:0!important;
+  overflow:hidden!important;
+  -webkit-line-clamp:2!important;
+  -webkit-box-orient:vertical!important;
+  font-size:.70rem!important;
+  line-height:1.02!important;
+  white-space:normal!important;
+}
+
+#tableOrderModal #tableProducts .posProductInfo strong{
+  display:block!important;
+  margin-top:auto!important;
+  padding-top:2px!important;
+  font-size:.82rem!important;
+  line-height:1!important;
+}
+
+#tableOrderModal .tableTicket{
+  min-width:0!important;
+  min-height:0!important;
+  height:100%!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:10px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  border:1px solid #e3d7c7!important;
+  border-radius:13px!important;
+  background:#f7f2e9!important;
+}
+
+#tableOrderModal .tableTicket .posCart{
+  flex:1 1 auto!important;
+  min-height:76px!important;
+  max-height:none!important;
+  overflow-y:auto!important;
+  margin:0 0 4px!important;
+}
+
+#tableOrderModal .tableTicket label{
+  flex:0 0 auto!important;
+  margin-top:5px!important;
+  font-size:.76rem!important;
+}
+
+#tableOrderModal .tableTicket input{
+  min-height:34px!important;
+  height:34px!important;
+  margin-top:3px!important;
+  padding:5px 7px!important;
+}
+
+#tableOrderModal .tableTicket textarea{
+  min-height:50px!important;
+  height:50px!important;
+  max-height:70px!important;
+  margin-top:3px!important;
+  padding:6px 7px!important;
+  resize:vertical!important;
+}
+
+#tableOrderModal .tableTicket .posTotals{
+  flex:0 0 auto!important;
+  margin:5px 0!important;
+  padding:6px 0!important;
+}
+
+#tableOrderModal .tableTicket .posTotals strong{
+  font-size:1.55rem!important;
+}
+
+#tableOrderModal .tableTicket button{
+  flex:0 0 38px!important;
+  min-height:38px!important;
+  height:38px!important;
+  margin-top:5px!important;
+  padding:6px 8px!important;
+  border-radius:9px!important;
+  font-size:.88rem!important;
+}
+
+#tableOrderModal .tableCloseBottom{
+  background:#fff!important;
+  color:#111!important;
+  border:1px solid #cdbfae!important;
+}
+
+/* Portátil pequeño */
+@media(max-width:1100px){
+  #tableOrderModal.modal{
+    padding-left:170px!important;
+  }
+
+  #tableOrderModal .tableOrderLayout{
+    grid-template-columns:minmax(0,1fr) 270px!important;
+  }
+
+  #tableOrderModal #tableProducts{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  }
+}
+
+/* Tableta y teléfono */
+@media(max-width:760px){
+  #tableOrderModal.modal{
+    padding:0!important;
+  }
+
+  #tableOrderModal .tableOrderCard{
+    border-radius:0!important;
+  }
+
+  #tableOrderModal .tableOrderLayout{
+    display:flex!important;
+    flex-direction:column!important;
+    overflow-y:auto!important;
+  }
+
+  #tableOrderModal .tableCatalog{
+    flex:0 0 500px!important;
+    min-height:500px!important;
+  }
+
+  #tableOrderModal .tableCatalogToolbar{
+    grid-template-columns:1fr!important;
+    flex-basis:82px!important;
+    height:82px!important;
+  }
+
+  #tableOrderModal #tableProducts{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+
+  #tableOrderModal .tableTicket{
+    flex:0 0 auto!important;
+    height:auto!important;
+    min-height:480px!important;
+  }
+}
+
+@media(max-width:480px){
+  #tableOrderModal #tableProducts{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+}
