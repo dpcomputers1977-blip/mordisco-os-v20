@@ -4401,3 +4401,39 @@ body.posFocusMode #tab-pos .posPrimaryActions{
     grid-template-columns:1fr;
   }
 }
+
+/* ============================================================
+   V21 — ESTADO VISIBLE DEL COBRO
+   ============================================================ */
+.chargeOperationStatus{
+  margin:10px 0 4px;
+  padding:10px 12px;
+  border-radius:9px;
+  font-size:.82rem;
+  font-weight:850;
+  line-height:1.35;
+}
+
+.chargeOperationStatus.loading,
+.chargeOperationStatus.info{
+  background:#fff4ce;
+  color:#6d5200;
+  border:1px solid #efd16c;
+}
+
+.chargeOperationStatus.success{
+  background:#e5f7eb;
+  color:#166a35;
+  border:1px solid #bfe5ca;
+}
+
+.chargeOperationStatus.error{
+  background:#ffe5e2;
+  color:#92291f;
+  border:1px solid #efb8b2;
+}
+
+#confirmChargeOrder[disabled]{
+  opacity:.72;
+  cursor:wait;
+}

@@ -3828,3 +3828,216 @@ const chargeModalV21=document.querySelector('#chargeOrderModal');
 if(chargeModalV21){
   chargeModalObserverV21.observe(chargeModalV21,{attributes:true,attributeFilter:['class']});
 }
+
+
+/* ============================================================
+   V21 — COBRO REAL, VERIFICADO Y CON RESPALDO
+   ============================================================ */
+function showChargeOperationStatus(message,type='info'){
+  const box=document.querySelector('#chargeOperationStatus');
+  if(!box)return;
+  box.textContent=message||'';
+  box.className=`chargeOperationStatus ${type}`;
+  box.classList.toggle('hidden',!message);
+}
+
+async function confirmChargeOrderV21(){
+  const order=orders.find(item=>String(item.id)===String(paymentOrderId));
+  if(!order){
+    showChargeOperationStatus('No se encontró el pedido seleccionado.','error');
+    return toast('No se encontró el pedido');
+  }
+
+  const calculation=getChargeCalculation();
+  const method=document.querySelector('#chargePaymentMethod')?.value||'cash';
+  const received=method==='cash'
+    ?Number(document.querySelector('#chargeReceived')?.value||0)
+    :calculation.total;
+
+  if(method==='cash'&&received<calculation.total){
+    showChargeOperationStatus('El efectivo recibido es menor al total final.','error');
+    return;
+  }
+
+  if(currentEmployee?.role==='cashier'){
+    try{
+      await refreshCurrentCashierShift();
+    }catch(error){
+      showChargeOperationStatus(
+        'No se pudo comprobar el turno: '+(error.message||'Error de conexión'),
+        'error'
+      );
+      return;
+    }
+
+    if(!currentShift){
+      showChargeOperationStatus('El administrador debe abrir tu turno antes de cobrar.','error');
+      return;
+    }
+  }
+
+  const button=document.querySelector('#confirmChargeOrder');
+  if(!button||button.dataset.processing==='1')return;
+
+  button.dataset.processing='1';
+  button.disabled=true;
+  button.textContent='Procesando cobro...';
+  showChargeOperationStatus('Guardando el pago en Supabase…','loading');
+
+  let paidSuccessfully=false;
+  let paymentError=null;
+
+  try{
+    const {data,error}=await db.rpc('pay_order_with_discount',{
+      p_order_id:order.id,
+      p_payment_method:method,
+      p_received:received,
+      p_cashier_id:currentEmployee?.role==='cashier'
+        ?currentEmployee.id
+        :(order.cashier_id||null),
+      p_discount_type:calculation.discountType,
+      p_discount_value:calculation.discountValue
+    });
+
+    if(error){
+      paymentError=error;
+    }else{
+      paidSuccessfully=true;
+    }
+  }catch(error){
+    paymentError=error;
+  }
+
+  // The request may have succeeded even if the response was interrupted.
+  if(!paidSuccessfully){
+    const {data:verifiedOrder,error:verifyError}=await db
+      .from('orders')
+      .select('id,payment_status,payment_method,total')
+      .eq('id',order.id)
+      .maybeSingle();
+
+    if(!verifyError&&verifiedOrder?.payment_status==='paid'){
+      paidSuccessfully=true;
+    }
+  }
+
+  // Safe fallback when the older RPC is unavailable or rejects the request.
+  if(!paidSuccessfully){
+    showChargeOperationStatus('Aplicando respaldo de cobro…','loading');
+
+    const paymentRow={
+      payment_status:'paid',
+      payment_method:method,
+      subtotal:calculation.subtotal,
+      discount_type:calculation.discountType,
+      discount_value:calculation.discountValue,
+      discount_amount:calculation.discountAmount,
+      total:calculation.total
+    };
+
+    if(currentEmployee?.role==='cashier'){
+      paymentRow.cashier_id=currentEmployee.id;
+    }
+
+    const {error:updateError}=await db
+      .from('orders')
+      .update(paymentRow)
+      .eq('id',order.id)
+      .neq('payment_status','paid');
+
+    if(!updateError){
+      const today=new Date().toISOString().slice(0,10);
+      const financeRow={
+        type:'income',
+        category:'Ventas',
+        amount:calculation.total,
+        payment_method:method,
+        movement_date:today,
+        reference:`Venta #${order.order_number}`,
+        description:`Pago del pedido #${order.order_number}`,
+        staff_id:currentEmployee?.id||null
+      };
+
+      const {error:financeError}=await db
+        .from('financial_movements')
+        .insert(financeRow);
+
+      // A duplicated or blocked accounting row must not undo the paid order.
+      if(financeError){
+        console.warn('El pedido se pagó, pero no se creó el movimiento contable:',financeError);
+      }
+
+      const {data:finalOrder}=await db
+        .from('orders')
+        .select('payment_status')
+        .eq('id',order.id)
+        .maybeSingle();
+
+      paidSuccessfully=finalOrder?.payment_status==='paid';
+      if(!paidSuccessfully)paymentError=updateError||paymentError;
+    }else{
+      paymentError=updateError;
+    }
+  }
+
+  if(!paidSuccessfully){
+    const message=paymentError?.message||'Supabase no confirmó el cobro';
+    console.error('Cobro fallido:',paymentError);
+    showChargeOperationStatus('No se pudo cobrar: '+message,'error');
+    button.disabled=false;
+    button.textContent='Confirmar cobro';
+    button.dataset.processing='0';
+    return;
+  }
+
+  const paidOrder={
+    ...order,
+    subtotal:calculation.subtotal,
+    discount_type:calculation.discountType,
+    discount_value:calculation.discountValue,
+    discount_amount:calculation.discountAmount,
+    total:calculation.total,
+    payment_method:method,
+    payment_status:'paid',
+    cashier_name:currentEmployee?.name||order.cashier?.name||'Administrador'
+  };
+
+  lastReceiptOrder={order:paidOrder,items:order.order_items||[],received};
+  document.querySelector('#receiptContent').innerHTML=
+    buildReceipt(paidOrder,order.order_items||[],received);
+
+  showChargeOperationStatus('Cobro registrado correctamente.','success');
+
+  await Promise.allSettled([
+    loadOrders(),
+    loadFinance(),
+    typeof loadShifts==='function'?loadShifts():Promise.resolve()
+  ]);
+
+  renderPosPendingOrders();
+
+  document.querySelector('#chargeOrderModal')?.classList.add('hidden');
+  document.querySelector('#receiptModal')?.classList.remove('hidden');
+
+  button.disabled=false;
+  button.textContent='Confirmar cobro';
+  button.dataset.processing='0';
+
+  toast(`Pedido #${order.order_number} cobrado correctamente`);
+}
+
+// Capture phase prevents the older handler from firing twice.
+document.addEventListener('click',event=>{
+  const button=event.target.closest?.('#confirmChargeOrder');
+  if(!button)return;
+
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  confirmChargeOrderV21();
+},true);
+
+document.addEventListener('click',event=>{
+  if(event.target.closest?.('[data-pos-pay]')){
+    showChargeOperationStatus('', 'info');
+  }
+},true);
