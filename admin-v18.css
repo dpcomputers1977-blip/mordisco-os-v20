@@ -2756,3 +2756,266 @@ body:not(.modal-open){overflow:auto!important}
     max-height:none!important;
   }
 }
+
+/* ============================================================
+   POS / CAJA — VENTANA FLOTANTE PROFESIONAL
+   ============================================================ */
+
+body.posFocusMode{
+  overflow:hidden!important;
+  background:#111!important;
+}
+
+body.posFocusMode .sidebar,
+body.posFocusMode .adminTop{
+  display:none!important;
+}
+
+body.posFocusMode .adminShell{
+  display:block!important;
+  min-height:100vh!important;
+}
+
+body.posFocusMode .adminContent{
+  width:100vw!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+}
+
+body.posFocusMode #tab-pos{
+  position:fixed!important;
+  inset:0!important;
+  z-index:9999!important;
+  display:flex!important;
+  flex-direction:column!important;
+  min-height:100vh!important;
+  width:100vw!important;
+  padding:14px!important;
+  overflow:hidden!important;
+  background:#f4efe6!important;
+}
+
+body.posFocusMode #tab-pos.hidden{
+  display:none!important;
+}
+
+body.posFocusMode #adminCashControl{
+  flex:0 0 auto!important;
+  margin:0 0 10px!important;
+  padding:10px 14px!important;
+  border-radius:14px!important;
+}
+
+body.posFocusMode #tab-pos .posHeader{
+  flex:0 0 auto!important;
+  min-height:74px!important;
+  margin:0 0 10px!important;
+  padding:12px 14px!important;
+  border-radius:16px!important;
+  background:#fff!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.08)!important;
+}
+
+body.posFocusMode #tab-pos .posHeaderTitle .eyebrow{
+  font-size:.67rem!important;
+}
+
+body.posFocusMode #tab-pos .posHeader h2{
+  margin:2px 0 2px!important;
+  font-size:1.55rem!important;
+}
+
+body.posFocusMode #tab-pos .posHeader p{
+  margin:0!important;
+  font-size:.86rem!important;
+}
+
+body.posFocusMode #tab-pos .posHeaderActions{
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+}
+
+body.posFocusMode #tab-pos .posHeaderStats{
+  min-width:165px!important;
+  padding:9px 13px!important;
+  border-radius:12px!important;
+}
+
+body.posFocusMode .posFocusClose{
+  width:44px!important;
+  height:44px!important;
+  min-width:44px!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  border:2px solid #111!important;
+  border-radius:11px!important;
+  background:#fff!important;
+  color:#111!important;
+  font-size:27px!important;
+  line-height:1!important;
+  cursor:pointer!important;
+}
+
+body.posFocusMode #cashRegisterClosedNotice{
+  flex:0 0 auto!important;
+  margin:0 0 10px!important;
+}
+
+body.posFocusMode #tab-pos .posLayout{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  height:auto!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 350px!important;
+  gap:10px!important;
+  overflow:hidden!important;
+}
+
+body.posFocusMode #tab-pos .posCatalog{
+  min-height:0!important;
+  height:100%!important;
+  padding:12px!important;
+  border-radius:16px!important;
+  overflow:hidden!important;
+}
+
+body.posFocusMode #tab-pos .posCatalogTop{
+  grid-template-columns:minmax(180px,1fr) 230px!important;
+  margin-bottom:7px!important;
+}
+
+body.posFocusMode #tab-pos #posProducts{
+  max-height:none!important;
+  height:calc(100% - 50px)!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  grid-auto-rows:132px!important;
+  gap:7px!important;
+  overflow-y:auto!important;
+  padding-bottom:18px!important;
+}
+
+body.posFocusMode #tab-pos #posProducts .posProduct{
+  height:132px!important;
+  min-height:132px!important;
+  max-height:132px!important;
+  border-radius:10px!important;
+}
+
+body.posFocusMode #tab-pos #posProducts .posProduct img,
+body.posFocusMode #tab-pos #posProducts .posProductNoImage{
+  flex:0 0 60px!important;
+  height:60px!important;
+  min-height:60px!important;
+  max-height:60px!important;
+}
+
+body.posFocusMode #tab-pos #posProducts .posProductInfo{
+  padding:6px 7px!important;
+}
+
+body.posFocusMode #tab-pos #posProducts .posProductInfo b{
+  min-height:27px!important;
+  max-height:27px!important;
+  font-size:.76rem!important;
+}
+
+body.posFocusMode #tab-pos #posProducts .posProductInfo strong{
+  font-size:.88rem!important;
+  padding-top:3px!important;
+}
+
+body.posFocusMode #tab-pos .posTicket{
+  position:static!important;
+  top:auto!important;
+  height:100%!important;
+  max-height:none!important;
+  min-height:0!important;
+  padding:13px!important;
+  border-radius:16px!important;
+  overflow-y:auto!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.08)!important;
+}
+
+body.posFocusMode #tab-pos .posTicketTitle h3{
+  font-size:1.3rem!important;
+}
+
+body.posFocusMode #tab-pos .posCart{
+  max-height:155px!important;
+}
+
+body.posFocusMode #tab-pos .posTotals{
+  margin:7px 0!important;
+}
+
+body.posFocusMode #tab-pos .preDiscountBox{
+  padding:9px!important;
+}
+
+body.posFocusMode #tab-pos .posTicket input,
+body.posFocusMode #tab-pos .posTicket select,
+body.posFocusMode #tab-pos .posTicket textarea{
+  min-height:34px!important;
+  padding:6px 8px!important;
+}
+
+body.posFocusMode #tab-pos .posTicket textarea{
+  min-height:48px!important;
+}
+
+body.posFocusMode #tab-pos .posTicket button{
+  min-height:40px!important;
+}
+
+body.posFocusMode #tab-pos .pendingPaymentSection{
+  display:none!important;
+}
+
+/* El botón aparece también fuera del modo flotante */
+.posFocusClose{
+  display:none;
+}
+
+body.posFocusMode .posFocusClose{
+  display:grid!important;
+}
+
+@media(max-width:1100px){
+  body.posFocusMode #tab-pos .posLayout{
+    grid-template-columns:minmax(0,1fr) 320px!important;
+  }
+
+  body.posFocusMode #tab-pos #posProducts{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  }
+}
+
+@media(max-width:780px){
+  body.posFocusMode #tab-pos{
+    padding:8px!important;
+    overflow-y:auto!important;
+  }
+
+  body.posFocusMode #tab-pos .posLayout{
+    display:flex!important;
+    flex-direction:column!important;
+    overflow:visible!important;
+  }
+
+  body.posFocusMode #tab-pos .posCatalog{
+    min-height:520px!important;
+  }
+
+  body.posFocusMode #tab-pos #posProducts{
+    height:440px!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+
+  body.posFocusMode #tab-pos .posTicket{
+    height:auto!important;
+    max-height:none!important;
+  }
+}
