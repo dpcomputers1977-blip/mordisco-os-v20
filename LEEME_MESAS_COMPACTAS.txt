@@ -1,0 +1,29 @@
+MORDISCO — PRODUCTOS COMPACTOS EN MESAS
+
+CORRIGE
+- Tarjetas de productos más pequeñas.
+- Hasta 4 productos por fila en pantallas grandes.
+- Imágenes más bajas sin deformarse.
+- Catálogo con desplazamiento propio hasta el último producto.
+- La orden permanece visible a la derecha.
+
+NO MODIFICA
+- Productos ni precios.
+- Ventas, pedidos o mesas guardadas.
+- Caja, Cocina, clientes, permisos o turnos.
+- Página pública.
+
+APLICAR
+1. Extrae este ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Hacer productos compactos en Mesas
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Abre:
+   https://mordiscofastfood.com/admin?session=ok&tab=tables&v=tables-compact-products
+
+NO ejecuta SQL.

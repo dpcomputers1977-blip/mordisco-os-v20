@@ -1823,3 +1823,121 @@ body:not(.modal-open){overflow:auto!important}
 
 /* V21 — TURNO ABIERTO DE FECHAS ANTERIORES */
 #adminShiftStatus strong{font-weight:900}
+
+/* ===== MESAS: PRODUCTOS COMPACTOS Y CATÁLOGO COMPLETO ===== */
+#tableOrderModal .tableOrderCard{
+  height:min(760px,calc(100vh - 24px))!important;
+  max-height:calc(100vh - 24px)!important;
+}
+
+#tableOrderModal .tableOrderLayout{
+  min-height:0!important;
+  overflow:hidden!important;
+}
+
+#tableOrderModal .tableCatalog{
+  min-height:0!important;
+  overflow:hidden!important;
+}
+
+#tableOrderModal #tableProducts{
+  min-height:0!important;
+  height:100%!important;
+  max-height:none!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(125px,1fr))!important;
+  grid-auto-rows:max-content!important;
+  gap:9px!important;
+  padding:2px 8px 28px 2px!important;
+  align-content:start!important;
+  scroll-behavior:smooth;
+  overscroll-behavior:contain;
+}
+
+#tableOrderModal #tableProducts .posProduct{
+  min-height:155px!important;
+  height:auto!important;
+  border-radius:12px!important;
+}
+
+#tableOrderModal #tableProducts .posProduct img,
+#tableOrderModal #tableProducts .posProductNoImage{
+  flex:0 0 76px!important;
+  width:100%!important;
+  height:76px!important;
+  min-height:76px!important;
+  max-height:76px!important;
+  object-fit:contain!important;
+}
+
+#tableOrderModal #tableProducts .posProductInfo{
+  min-height:76px!important;
+  padding:7px 8px!important;
+}
+
+#tableOrderModal #tableProducts .posProductInfo small{
+  margin-bottom:2px!important;
+  font-size:.72rem!important;
+}
+
+#tableOrderModal #tableProducts .posProductInfo b{
+  min-height:30px!important;
+  font-size:.84rem!important;
+  line-height:1.08!important;
+}
+
+#tableOrderModal #tableProducts .posProductInfo strong{
+  padding-top:4px!important;
+  font-size:.92rem!important;
+}
+
+#tableOrderModal .tableCatalogToolbar{
+  margin-bottom:8px!important;
+}
+
+#tableOrderModal .tableCatalogToolbar input,
+#tableOrderModal .tableCatalogToolbar select{
+  min-height:38px!important;
+  padding:7px 10px!important;
+}
+
+#tableOrderModal .tableTicket{
+  min-height:0!important;
+  height:100%!important;
+  overflow-y:auto!important;
+}
+
+@media(max-width:1250px){
+  #tableOrderModal #tableProducts{
+    grid-template-columns:repeat(3,minmax(135px,1fr))!important;
+  }
+}
+
+@media(max-width:980px){
+  #tableOrderModal #tableProducts{
+    grid-template-columns:repeat(2,minmax(135px,1fr))!important;
+  }
+}
+
+@media(max-width:760px){
+  #tableOrderModal .tableOrderCard{
+    height:100vh!important;
+    max-height:100vh!important;
+  }
+
+  #tableOrderModal .tableOrderLayout{
+    overflow-y:auto!important;
+  }
+
+  #tableOrderModal .tableCatalog{
+    min-height:520px!important;
+  }
+
+  #tableOrderModal #tableProducts{
+    height:430px!important;
+    max-height:430px!important;
+    grid-template-columns:repeat(2,minmax(125px,1fr))!important;
+  }
+}
