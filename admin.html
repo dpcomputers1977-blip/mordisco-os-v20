@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=table-layout-real-final">
+<link rel="stylesheet" href="/admin-v18.css?v=tables-bar-control">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 </head>
@@ -437,10 +437,14 @@
       </div>
 
       <div class="tablesToolbar panel">
-        <div class="inlineForm">
-          <input id="newTableName" placeholder="Ej. Mesa 1">
+        <div class="inlineForm tableManagerCreate">
+          <select id="newTableType" aria-label="Tipo de espacio">
+            <option value="table">Mesa</option>
+            <option value="bar">Barra</option>
+          </select>
+          <input id="newTableName" placeholder="Ej. Mesa 1 o Barra principal">
           <input id="newTableSeats" type="number" min="1" value="4" placeholder="Puestos">
-          <button class="primary" id="createTableBtn">Crear mesa</button>
+          <button class="primary" id="createTableBtn">Crear espacio</button>
         </div>
         <div class="tableLegend">
           <span><i class="free"></i>Libre</span>
@@ -974,6 +978,39 @@
   </div>
 </div>
 
+
+  <div id="tableManageModal" class="modal hidden">
+    <div class="modalCard tableManageCard">
+      <button class="close" type="button" data-close="tableManageModal">×</button>
+      <span class="eyebrow">CONTROL DEL ADMINISTRADOR</span>
+      <h2>Editar espacio</h2>
+      <input id="editTableId" type="hidden">
+
+      <label>Tipo de espacio
+        <select id="editTableType">
+          <option value="table">Mesa</option>
+          <option value="bar">Barra</option>
+        </select>
+      </label>
+
+      <label>Nombre
+        <input id="editTableName" placeholder="Ej. Mesa 1">
+      </label>
+
+      <label>Puestos
+        <input id="editTableSeats" type="number" min="1" value="4">
+      </label>
+
+      <div class="tableManageActions">
+        <button id="saveTableChangesBtn" class="primary" type="button">Guardar cambios</button>
+        <button id="deleteTableBtn" class="danger" type="button">Eliminar espacio</button>
+        <button class="ghost" type="button" data-close="tableManageModal">Cancelar</button>
+      </div>
+
+      <p id="tableManageMessage" class="muted"></p>
+    </div>
+  </div>
+
 <div id="tableOrderModal" class="modal hidden">
   <div class="modalCard tableOrderCard">
     <button class="close" data-close="tableOrderModal">×</button>
@@ -1017,7 +1054,7 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=table-layout-real-final"></script>
+<script src="/admin-v18.js?v=tables-bar-control"></script>
 
 
 

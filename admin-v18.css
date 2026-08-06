@@ -2403,3 +2403,115 @@ body:not(.modal-open){overflow:auto!important}
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
   }
 }
+
+/* ===== CONTROL DE MESAS Y BARRA ===== */
+.tableManagerCreate{
+  display:grid!important;
+  grid-template-columns:140px minmax(180px,1fr) 110px auto!important;
+  gap:8px!important;
+  align-items:center!important;
+}
+
+.tableManagerCreate select,
+.tableManagerCreate input{
+  min-height:42px!important;
+}
+
+.tablesGrid{
+  align-items:start!important;
+}
+
+.tableCardWrap{
+  position:relative;
+  min-width:0;
+}
+
+.tableCardWrap .tableCard{
+  width:100%;
+}
+
+.tableTypeBadge{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  margin-bottom:8px;
+  padding:5px 9px;
+  border-radius:999px;
+  background:#f3eadc;
+  color:#6f4c14;
+  font-size:.70rem;
+  font-weight:900;
+  text-transform:uppercase;
+}
+
+.tableTypeBadge.bar{
+  background:#17130e;
+  color:#ffc400;
+}
+
+.tableEditBtn{
+  position:absolute;
+  right:9px;
+  bottom:9px;
+  z-index:3;
+  min-height:30px!important;
+  padding:5px 10px!important;
+  border:1px solid #cbbba4!important;
+  border-radius:8px!important;
+  background:#fff!important;
+  color:#111!important;
+  font-size:.72rem!important;
+  font-weight:900!important;
+}
+
+.tableEditBtn:hover{
+  background:#111!important;
+  color:#fff!important;
+}
+
+.tableManageCard{
+  width:min(460px,calc(100vw - 30px))!important;
+  padding:24px!important;
+}
+
+.tableManageCard label{
+  display:grid;
+  gap:6px;
+  margin-top:14px;
+  font-weight:900;
+}
+
+.tableManageCard input,
+.tableManageCard select{
+  width:100%;
+  min-height:44px;
+  padding:9px 11px;
+  border:1px solid #cdbda8;
+  border-radius:10px;
+  background:#fff;
+}
+
+.tableManageActions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-top:20px;
+}
+
+.tableManageActions .ghost{
+  grid-column:1/-1;
+}
+
+@media(max-width:760px){
+  .tableManagerCreate{
+    grid-template-columns:1fr 1fr!important;
+  }
+
+  .tableManagerCreate #newTableName{
+    grid-column:1/-1;
+  }
+
+  .tableManagerCreate #createTableBtn{
+    grid-column:1/-1;
+  }
+}

@@ -1624,23 +1624,160 @@ async function loadTables(){
   if(error)return toast('Primero ejecuta el SQL V9 en Supabase');
   tables=data||[];renderTables();
 }
+function tableTypeLabel(type){
+  return type==='bar'?'Barra':'Mesa';
+}
+
+function tableTypeIcon(type){
+  return type==='bar'?'▰':'▣';
+}
+
 function renderTables(){
   if(!$('#tablesGrid'))return;
+
   $('#tablesFreeCount').textContent=tables.filter(t=>t.status==='free').length;
   $('#tablesBusyCount').textContent=tables.filter(t=>['occupied','preparing'].includes(t.status)).length;
   $('#tablesPaymentCount').textContent=tables.filter(t=>t.status==='payment').length;
-  $('#tablesGrid').innerHTML=tables.length?tables.map(t=>`<button class="tableCard ${t.status}" data-open-table="${t.id}">
-    <h3>${esc(t.name)}</h3><p>${t.seats} puestos</p><strong>${tableStatusLabel(t.status)}</strong>
-    <div class="tableMeta">${t.staff?.name?`Mesero: ${esc(t.staff.name)}`:'Sin mesero asignado'}</div>
-  </button>`).join(''):'<div class="inventoryEmpty">No hay mesas. Crea la primera.</div>';
-  $$('[data-open-table]').forEach(b=>b.onclick=()=>openTableOrder(b.dataset.openTable));
+
+  $('#tablesGrid').innerHTML=tables.length?tables.map(t=>`
+    <article class="tableCardWrap ${t.status}">
+      <button class="tableCard ${t.status}" data-open-table="${t.id}">
+        <span class="tableTypeBadge ${t.service_type==='bar'?'bar':''}">
+          ${tableTypeIcon(t.service_type)} ${tableTypeLabel(t.service_type)}
+        </span>
+        <h3>${esc(t.name)}</h3>
+        <p>${Number(t.seats||1)} ${Number(t.seats||1)===1?'puesto':'puestos'}</p>
+        <strong>${tableStatusLabel(t.status)}</strong>
+        <div class="tableMeta">
+          ${t.staff?.name?`Mesero: ${esc(t.staff.name)}`:'Sin mesero asignado'}
+        </div>
+      </button>
+      ${isAdminSession?`
+        <button class="tableEditBtn" type="button" data-edit-table="${t.id}">
+          Editar
+        </button>
+      `:''}
+    </article>
+  `).join(''):'<div class="inventoryEmpty">No hay mesas ni barras. Crea el primer espacio.</div>';
+
+  $$('[data-open-table]').forEach(button=>{
+    button.onclick=()=>openTableOrder(button.dataset.openTable);
+  });
+
+  $$('[data-edit-table]').forEach(button=>{
+    button.onclick=event=>{
+      event.preventDefault();
+      event.stopPropagation();
+      openTableManager(button.dataset.editTable);
+    };
+  });
 }
 if(document.querySelector('#createTableBtn'))document.querySelector('#createTableBtn').onclick=async()=>{
-  const name=$('#newTableName').value.trim();if(!name)return toast('Escribe el nombre de la mesa');
-  const payload={name,seats:Number($('#newTableSeats').value||4),sort_order:tables.length+1};
-  const {error}=await db.from('restaurant_tables').insert(payload);if(error)return toast(error.message);
-  $('#newTableName').value='';toast('Mesa creada');await loadTables();
+  if(!isAdminSession)return toast('Solo el administrador puede crear espacios');
+
+  const name=$('#newTableName').value.trim();
+  const serviceType=$('#newTableType').value||'table';
+  const seats=Math.max(1,Number($('#newTableSeats').value||1));
+
+  if(!name)return toast('Escribe el nombre del espacio');
+
+  const {data,error}=await db.rpc('admin_save_service_point',{
+    p_id:null,
+    p_name:name,
+    p_seats:seats,
+    p_service_type:serviceType,
+    p_sort_order:tables.length+1
+  });
+
+  if(error)return toast('No se pudo crear: '+error.message);
+
+  $('#newTableName').value='';
+  $('#newTableSeats').value=serviceType==='bar'?'1':'4';
+  toast(serviceType==='bar'?'Barra creada':'Mesa creada');
+  await loadTables();
 };
+
+function openTableManager(id){
+  if(!isAdminSession)return;
+
+  const table=tables.find(item=>String(item.id)===String(id));
+  if(!table)return toast('Espacio no encontrado');
+
+  $('#editTableId').value=table.id;
+  $('#editTableType').value=table.service_type||'table';
+  $('#editTableName').value=table.name||'';
+  $('#editTableSeats').value=Number(table.seats||1);
+
+  const locked=table.status!=='free';
+  $('#deleteTableBtn').disabled=locked;
+  $('#tableManageMessage').textContent=locked
+    ? 'Este espacio tiene una orden activa. Puedes editarlo, pero no eliminarlo hasta liberarlo.'
+    : 'Puedes modificar o eliminar este espacio porque está libre.';
+
+  $('#tableManageModal').classList.remove('hidden');
+}
+
+$('#saveTableChangesBtn')?.addEventListener('click',async()=>{
+  const id=$('#editTableId').value;
+  const name=$('#editTableName').value.trim();
+  const serviceType=$('#editTableType').value||'table';
+  const seats=Math.max(1,Number($('#editTableSeats').value||1));
+  const current=tables.find(item=>String(item.id)===String(id));
+
+  if(!name)return toast('Escribe el nombre del espacio');
+
+  const {error}=await db.rpc('admin_save_service_point',{
+    p_id:id,
+    p_name:name,
+    p_seats:seats,
+    p_service_type:serviceType,
+    p_sort_order:Number(current?.sort_order||tables.length)
+  });
+
+  if(error)return toast('No se pudo guardar: '+error.message);
+
+  $('#tableManageModal').classList.add('hidden');
+  toast('Espacio actualizado');
+  await loadTables();
+});
+
+$('#deleteTableBtn')?.addEventListener('click',async()=>{
+  const id=$('#editTableId').value;
+  const table=tables.find(item=>String(item.id)===String(id));
+
+  if(!table)return;
+  if(table.status!=='free'){
+    return toast('Primero libera este espacio');
+  }
+
+  if(!confirm(`¿Eliminar definitivamente ${table.name}?`))return;
+
+  const {error}=await db.rpc('admin_delete_service_point',{
+    p_id:id
+  });
+
+  if(error)return toast('No se pudo eliminar: '+error.message);
+
+  $('#tableManageModal').classList.add('hidden');
+  toast('Espacio eliminado');
+  await loadTables();
+});
+
+$('#newTableType')?.addEventListener('change',event=>{
+  const isBar=event.target.value==='bar';
+  if(isBar){
+    if(!$('#newTableName').value.trim())$('#newTableName').value='Barra';
+    $('#newTableSeats').value='1';
+  }else{
+    if($('#newTableName').value.trim()==='Barra')$('#newTableName').value='';
+    $('#newTableSeats').value='4';
+  }
+});
+
+$$('[data-close="tableManageModal"]').forEach(button=>{
+  button.onclick=()=>$('#tableManageModal').classList.add('hidden');
+});
+
 function fillTableSelectors(){
   $('#tableCategory').innerHTML='<option value="all">Todas las categorías</option>'+categories.filter(c=>c.active).map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
 }
