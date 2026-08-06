@@ -3543,7 +3543,7 @@ function setPosFocusMode(enabled){
 
   if(enabled){
     document.documentElement.classList.add('posFocusModeRoot');
-    requestAnimationFrame(()=>window.scrollTo({top:0,left:0,behavior:'instant'}));
+    requestAnimationFrame(()=>window.scrollTo({top:0,left:0,behavior:'auto'}));
   }else{
     document.documentElement.classList.remove('posFocusModeRoot');
   }
