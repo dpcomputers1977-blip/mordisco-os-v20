@@ -4088,3 +4088,23 @@ document.querySelector('#exitPosToAdminV21')
     event.stopImmediatePropagation();
     exitPosToAdministratorV21();
   });
+
+
+/* ============================================================
+   V21 — ÚNICO BOTÓN DE SALIDA DE CAJA
+   ============================================================ */
+document.querySelector('#exitPosFocusBtn')?.addEventListener('click',event=>{
+  event.preventDefault();
+  event.stopImmediatePropagation();
+
+  if(typeof exitPosToAdministratorV21==='function'){
+    exitPosToAdministratorV21();
+    return;
+  }
+
+  document.body.classList.remove('posFocusMode','moduleFocusV21');
+  document.documentElement.classList.remove('posFocusModeRoot');
+
+  const dashboardButton=document.querySelector('.sidebar [data-tab="dashboard"]');
+  if(dashboardButton)dashboardButton.click();
+},true);
