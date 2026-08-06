@@ -2515,3 +2515,244 @@ body:not(.modal-open){overflow:auto!important}
     grid-column:1/-1;
   }
 }
+
+/* ============================================================
+   POS / CAJA — DISEÑO COMPACTO Y ORDENADO
+   Solo afecta #tab-pos
+   ============================================================ */
+
+#tab-pos{
+  min-height:0!important;
+}
+
+#tab-pos .posLayout{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 330px!important;
+  gap:14px!important;
+  align-items:stretch!important;
+  min-height:calc(100vh - 250px)!important;
+}
+
+#tab-pos .posCatalog{
+  min-width:0!important;
+  min-height:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+}
+
+#tab-pos .posCatalogTop{
+  flex:0 0 auto!important;
+  display:grid!important;
+  grid-template-columns:minmax(180px,1fr) 220px!important;
+  gap:8px!important;
+  margin-bottom:8px!important;
+}
+
+#tab-pos .posCatalogTop input,
+#tab-pos .posCatalogTop select{
+  width:100%!important;
+  min-height:40px!important;
+  height:40px!important;
+  padding:7px 10px!important;
+  border-radius:9px!important;
+  font-size:.9rem!important;
+}
+
+#tab-pos .categoryChips{
+  margin-bottom:7px!important;
+  padding-bottom:5px!important;
+}
+
+#tab-pos #posProducts{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  max-height:calc(100vh - 340px)!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  grid-auto-rows:150px!important;
+  gap:8px!important;
+  align-content:start!important;
+  padding:2px 7px 22px 2px!important;
+  overscroll-behavior:contain!important;
+}
+
+#tab-pos #posProducts .posProduct{
+  width:100%!important;
+  min-width:0!important;
+  height:150px!important;
+  min-height:150px!important;
+  max-height:150px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+  border-radius:11px!important;
+  margin:0!important;
+}
+
+#tab-pos #posProducts .posProduct img,
+#tab-pos #posProducts .posProductNoImage{
+  flex:0 0 72px!important;
+  width:100%!important;
+  height:72px!important;
+  min-height:72px!important;
+  max-height:72px!important;
+  object-fit:contain!important;
+  background:#f4efe6!important;
+}
+
+#tab-pos #posProducts .posProductInfo{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  padding:7px 8px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+}
+
+#tab-pos #posProducts .posProductInfo small{
+  margin:0 0 2px!important;
+  font-size:.66rem!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+#tab-pos #posProducts .posProductInfo b{
+  display:-webkit-box!important;
+  min-height:31px!important;
+  max-height:31px!important;
+  overflow:hidden!important;
+  -webkit-line-clamp:2!important;
+  -webkit-box-orient:vertical!important;
+  font-size:.82rem!important;
+  line-height:1.05!important;
+}
+
+#tab-pos #posProducts .posProductInfo strong{
+  margin-top:auto!important;
+  padding-top:4px!important;
+  font-size:.95rem!important;
+}
+
+#tab-pos .posTicket{
+  min-width:0!important;
+  min-height:0!important;
+  max-height:calc(100vh - 250px)!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  padding:15px!important;
+  border-radius:16px!important;
+}
+
+#tab-pos .posTicket h2,
+#tab-pos .posTicket h3{
+  margin-top:0!important;
+}
+
+#tab-pos .posCart{
+  max-height:170px!important;
+  overflow-y:auto!important;
+  margin-bottom:8px!important;
+}
+
+#tab-pos .discountBox{
+  display:grid!important;
+  grid-template-columns:110px 1fr!important;
+  gap:7px!important;
+  align-items:end!important;
+  padding:10px!important;
+}
+
+#tab-pos .discountBox .discountQuick{
+  grid-column:1/-1!important;
+  display:grid!important;
+  grid-template-columns:repeat(4,1fr)!important;
+  gap:6px!important;
+}
+
+#tab-pos .discountBox button{
+  min-width:0!important;
+  padding:8px 4px!important;
+}
+
+#tab-pos .posCustomerGrid,
+#tab-pos .posStaffGrid{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:8px!important;
+}
+
+#tab-pos .posTicket label{
+  font-size:.78rem!important;
+  font-weight:900!important;
+}
+
+#tab-pos .posTicket input,
+#tab-pos .posTicket select,
+#tab-pos .posTicket textarea{
+  width:100%!important;
+  min-width:0!important;
+  min-height:36px!important;
+  padding:7px 9px!important;
+  border-radius:8px!important;
+}
+
+#tab-pos .posTicket textarea{
+  min-height:58px!important;
+}
+
+#tab-pos .posTicket .primary,
+#tab-pos .posTicket .success,
+#tab-pos .posTicket .dark{
+  min-height:44px!important;
+  border-radius:10px!important;
+}
+
+#tab-pos .pendingPaymentSection{
+  margin-top:14px!important;
+}
+
+@media(max-width:1250px){
+  #tab-pos .posLayout{
+    grid-template-columns:minmax(0,1fr) 310px!important;
+  }
+
+  #tab-pos #posProducts{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  }
+}
+
+@media(max-width:980px){
+  #tab-pos .posLayout{
+    grid-template-columns:minmax(0,1fr) 290px!important;
+  }
+
+  #tab-pos #posProducts{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+
+  #tab-pos .posCustomerGrid,
+  #tab-pos .posStaffGrid{
+    grid-template-columns:1fr!important;
+  }
+}
+
+@media(max-width:760px){
+  #tab-pos .posLayout{
+    display:flex!important;
+    flex-direction:column!important;
+  }
+
+  #tab-pos #posProducts{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    max-height:430px!important;
+  }
+
+  #tab-pos .posTicket{
+    max-height:none!important;
+  }
+}

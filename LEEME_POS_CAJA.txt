@@ -1,0 +1,32 @@
+MORDISCO — POS / CAJA REHECHO
+
+CAMBIOS
+- Cinco productos por fila en computadora.
+- Tarjetas compactas y completas.
+- Buscador y categorías siempre visibles.
+- Orden fija a la derecha.
+- Cliente, teléfono, cajero y mesero ordenados.
+- Descuentos acomodados sin salirse del panel.
+- Un solo desplazamiento en productos.
+- Adaptación a portátil, tableta y teléfono.
+
+NO CAMBIA
+- Página pública.
+- Productos, precios o imágenes.
+- Mesas, Cocina, Turnos o permisos.
+- Ventas, clientes o base de datos.
+
+APLICAR
+1. Extrae este ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Rehacer POS Caja como Mesas
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Abre:
+   https://mordiscofastfood.com/admin?session=ok&tab=pos&v=pos-layout-final
+
+NO ejecuta SQL.
