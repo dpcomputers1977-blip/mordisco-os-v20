@@ -3855,3 +3855,403 @@ body.customersFocusMode #customerAdminList > div{
     width:100%!important;
   }
 }
+
+
+/* ============================================================
+   MORDISCO OS V21 ESTABLE
+   Esta capa solo afecta el panel #adminView.
+   ============================================================ */
+:root{
+  --v21-sidebar:236px;
+  --v21-sidebar-collapsed:76px;
+  --v21-bg:#eee9df;
+  --v21-panel:#ffffff;
+  --v21-ink:#17130f;
+  --v21-muted:#746b60;
+  --v21-line:#e3d9ca;
+  --v21-gold:#ffc400;
+  --v21-dark:#17130f;
+  --v21-radius:16px;
+  --v21-shadow:0 10px 28px rgba(34,26,16,.07);
+}
+
+#adminView.adminV21{
+  min-height:100vh!important;
+  background:var(--v21-bg)!important;
+}
+
+#adminView.adminV21 .sidebar{
+  width:var(--v21-sidebar)!important;
+  padding:16px 12px!important;
+  gap:5px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  transition:width .18s ease,padding .18s ease!important;
+}
+
+#adminView.adminV21 .sidebar img{
+  width:104px!important;
+  height:70px!important;
+  margin:0 auto 10px!important;
+  transition:width .18s ease!important;
+}
+
+#adminView.adminV21 .sidebar button{
+  min-height:40px!important;
+  padding:9px 11px!important;
+  border-radius:10px!important;
+  font-size:.86rem!important;
+  transition:background .15s ease,color .15s ease!important;
+}
+
+#adminView.adminV21 .adminContent{
+  margin-left:var(--v21-sidebar)!important;
+  width:calc(100% - var(--v21-sidebar))!important;
+  max-width:none!important;
+  padding:22px 24px 42px!important;
+  transition:margin-left .18s ease,width .18s ease!important;
+}
+
+body.sidebarCollapsedV21 #adminView.adminV21 .sidebar{
+  width:var(--v21-sidebar-collapsed)!important;
+  padding-left:8px!important;
+  padding-right:8px!important;
+}
+
+body.sidebarCollapsedV21 #adminView.adminV21 .sidebar img{
+  width:55px!important;
+  height:48px!important;
+}
+
+body.sidebarCollapsedV21 #adminView.adminV21 .sidebar button{
+  justify-content:center!important;
+  gap:0!important;
+  font-size:0!important;
+  padding:8px!important;
+}
+
+body.sidebarCollapsedV21 #adminView.adminV21 .sidebar button span{
+  flex:0 0 auto!important;
+  width:auto!important;
+  font-size:1.05rem!important;
+}
+
+body.sidebarCollapsedV21 #adminView.adminV21 .sidebar button[data-tab="extras"]{
+  font-size:0!important;
+}
+body.sidebarCollapsedV21 #adminView.adminV21 .sidebar button[data-tab="extras"]::before{
+  content:"+";
+  font-size:1.15rem;
+}
+
+body.sidebarCollapsedV21 #adminView.adminV21 .adminContent{
+  margin-left:var(--v21-sidebar-collapsed)!important;
+  width:calc(100% - var(--v21-sidebar-collapsed))!important;
+}
+
+#adminView.adminV21 .adminTop{
+  position:sticky!important;
+  top:0!important;
+  z-index:45!important;
+  min-height:68px!important;
+  margin:-22px -24px 16px!important;
+  padding:10px 22px!important;
+  background:rgba(238,233,223,.94)!important;
+  backdrop-filter:blur(12px)!important;
+  border-bottom:1px solid rgba(90,72,48,.09)!important;
+}
+
+.adminTopTitle,.adminTopActions{
+  display:flex;
+  align-items:center;
+  gap:11px;
+}
+
+#adminView.adminV21 .adminTop h1{
+  margin:1px 0 0!important;
+  font-size:1.75rem!important;
+  letter-spacing:-.5px!important;
+}
+
+.sidebarToggleV21,.moduleFocusBtn{
+  min-height:39px;
+  padding:8px 12px;
+  border:1px solid #d4c6b2;
+  border-radius:10px;
+  background:#fff;
+  color:#17130f;
+  font-weight:900;
+}
+
+.sidebarToggleV21{
+  width:42px;
+  padding:0;
+  font-size:1.15rem;
+}
+
+.moduleFocusBtn:hover,.sidebarToggleV21:hover{
+  background:#17130f;
+  color:#fff;
+}
+
+#adminView.adminV21 .cloudStatus{
+  padding:8px 11px!important;
+  font-size:.76rem!important;
+}
+
+#adminView.adminV21 .panel{
+  padding:17px!important;
+  border-radius:var(--v21-radius)!important;
+  border:1px solid rgba(95,75,47,.08)!important;
+  box-shadow:var(--v21-shadow)!important;
+  margin-bottom:14px!important;
+}
+
+#adminView.adminV21 .tablesHeader,
+#adminView.adminV21 .inventoryHeader,
+#adminView.adminV21 .staffHeader{
+  padding:16px 18px!important;
+  border-radius:16px!important;
+  margin-bottom:12px!important;
+}
+
+#adminView.adminV21 .tablesStats div,
+#adminView.adminV21 .inventorySummary div,
+#adminView.adminV21 .staffStats div{
+  min-height:58px!important;
+  padding:7px 10px!important;
+}
+
+/* POS estable: ocupa el espacio sin bloquear ni exigir scroll para enviar */
+body.posFocusMode{
+  overflow:auto!important;
+}
+body.posFocusMode #adminView.adminV21 .sidebar,
+body.posFocusMode #adminView.adminV21 .adminTop{
+  display:none!important;
+}
+body.posFocusMode #adminView.adminV21 .adminContent{
+  margin-left:0!important;
+  width:100%!important;
+  min-height:100vh!important;
+  padding:8px!important;
+}
+body.posFocusMode #tab-pos{
+  position:relative!important;
+  inset:auto!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:100vh!important;
+  padding:0!important;
+  overflow:visible!important;
+}
+body.posFocusMode #tab-pos .posHeader{
+  min-height:62px!important;
+  margin-bottom:7px!important;
+  padding:8px 12px!important;
+}
+body.posFocusMode #tab-pos .posLayout{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 350px!important;
+  gap:8px!important;
+  height:calc(100vh - 138px)!important;
+  min-height:570px!important;
+  overflow:hidden!important;
+}
+body.posFocusMode #tab-pos .posCatalog{
+  min-height:0!important;
+  height:100%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+}
+body.posFocusMode #tab-pos #posProducts{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow-y:auto!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  grid-auto-rows:134px!important;
+  gap:7px!important;
+}
+body.posFocusMode #tab-pos #posProducts .posProduct{
+  height:134px!important;
+  min-height:134px!important;
+  max-height:134px!important;
+}
+body.posFocusMode #tab-pos #posProducts .posProduct img,
+body.posFocusMode #tab-pos #posProducts .posProductNoImage{
+  height:62px!important;
+  min-height:62px!important;
+  max-height:62px!important;
+  object-fit:contain!important;
+}
+body.posFocusMode #tab-pos .posTicket{
+  height:100%!important;
+  min-height:0!important;
+  max-height:none!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+  padding:11px!important;
+}
+body.posFocusMode #tab-pos .posCart{
+  flex:1 1 auto!important;
+  min-height:100px!important;
+  max-height:none!important;
+  overflow-y:auto!important;
+}
+body.posFocusMode #tab-pos .posTotals{
+  flex:0 0 auto!important;
+  margin-bottom:6px!important;
+}
+.posDetailsToggle{
+  width:100%;
+  min-height:35px;
+  margin:4px 0;
+  padding:7px 9px;
+  border:1px solid #d5c6b1;
+  border-radius:9px;
+  background:#fff;
+  color:#17130f;
+  text-align:left;
+  font-weight:900;
+}
+.posOptionalDetails{
+  flex:0 0 auto;
+  max-height:330px;
+  overflow:hidden;
+  opacity:1;
+  transition:max-height .18s ease,opacity .18s ease;
+}
+.posOptionalDetails.collapsed{
+  max-height:0!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+.posPrimaryActions{
+  flex:0 0 auto;
+  position:sticky;
+  bottom:0;
+  padding-top:5px;
+  background:#fff;
+}
+body.posFocusMode #tab-pos .posChargeBtn{
+  min-height:48px!important;
+  margin:0!important;
+  border-radius:11px!important;
+  font-size:1rem!important;
+}
+body.posFocusMode #tab-pos .posPendingPanel{
+  margin-top:8px!important;
+  max-height:150px!important;
+  overflow:hidden!important;
+}
+body.posFocusMode #tab-pos .posPendingOrders{
+  display:flex!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  gap:7px!important;
+}
+body.posFocusMode #tab-pos .posPendingCard{
+  flex:0 0 330px!important;
+  padding:8px!important;
+}
+
+/* Contabilidad V21: más espacio y tablas legibles */
+#adminView.adminV21 #tab-finance .financeGrid,
+#adminView.adminV21 #tab-finance .accountsGrid{
+  grid-template-columns:minmax(300px,390px) minmax(0,1fr)!important;
+  gap:14px!important;
+  align-items:start!important;
+}
+#adminView.adminV21 #tab-finance .formGrid{
+  gap:10px!important;
+}
+#adminView.adminV21 #tab-finance .formGrid input,
+#adminView.adminV21 #tab-finance .formGrid select,
+#adminView.adminV21 #tab-finance .formGrid textarea{
+  min-height:39px!important;
+  padding:8px 9px!important;
+}
+#adminView.adminV21 #tab-finance .tableWrap{
+  max-height:480px;
+  overflow:auto;
+}
+#adminView.adminV21 #tab-finance .dataTable th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:#f5f0e7;
+}
+
+/* Modo de pantalla amplia genérico */
+body.moduleFocusV21 #adminView.adminV21 .sidebar,
+body.moduleFocusV21 #adminView.adminV21 .adminTop{
+  display:none!important;
+}
+body.moduleFocusV21 #adminView.adminV21 .adminContent{
+  margin-left:0!important;
+  width:100%!important;
+  padding:10px!important;
+}
+body.moduleFocusV21 #adminView.adminV21 .tab:not(.hidden){
+  min-height:calc(100vh - 20px)!important;
+}
+
+/* Mobile/tablet */
+@media(max-width:1100px){
+  body.posFocusMode #tab-pos #posProducts{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  }
+  #adminView.adminV21 #tab-finance .financeGrid,
+  #adminView.adminV21 #tab-finance .accountsGrid{
+    grid-template-columns:340px minmax(0,1fr)!important;
+  }
+}
+
+@media(max-width:900px){
+  #adminView.adminV21 .sidebar{
+    position:relative!important;
+    width:100%!important;
+    height:auto!important;
+    flex-direction:row!important;
+  }
+  #adminView.adminV21 .adminContent,
+  body.sidebarCollapsedV21 #adminView.adminV21 .adminContent{
+    margin-left:0!important;
+    width:100%!important;
+  }
+  .sidebarToggleV21{display:none}
+  body.posFocusMode #tab-pos .posLayout{
+    grid-template-columns:minmax(0,1fr) 320px!important;
+  }
+  body.posFocusMode #tab-pos #posProducts{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+}
+
+@media(max-width:720px){
+  .moduleFocusBtn{display:none}
+  #adminView.adminV21 .adminTopActions .cloudStatus{display:none!important}
+  body.posFocusMode #tab-pos .posLayout{
+    display:flex!important;
+    flex-direction:column!important;
+    height:auto!important;
+    overflow:visible!important;
+  }
+  body.posFocusMode #tab-pos .posCatalog{
+    height:500px!important;
+  }
+  body.posFocusMode #tab-pos #posProducts{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  body.posFocusMode #tab-pos .posTicket{
+    height:auto!important;
+    overflow:visible!important;
+  }
+  #adminView.adminV21 #tab-finance .financeGrid,
+  #adminView.adminV21 #tab-finance .accountsGrid{
+    grid-template-columns:1fr!important;
+  }
+}

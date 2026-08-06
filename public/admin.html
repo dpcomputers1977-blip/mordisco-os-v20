@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=customers-professional-focus">
+<link rel="stylesheet" href="/admin-v18.css?v=mordisco-v21-stable">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 </head>
@@ -51,7 +51,16 @@
  <aside class="sidebar"><img src="media/logo.png" alt="Mordisco"><button data-tab="dashboard"><span>▦</span> Resumen</button><button data-tab="products" class="active"><span>🍔</span> Productos</button><button data-tab="categories"><span>▤</span> Categorías</button><button data-tab="orders"><span>🌐</span> Pedidos web</button><button data-tab="kitchen"><span>♨</span> Cocina</button><button data-tab="pos"><span>▣</span> POS / Caja</button><button data-tab="inventory"><span>◇</span> Inventario</button><button data-tab="tables"><span>🍽</span> Mesas</button><button data-tab="shifts"><span>🕒</span> Turnos</button><button data-tab="finance"><span>💰</span> Contabilidad</button><button data-tab="customers"><span>👤</span> Clientes</button><button data-tab="promotions"><span>🎁</span> Promociones</button><button data-tab="pages"><span>📄</span> Páginas</button><button data-tab="staff"><span>👥</span> Personal</button><button data-tab="extras">➕ Extras y empaques</button>
 <button data-tab="settings"><span>⚙</span> Negocio</button><button id="logoutBtn"><span>↪</span> Cerrar sesión</button><button id="backToStore"><span>↗</span> Ver página</button></aside>
  <div class="adminContent">
-   <div class="adminTop"><div><span class="eyebrow">MORDISCO OS V18</span><h1 id="adminTitle">Productos</h1></div><span class="cloudStatus">● Conectado a Supabase</span></div>
+   <div class="adminTop">
+      <div class="adminTopTitle">
+        <button id="toggleAdminSidebar" class="sidebarToggleV21" type="button" aria-label="Mostrar u ocultar menú">☰</button>
+        <div><span class="eyebrow">MORDISCO OS V21</span><h1 id="adminTitle">Productos</h1></div>
+      </div>
+      <div class="adminTopActions">
+        <button id="toggleModuleFocus" class="moduleFocusBtn" type="button">Pantalla amplia</button>
+        <span class="cloudStatus">● Conectado a Supabase</span>
+      </div>
+    </div>
    <section id="tab-dashboard" class="tab hidden">
       <div class="metrics">
         <article><span>Órdenes totales</span><b id="metricOrders">0</b></article>
@@ -275,6 +284,8 @@
             <div><span>Total</span><strong id="posTotal">$0.00</strong></div>
           </div>
 
+          <button id="posDetailsToggle" class="posDetailsToggle" type="button">Datos del pedido ▾</button>
+          <div id="posOptionalDetails" class="posOptionalDetails collapsed">
           <div class="posForm">
             <label>Cliente
               <input id="posCustomer" list="posCustomerList" autocomplete="off" placeholder="Buscar o seleccionar cliente"><datalist id="posCustomerList"></datalist>
@@ -299,8 +310,11 @@
               <textarea id="posNotes" placeholder="Sin cebolla, extra salsa, etc."></textarea>
             </label>
           </div>
+          </div>
 
-          <button class="primary posChargeBtn" id="posCharge">Enviar a cocina</button>
+          <div class="posPrimaryActions">
+            <button class="primary posChargeBtn" id="posCharge">Enviar a cocina</button>
+          </div>
         </aside>
       </div>
 
@@ -527,7 +541,7 @@
    </section>
 
    
-<section id="tab-finance" class="tab hidden">
+<section id="tab-finance" class="tab hidden v21Workspace">
   <div class="tablesHeader">
     <div><h2>Contabilidad</h2><p>Ingresos, egresos y resultado del negocio.</p></div>
     <div class="tablesStats">
@@ -536,7 +550,7 @@
       <div><span>Resultado</span><strong id="financeBalance">$0.00</strong></div>
     </div>
   </div>
-  <div class="dashboardGrid financeGrid">
+  <div class="dashboardGrid financeGrid v21FinanceMain">
     <form id="financeForm" class="panel formGrid">
       <input type="hidden" id="financeId">
       <h3 class="wide">Nuevo movimiento</h3>
@@ -570,7 +584,7 @@
     </div>
   </div>
 
-  <div class="dashboardGrid accountsGrid">
+  <div class="dashboardGrid accountsGrid v21AccountsMain">
     <form id="financeAccountForm" class="panel formGrid">
       <input type="hidden" id="financeAccountId">
       <h3 class="wide">Nueva cuenta</h3>
@@ -1133,7 +1147,7 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=customers-professional-focus"></script>
+<script src="/admin-v18.js?v=mordisco-v21-stable"></script>
 
 
 

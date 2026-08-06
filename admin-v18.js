@@ -1,4 +1,4 @@
-console.info('MORDISCO OS V20 cargado correctamente — descuentos y rutas');
+console.info('MORDISCO OS V21 estable cargado correctamente');
 window.addEventListener('error',event=>{
   console.error('Error global Mordisco OS:',event.error||event.message);
   const node=document.querySelector('#toast');
@@ -239,7 +239,7 @@ function totals(){const subtotal=cart.reduce((s,x)=>{const p=products.find(y=>y.
 function renderCart(){$('#cartCount').textContent=cart.reduce((s,x)=>s+x.qty,0);$('#cartItems').innerHTML=cart.length?cart.map(x=>{const p=products.find(y=>y.id===x.id);if(!p)return'';return`<div class="cartItem">${p.image_url?`<img src="${esc(p.image_url)}">`:'<div></div>'}<div><b>${esc(p.name)}</b><small>${money(p.price)}</small><div class="qty"><button data-minus="${p.id}">−</button><span>${x.qty}</span><button data-plus="${p.id}">+</button></div></div><b>${money(Number(p.price)*x.qty)}</b></div>`}).join(''):'<p class="notice">Tu carrito está vacío.</p>';$$('[data-minus]').forEach(b=>b.onclick=()=>changeQty(b.dataset.minus,-1));$$('[data-plus]').forEach(b=>b.onclick=()=>changeQty(b.dataset.plus,1));const t=totals();$('#subtotal').textContent=money(t.subtotal);$('#deliveryTotal').textContent=money(t.delivery);$('#grandTotal').textContent=money(t.total)}
 function openCart(){$('#cartDrawer').classList.add('open')} if(document.querySelector('#cartBtn'))document.querySelector('#cartBtn').onclick=openCart;if(document.querySelector('#orderNowBtn'))document.querySelector('#orderNowBtn').onclick=openCart;if(document.querySelector('#closeCart'))document.querySelector('#closeCart').onclick=()=>$('#cartDrawer').classList.remove('open');if(document.querySelector('#orderType'))document.querySelector('#orderType').onchange=()=>{renderCart();$('#customerAddress').classList.toggle('hidden',$('#orderType').value!=='delivery')};
 
-$$('.sidebar [data-tab]').forEach(b=>b.onclick=async()=>{const tab=b.dataset.tab;setPosFocusMode(tab==='pos');setCustomersFocusMode(tab==='customers');$$('.sidebar [data-tab]').forEach(x=>x.classList.toggle('active',x===b));$$('.tab').forEach(x=>x.classList.add('hidden'));$('#tab-'+tab).classList.remove('hidden');$('#adminTitle').textContent={dashboard:'Resumen',products:'Productos',categories:'Categorías',orders:'Pedidos web',kitchen:'Cocina',pos:'POS / Caja',inventory:'Inventario',tables:'Mesas',shifts:'Turnos',staff:'Personal',finance:'Contabilidad',customers:'Clientes',promotions:'Promociones',pages:'Páginas',settings:'Negocio'}[tab];if(tab==='orders'||tab==='kitchen')await loadOrders();if(tab==='dashboard'){await loadOrders();renderMetrics()}if(tab==='kitchen')startKitchenClock();if(tab==='pos'){
+$$('.sidebar [data-tab]').forEach(b=>b.onclick=async()=>{const tab=b.dataset.tab;setPosFocusMode(tab==='pos');setCustomersFocusMode(false);$$('.sidebar [data-tab]').forEach(x=>x.classList.toggle('active',x===b));$$('.tab').forEach(x=>x.classList.add('hidden'));$('#tab-'+tab).classList.remove('hidden');$('#adminTitle').textContent={dashboard:'Resumen',products:'Productos',categories:'Categorías',orders:'Pedidos web',kitchen:'Cocina',pos:'POS / Caja',inventory:'Inventario',tables:'Mesas',shifts:'Turnos',staff:'Personal',finance:'Contabilidad',customers:'Clientes',promotions:'Promociones',pages:'Páginas',settings:'Negocio'}[tab];if(tab==='orders'||tab==='kitchen')await loadOrders();if(tab==='dashboard'){await loadOrders();renderMetrics()}if(tab==='kitchen')startKitchenClock();if(tab==='pos'){
       setPosFocusMode(true);
       fillPosCategories();
       renderPosProducts();
@@ -3542,7 +3542,7 @@ function setPosFocusMode(enabled){
   document.body.classList.toggle('posFocusMode',Boolean(enabled));
 
   if(enabled){
-    document.documentElement.classList.add('posFocusModeRoot');
+    document.documentElement.classList.remove('posFocusModeRoot');
     requestAnimationFrame(()=>window.scrollTo({top:0,left:0,behavior:'auto'}));
   }else{
     document.documentElement.classList.remove('posFocusModeRoot');
@@ -3708,3 +3708,80 @@ document.addEventListener('keydown',event=>{
     if(!openModal)exitCustomersFocusMode();
   }
 });
+
+
+/* ============================================================
+   MORDISCO OS V21 — NAVEGACIÓN Y ESPACIO DE TRABAJO ESTABLE
+   ============================================================ */
+function activateMordiscoV21(){
+  const view=document.querySelector('#adminView');
+  if(!view)return;
+  view.classList.add('adminV21');
+
+  const collapsed=localStorage.getItem('mordisco_sidebar_collapsed')==='1';
+  document.body.classList.toggle('sidebarCollapsedV21',collapsed);
+  updateSidebarToggleLabel();
+}
+
+function updateSidebarToggleLabel(){
+  const button=document.querySelector('#toggleAdminSidebar');
+  if(!button)return;
+  const collapsed=document.body.classList.contains('sidebarCollapsedV21');
+  button.textContent=collapsed?'☰':'←';
+  button.title=collapsed?'Mostrar menú':'Ocultar menú';
+  button.setAttribute('aria-label',button.title);
+}
+
+function toggleAdminSidebarV21(){
+  const collapsed=document.body.classList.toggle('sidebarCollapsedV21');
+  localStorage.setItem('mordisco_sidebar_collapsed',collapsed?'1':'0');
+  updateSidebarToggleLabel();
+}
+
+function toggleModuleFocusV21(){
+  const tab=document.querySelector('#adminView .tab:not(.hidden)');
+  if(!tab)return;
+
+  const enabled=document.body.classList.toggle('moduleFocusV21');
+  document.body.dataset.focusTab=enabled?tab.id:'';
+
+  const button=document.querySelector('#toggleModuleFocus');
+  if(button)button.textContent=enabled?'Volver al panel':'Pantalla amplia';
+
+  if(enabled)window.scrollTo({top:0,left:0,behavior:'auto'});
+}
+
+function leaveModuleFocusV21(){
+  document.body.classList.remove('moduleFocusV21');
+  document.body.dataset.focusTab='';
+  const button=document.querySelector('#toggleModuleFocus');
+  if(button)button.textContent='Pantalla amplia';
+}
+
+document.querySelector('#toggleAdminSidebar')?.addEventListener('click',toggleAdminSidebarV21);
+document.querySelector('#toggleModuleFocus')?.addEventListener('click',toggleModuleFocusV21);
+
+document.querySelectorAll('.sidebar [data-tab]').forEach(button=>{
+  button.addEventListener('click',()=>{
+    leaveModuleFocusV21();
+    requestAnimationFrame(activateMordiscoV21);
+  });
+});
+
+document.querySelector('#posDetailsToggle')?.addEventListener('click',()=>{
+  const details=document.querySelector('#posOptionalDetails');
+  const button=document.querySelector('#posDetailsToggle');
+  if(!details||!button)return;
+  const collapsed=details.classList.toggle('collapsed');
+  button.textContent=collapsed?'Datos del pedido ▾':'Datos del pedido ▴';
+});
+
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape'&&document.body.classList.contains('moduleFocusV21')){
+    const visibleModal=document.querySelector('.modal:not(.hidden)');
+    if(!visibleModal)leaveModuleFocusV21();
+  }
+});
+
+window.addEventListener('load',activateMordiscoV21);
+window.addEventListener('pageshow',activateMordiscoV21);

@@ -1,0 +1,39 @@
+MORDISCO OS V21 ESTABLE DEFINITIVO
+
+ESTA VERSIÓN FUE CREADA SOBRE LOS 3 ARCHIVOS ACTUALES SUBIDOS POR EL USUARIO:
+- admin.html
+- admin-v18.js
+- admin-v18.css
+
+NO MODIFICA LA WEB PÚBLICA
+La portada, menú público, promociones, contacto y pedidos en línea se conservan.
+Los cambios visuales están limitados al panel #adminView.
+
+MEJORAS
+- Menú lateral plegable en todos los módulos.
+- El tamaño elegido queda guardado.
+- Botón Pantalla amplia para trabajar sin menú lateral.
+- POS/Caja a pantalla completa, sin bloqueo.
+- Productos y orden visibles al mismo tiempo.
+- Datos secundarios del pedido plegables.
+- Botón Enviar a cocina siempre accesible.
+- Contabilidad más amplia y profesional.
+- Tablas con encabezado fijo.
+- Estilos V21 consolidados sobre la versión actual.
+
+INSTALACIÓN
+1. Extrae este ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Elige Reemplazar archivos en el destino.
+4. Abre GitHub Desktop.
+5. Summary:
+   Mordisco OS V21 estable definitivo
+6. Commit to main.
+7. Push origin.
+8. Espera Vercel Ready.
+
+PRUEBA
+https://mordiscofastfood.com/admin?session=ok&v=mordisco-v21-stable
+
+NO EJECUTA SQL.
