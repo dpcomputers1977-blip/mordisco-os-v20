@@ -1,1533 +1,327 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#11100e">
-<title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=club-boom-1">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/admin-auth-v18.js?v=final-1" defer></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="description" content="Mordisco Fast Food: hamburguesas intensas, promociones y pedidos en línea.">
+  <title>Mordisco Fast Food</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/mordisco-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="/public-site.css?v=21.0.0">
 
-
-
-
-<style id="clubMordiscoBoomStyles">
-.publicQuickLinks{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
+<style id="clubMordiscoSafeHomepage">
+.rewards-header-link{border-color:#ffc400!important;color:#ffc400!important}
+.club-public-section{
+  position:relative;isolation:isolate;display:grid;
+  grid-template-columns:minmax(0,1.15fr) minmax(310px,.85fr);
+  gap:42px;align-items:center;max-width:1240px;margin:55px auto;
+  padding:58px;border-radius:34px;overflow:hidden;color:#fff;
+  background:radial-gradient(circle at 85% 5%,rgba(255,196,0,.24),transparent 30%),linear-gradient(145deg,#0c0b09,#201a11 60%,#0d0c0a);
+  box-shadow:0 30px 80px rgba(20,15,7,.26)
 }
-.rewardsPublicLink{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-height:42px;
-  padding:9px 15px;
-  border-radius:12px;
-  background:linear-gradient(135deg,#ffd21f,#ff9f00);
-  color:#17130f;
-  text-decoration:none;
-  font-weight:950;
-  box-shadow:0 8px 22px rgba(255,180,0,.25);
+.club-public-section:before{
+  content:"";position:absolute;width:280px;height:280px;border-radius:50%;
+  right:-110px;top:-120px;background:#ffc400;filter:blur(28px);opacity:.35;z-index:-1
 }
-
-.clubMordiscoBoom{
-  position:relative;
-  isolation:isolate;
-  display:grid;
-  grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);
-  align-items:center;
-  gap:40px;
-  max-width:1240px;
-  margin:50px auto;
-  padding:58px;
-  overflow:hidden;
-  border-radius:34px;
-  background:
-    radial-gradient(circle at top right,rgba(255,198,0,.20),transparent 30%),
-    linear-gradient(145deg,#11100e 0%,#1c1812 55%,#0f0e0c 100%);
-  color:#fff;
-  box-shadow:0 30px 80px rgba(24,18,8,.28);
+.club-new-badge{
+  display:inline-flex;padding:7px 11px;border-radius:999px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
+  font-size:.74rem;font-weight:950;letter-spacing:1.3px
 }
-
-.clubBoomGlow{
-  position:absolute;
-  border-radius:50%;
-  filter:blur(14px);
-  opacity:.55;
-  z-index:-1;
+.club-public-copy h2{
+  margin:13px 0 17px;font-size:clamp(2.7rem,5vw,5.5rem);
+  line-height:.93;letter-spacing:-2px
 }
-.clubBoomGlowOne{
-  width:260px;
-  height:260px;
-  right:-80px;
-  top:-100px;
-  background:#ffbf00;
+.club-public-copy h2 strong{color:#ffc400}
+.club-public-copy>p{max-width:650px;color:#d8cebe;line-height:1.65;font-size:1.06rem}
+.club-public-button{
+  display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:13px;
+  max-width:520px;margin-top:26px;padding:15px 17px;border-radius:18px;
+  background:linear-gradient(135deg,#ffd325,#ff9f00);color:#17130f;
+  text-decoration:none;box-shadow:0 16px 38px rgba(255,170,0,.28)
 }
-.clubBoomGlowTwo{
-  width:180px;
-  height:180px;
-  left:-70px;
-  bottom:-80px;
-  background:#ff7b00;
+.club-public-button>span{
+  display:grid;place-items:center;width:48px;height:48px;border-radius:14px;
+  background:rgba(255,255,255,.44);font-size:1.35rem
 }
-
-.clubBoomBadge{
-  display:inline-flex;
-  padding:8px 12px;
-  border:1px solid rgba(255,255,255,.18);
-  border-radius:999px;
-  background:rgba(255,255,255,.08);
-  font-size:.76rem;
-  font-weight:950;
-  letter-spacing:1.4px;
+.club-public-button small{display:block;font-size:.65rem;font-weight:950;letter-spacing:1.3px}
+.club-public-button b{display:block;margin-top:2px}
+.club-public-button>strong{font-size:1.7rem}
+.club-public-benefits{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
+.club-public-benefits span{
+  padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.1);font-size:.76rem;font-weight:800
 }
-.clubBoomContent .eyebrow{
-  display:block;
-  margin-top:20px;
-  color:#ffc400;
+.club-public-card{
+  padding:28px;border-radius:27px;color:#17130f;
+  background:linear-gradient(145deg,rgba(255,255,255,.38),rgba(255,255,255,.06)),linear-gradient(145deg,#ffc400,#ff9500);
+  box-shadow:0 28px 70px rgba(0,0,0,.34);transform:rotate(3deg)
 }
-.clubBoomContent h2{
-  margin:10px 0 18px;
-  font-size:clamp(2.7rem,5vw,5.8rem);
-  line-height:.92;
-  letter-spacing:-2px;
+.club-card-top,.club-card-points{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.club-card-top span{font-size:.73rem;font-weight:950;letter-spacing:1.8px}
+.club-card-top img{width:88px;height:58px;object-fit:contain}
+.club-public-card>small{display:block;margin-top:38px;font-weight:900;opacity:.65}
+.club-public-card h3{margin:4px 0 22px;font-size:1.35rem}
+.club-card-points b{font-size:4.7rem;line-height:.9}
+.club-card-points span{padding:8px 12px;border-radius:999px;background:#17130f;color:#fff;font-weight:950}
+.club-card-progress{height:13px;margin:20px 0 9px;border-radius:999px;background:rgba(255,255,255,.55);overflow:hidden}
+.club-card-progress i{display:block;width:72%;height:100%;background:#17130f;border-radius:999px}
+.club-public-card p{margin:0;font-size:.8rem;font-weight:850}
+.mobile-admin-access{
+  position:fixed;left:10px;bottom:10px;z-index:9000;
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:34px;padding:6px 9px;border-radius:9px;
+  background:rgba(17,16,14,.88);color:#fff;text-decoration:none;
+  font-size:.7rem;font-weight:900;box-shadow:0 7px 20px rgba(0,0,0,.22);
+  backdrop-filter:blur(8px);opacity:.72
 }
-.clubBoomContent h2 strong{
-  color:#ffc400;
+.mobile-admin-access:hover{opacity:1}
+@media(max-width:880px){
+  .club-public-section{grid-template-columns:1fr;margin:28px 14px;padding:32px 23px;border-radius:25px}
+  .club-public-card{max-width:430px;margin:auto;transform:rotate(1deg)}
 }
-.clubBoomContent p{
-  max-width:660px;
-  margin:0;
-  color:#d8cebe;
-  font-size:1.08rem;
-  line-height:1.65;
-}
-
-.clubBoomActions{
-  margin-top:28px;
-}
-.clubBoomPrimary{
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  align-items:center;
-  gap:14px;
-  width:min(100%,520px);
-  padding:15px 17px;
-  border-radius:18px;
-  background:linear-gradient(135deg,#ffd21f,#ff9f00);
-  color:#17130f;
-  text-decoration:none;
-  box-shadow:0 16px 36px rgba(255,169,0,.28);
-  transform:translateY(0);
-  transition:.2s ease;
-}
-.clubBoomPrimary:hover{
-  transform:translateY(-4px) scale(1.01);
-  box-shadow:0 22px 44px rgba(255,169,0,.38);
-}
-.clubBoomPrimary>span{
-  display:grid;
-  place-items:center;
-  width:48px;
-  height:48px;
-  border-radius:14px;
-  background:rgba(255,255,255,.45);
-  font-size:1.35rem;
-}
-.clubBoomPrimary small{
-  display:block;
-  font-size:.65rem;
-  font-weight:950;
-  letter-spacing:1.4px;
-}
-.clubBoomPrimary b{
-  display:block;
-  margin-top:2px;
-  font-size:1.05rem;
-}
-.clubBoomPrimary>strong{
-  font-size:1.6rem;
-}
-
-.clubBoomBenefits{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-top:16px;
-}
-.clubBoomBenefits span{
-  padding:8px 10px;
-  border-radius:999px;
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.1);
-  font-size:.78rem;
-  font-weight:800;
-}
-
-.clubBoomVisual{
-  position:relative;
-  min-height:410px;
-  display:grid;
-  place-items:center;
-}
-.clubBoomCard{
-  width:min(100%,420px);
-  padding:28px;
-  border-radius:28px;
-  background:
-    linear-gradient(145deg,rgba(255,255,255,.38),rgba(255,255,255,.07)),
-    linear-gradient(145deg,#ffc400,#ff9700);
-  color:#17130f;
-  box-shadow:
-    0 28px 70px rgba(0,0,0,.35),
-    inset 0 1px 0 rgba(255,255,255,.7);
-  transform:rotate(4deg);
-}
-.clubBoomCardTop,
-.clubBoomPoints{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-}
-.clubBoomCardTop span{
-  font-size:.74rem;
-  font-weight:950;
-  letter-spacing:1.8px;
-}
-.clubBoomCardTop img{
-  width:88px;
-  height:58px;
-  object-fit:contain;
-}
-.clubBoomMember{
-  margin:38px 0 26px;
-}
-.clubBoomMember small{
-  display:block;
-  font-size:.68rem;
-  font-weight:900;
-  opacity:.65;
-}
-.clubBoomMember strong{
-  display:block;
-  margin-top:4px;
-  font-size:1.35rem;
-}
-.clubBoomPoints small{
-  display:block;
-  font-size:.7rem;
-  font-weight:900;
-}
-.clubBoomPoints strong{
-  display:block;
-  font-size:4.8rem;
-  line-height:.9;
-}
-.clubBoomPoints>span{
-  padding:8px 12px;
-  border-radius:999px;
-  background:#17130f;
-  color:#fff;
-  font-weight:950;
-}
-.clubBoomProgress{
-  height:13px;
-  margin:22px 0 10px;
-  overflow:hidden;
-  border-radius:999px;
-  background:rgba(255,255,255,.55);
-}
-.clubBoomProgress i{
-  display:block;
-  width:72%;
-  height:100%;
-  border-radius:999px;
-  background:#17130f;
-}
-.clubBoomCard p{
-  margin:0;
-  font-size:.8rem;
-  font-weight:850;
-}
-.clubBoomReward{
-  position:absolute;
-  right:0;
-  bottom:32px;
-  padding:12px 16px;
-  border-radius:14px;
-  background:#fff;
-  color:#17130f;
-  box-shadow:0 14px 35px rgba(0,0,0,.22);
-  font-size:.76rem;
-  font-weight:950;
-  transform:rotate(-4deg);
-  animation:clubRewardFloat 2.4s ease-in-out infinite;
-}
-@keyframes clubRewardFloat{
-  0%,100%{transform:translateY(0) rotate(-4deg)}
-  50%{transform:translateY(-8px) rotate(-4deg)}
-}
-
-@media(max-width:860px){
-  .clubMordiscoBoom{
-    grid-template-columns:1fr;
-    margin:28px 14px;
-    padding:32px 24px;
-    border-radius:26px;
-  }
-  .clubBoomVisual{
-    min-height:350px;
-  }
-  .clubBoomCard{
-    transform:rotate(2deg);
-  }
-}
-@media(max-width:520px){
-  .clubMordiscoBoom{
-    padding:26px 18px;
-  }
-  .clubBoomContent h2{
-    font-size:2.65rem;
-    letter-spacing:-1px;
-  }
-  .clubBoomPrimary{
-    grid-template-columns:auto 1fr;
-  }
-  .clubBoomPrimary>strong{
-    display:none;
-  }
-  .clubBoomBenefits{
-    display:grid;
-  }
-  .clubBoomCard{
-    padding:22px;
-  }
-  .clubBoomPoints strong{
-    font-size:3.8rem;
-  }
+@media(max-width:560px){
+  .club-public-section{padding:26px 18px}
+  .club-public-copy h2{font-size:2.65rem;letter-spacing:-1px}
+  .club-public-button{grid-template-columns:auto 1fr}
+  .club-public-button>strong{display:none}
+  .club-public-benefits{display:grid}
+  .club-card-points b{font-size:3.8rem}
+  .mobile-admin-access{left:7px;bottom:7px}
 }
 </style>
 
 </head>
 <body>
-<header class="topbar hidden">
-  <a class="brand" href="#inicio"><img src="media/logo.png" alt="Mordisco"><span>MORDISCO</span></a>
-  <nav><a href="#inicio">Inicio</a><a href="#menu">Menú</a><a href="/promociones">Promociones</a><a href="#contacto">Contacto</a></nav>
-  <div class="top-actions"><button class="cartBtn" id="cartBtn">🛒 <b id="cartCount">0</b></button></div>
-<div class="publicQuickLinks">
-  <a class="clientAppLink" href="/app">📱 Pedir desde la app</a>
-  <a class="rewardsPublicLink" href="/recompensas">🎁 Mis recompensas</a>
-</div></header>
-
-<main id="publicView" class="hidden">
-<section class="hero" id="inicio">
- <video autoplay muted loop playsinline poster="media/hamburguesa.png"><source src="media/promo.mp4" type="video/mp4"></video>
- <div class="overlay"></div>
- <div class="heroCopy"><span class="kicker">🔥 SABOR SIN DISCUSIÓN</span><h1>DALE UN <em>MORDISCO</em> A LO BRUTAL.</h1><p id="businessDescription">El mejor sabor para compartir.</p><a class="primary" href="#menu">Ver menú</a></div>
- <img class="heroBurger" src="media/hamburguesa.png" alt="Hamburguesa">
-</section>
-
-<section class="benefits"><article>🚚 <b>Delivery</b><span>Directo a tu puerta</span></article><article>🏪 <b>Retiro</b><span>Pide y pasa por él</span></article><article>🍽️ <b>En el local</b><span>Disfrútalo recién hecho</span></article></section>
-
-<section class="promoHomeSection">
- <div class="sectionHead"><div><span class="eyebrow">OFERTAS ESPECIALES</span><h2>Promociones para disfrutar</h2></div><a class="dark publicLinkButton" href="/promociones">Ver todas</a></div>
- <div id="homePromotions" class="promotionGrid"></div>
-</section>
-<section class="menuSection" id="menu">
- <div class="sectionHead"><div><span class="eyebrow">NUESTRO MENÚ</span><h2>Elige tu próximo mordisco</h2></div><input id="searchInput" placeholder="Buscar producto..."></div>
- <div class="categories" id="categoryFilters"></div>
- <div id="loadingProducts" class="notice">Cargando menú desde la nube…</div>
- <div class="productGrid" id="productGrid"></div>
-</section>
-
-
-
-<section class="clubMordiscoBoom" id="club-mordisco">
-  <div class="clubBoomGlow clubBoomGlowOne"></div>
-  <div class="clubBoomGlow clubBoomGlowTwo"></div>
-
-  <div class="clubBoomContent">
-    <div class="clubBoomBadge">🔥 NUEVO EN MORDISCO</div>
-    <span class="eyebrow">CLUB MORDISCO</span>
-    <h2>Compra. Acumula.<br><strong>Gana comida gratis.</strong></h2>
-    <p>
-      Cada pedido suma puntos. Consulta tu tarjeta digital,
-      desbloquea premios y vuelve por más.
-    </p>
-
-    <div class="clubBoomActions">
-      <a class="clubBoomPrimary" href="/recompensas">
-        <span>🎁</span>
-        <div>
-          <small>ABRIR AHORA</small>
-          <b>Mi tarjeta de recompensas</b>
-        </div>
-        <strong>→</strong>
-      </a>
-
-      <div class="clubBoomBenefits">
-        <span>⭐ 1 punto por dólar</span>
-        <span>🍔 Premios gratis</span>
-        <span>📱 Sin descargar app</span>
-      </div>
-    </div>
+  <div class="promo-bar">
+    <span>🔥 SABOR QUE SE SIENTE</span>
+    <span class="promo-dot">•</span>
+    <span>PEDIDOS EN LÍNEA DISPONIBLES</span>
   </div>
 
-  <div class="clubBoomVisual">
-    <div class="clubBoomCard">
-      <div class="clubBoomCardTop">
-        <span>CLUB MORDISCO</span>
-        <img src="/media/logo.png" alt="Mordisco">
-      </div>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Mordisco Fast Food">
+      <img src="/mordisco-logo.png" alt="Mordisco Fast Food">
+      <span><strong>MORDISCO</strong><small>FAST FOOD</small></span>
+    </a>
 
-      <div class="clubBoomMember">
-        <small>TARJETA DIGITAL</small>
-        <strong>CLIENTE MORDISCO</strong>
-      </div>
+    <button class="menu-toggle" type="button" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
 
-      <div class="clubBoomPoints">
-        <div>
-          <small>PUNTOS</small>
-          <strong>120</strong>
+    <nav class="main-nav" aria-label="Navegación principal">
+      <a href="#inicio">Inicio</a>
+      <a href="#menu">Menú</a>
+      <a href="/promociones">Promociones</a>
+      <a href="#nosotros">Nosotros</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+
+    <div class="header-actions">
+      <a class="btn btn-outline rewards-header-link" href="/recompensas">🎁 Club Mordisco</a>
+      <a class="btn btn-outline employee-link" href="/staff">Empleados</a>
+      <a class="btn btn-primary" href="/pedir">Pedir ahora <span>→</span></a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="inicio">
+      <div class="hero-grid">
+        <div class="hero-copy reveal">
+          <div class="eyebrow"><span></span>MORDISCO FAST FOOD</div>
+          <h1>
+            <span>EL SABOR</span>
+            <span>QUE TE HACE</span>
+            <strong>VOLVER.</strong>
+          </h1>
+          <p>Hamburguesas intensas, ingredientes frescos y pedidos en línea sin complicaciones.</p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary btn-xl" href="/pedir">Ordenar ahora</a>
+            <a class="btn btn-dark btn-xl" href="#menu">Ver menú</a>
+          </div>
+
+          <div class="hero-proof">
+            <article><b>100%</b><small>Sabor artesanal</small></article>
+            <article><b>Rápido</b><small>Pedido en línea</small></article>
+            <article><b>Fresco</b><small>Hecho al momento</small></article>
+          </div>
         </div>
-        <span>ORO</span>
-      </div>
 
-      <div class="clubBoomProgress">
-        <i></i>
-      </div>
-
-      <p>Tu próxima recompensa está cerca.</p>
-    </div>
-
-    <div class="clubBoomReward">🍟 PREMIO DISPONIBLE</div>
-  </div>
-</section>
-
-<section class="contact" id="contacto"><div><span class="eyebrow">PIDE DIRECTO</span><h2>Tu próximo mordisco está cerca.</h2><p>📍 <span id="businessAddress">Dirección por configurar</span></p><p>🕒 <span id="businessSchedule">Horario por configurar</span></p></div><button class="primary" id="orderNowBtn">Hacer pedido</button></section>
-<footer class="publicFooter">
-  <span>© Mordisco Fast Food</span>
-  <div class="privateAccess">
-    <a href="/staff" title="Portal del personal">Personal</a>
-    <button id="adminBtn" title="Administración">•</button>
-  </div>
-</footer>
-</main>
-
-<section id="adminView" class="hidden adminShell">
- <aside class="sidebar"><img src="media/logo.png" alt="Mordisco"><button data-tab="dashboard"><span>▦</span> Resumen</button><button data-tab="products" class="active"><span>🍔</span> Productos</button><button data-tab="categories"><span>▤</span> Categorías</button><button data-tab="orders"><span>🌐</span> Pedidos web</button><button data-tab="kitchen"><span>♨</span> Cocina</button><button data-tab="pos"><span>▣</span> POS / Caja</button><button data-tab="inventory"><span>◇</span> Inventario</button><button data-tab="tables"><span>🍽</span> Mesas</button><button data-tab="shifts"><span>🕒</span> Turnos</button><button data-tab="finance"><span>💰</span> Contabilidad</button><button data-tab="customers"><span>👤</span> Clientes</button><button data-tab="promotions"><span>🎁</span> Promociones</button><button data-tab="pages"><span>📄</span> Páginas</button><button data-tab="staff"><span>👥</span> Personal</button><button data-tab="extras">➕ Extras y empaques</button>
-<button data-tab="settings"><span>⚙</span> Negocio</button><button id="logoutBtn"><span>↪</span> Cerrar sesión</button><button id="backToStore"><span>↗</span> Ver página</button></aside>
- <div class="adminContent">
-   <div class="adminTop">
-      <div class="adminTopTitle">
-        <button id="toggleAdminSidebar" class="sidebarToggleV21" type="button" aria-label="Mostrar u ocultar menú">☰</button>
-        <div><span class="eyebrow">MORDISCO OS V21</span><h1 id="adminTitle">Productos</h1></div>
-      </div>
-      <div class="adminTopActions">
-        <button id="toggleModuleFocus" class="moduleFocusBtn" type="button">Pantalla amplia</button>
-        <span class="cloudStatus">● Conectado a Supabase</span>
-      </div>
-    </div>
-   <section id="tab-dashboard" class="tab hidden">
-      <div class="metrics">
-        <article><span>Órdenes totales</span><b id="metricOrders">0</b></article>
-        <article><span>Ventas acumuladas</span><b id="metricSales">$0.00</b></article>
-        <article><span>Ventas de hoy</span><b id="metricToday">$0.00</b></article>
-        <article><span>Órdenes pendientes</span><b id="metricPending">0</b></article>
-        <article><span>Productos activos</span><b id="metricProducts">0</b></article>
-        <article><span>Categorías</span><b id="metricCategories">0</b></article>
-      </div>
-      <div class="dashboardGrid">
-        <section class="panel"><div class="panelTitle"><h3>Actividad reciente</h3><button class="dark" id="dashboardRefresh">Actualizar</button></div><div id="recentOrders"></div></section>
-        <section class="panel"><h3>Productos destacados</h3><div id="featuredSummary"></div></section>
-      </div>
-    </section>
-   <section id="tab-products" class="tab">
-    <form id="productForm" class="panel formGrid" autocomplete="off">
-      <input type="hidden" id="pId">
-      <div class="wide productFormTitle">
-        <div>
-          <span class="eyebrow">CATÁLOGO</span>
-          <h2 id="productFormHeading">Crear producto</h2>
-        </div>
-        <span id="productEditBadge" class="editBadge hidden">Editando producto</span>
-      </div>
-
-      <label>Nombre
-        <input id="pName" required maxlength="100">
-      </label>
-
-      <label>Categoría
-        <select id="pCategory" required></select>
-      </label>
-
-      <label>Precio
-        <input id="pPrice" type="number" min="0" step="0.01" required>
-      </label>
-
-      <label>Orden
-        <input id="pSort" type="number" value="0">
-      </label>
-
-      <label class="wide">Descripción
-        <textarea id="pDescription" maxlength="500"></textarea>
-      </label>
-
-      <label class="productImagePicker">
-        Subir imagen desde la computadora
-        <input id="pImageFile" type="file" accept="image/png,image/jpeg,image/webp">
-        <small>PNG, JPG o WEBP. Máximo 5 MB.</small>
-      </label>
-
-      <div class="previewBox">
-        <img id="pPreview" class="hidden" alt="Vista previa del producto">
-        <span id="pNoImage">Sin imagen seleccionada</span>
-      </div>
-
-      <label class="check"><input id="pFeatured" type="checkbox"> Destacado</label>
-      <label class="check"><input id="pActive" type="checkbox" checked> Visible</label>
-
-      <div class="wide actions">
-        <button class="primary" id="saveProductBtn">Guardar producto</button>
-        <button type="button" class="dark" id="clearProduct">Cancelar / Limpiar</button>
-        <button type="button" class="danger hidden" id="removeProductImage">Quitar imagen</button>
-      </div>
-    </form>
-    <div class="adminToolbar">
-      <input id="adminProductSearch" placeholder="Buscar producto...">
-      <select id="adminProductFilter">
-        <option value="all">Todos</option>
-        <option value="visible">Visibles</option>
-        <option value="hidden">Ocultos</option>
-        <option value="featured">Destacados</option>
-      </select>
-      <span id="adminProductCount"></span>
-    </div>
-    <div id="adminProducts" class="adminList"></div>
-   </section>
-   <section id="tab-categories" class="tab hidden"><form id="categoryForm" class="panel inlineForm"><input type="hidden" id="cId"><input id="cName" placeholder="Nombre de la categoría" required><input id="cSort" type="number" value="0" placeholder="Orden"><label class="check"><input id="cActive" type="checkbox" checked> Activa</label><button class="primary">Guardar</button><button type="button" class="dark" id="clearCategory">Limpiar</button></form><div id="adminCategories" class="adminList"></div></section>
-
-<section id="tab-orders" class="tab hidden">
-  <div class="tablesHeader">
-    <div>
-      <h2>Pedidos web</h2>
-      <p>Consulta los pedidos enviados desde la página y gestiona su preparación.</p>
-    </div>
-    <button class="dark" id="refreshOrders">Actualizar</button>
-  </div>
-
-  <div class="panel orderFilters">
-    <label>Estado
-      <select id="orderStatusFilter">
-        <option value="all">Todos</option>
-        <option value="pending">Pendientes</option>
-        <option value="accepted">Aceptados</option>
-        <option value="preparing">Preparando</option>
-        <option value="ready">Listos</option>
-        <option value="delivered">Entregados</option>
-        <option value="cancelled">Cancelados</option>
-      </select>
-    </label>
-  </div>
-
-  <div id="adminOrders" class="ordersGrid"></div>
-</section>
-
-<section id="tab-kitchen" class="tab hidden">
-      <div class="kitchenToolbar">
-        <div>
-          <h2>Pantalla de cocina</h2>
-          <p>Los pedidos nuevos aparecen automáticamente.</p>
-        </div>
-        <div class="kitchenActions">
-          <label class="check"><input id="kitchenSound" type="checkbox" checked> Sonido</label>
-          <button class="dark" id="refreshKitchen">Actualizar</button>
-          <button class="primary" id="fullscreenKitchen">Pantalla completa</button>
+        <div class="hero-visual reveal">
+          <div class="hero-glow"></div>
+          <div class="hero-circle"></div>
+          <div class="orbit orbit-one"></div>
+          <div class="orbit orbit-two"></div>
+          <img class="hero-burger" src="/media/hamburguesa.png" alt="Hamburguesa premium Mordisco">
+          <div class="product-badge badge-one"><span>🔥</span><b>La favorita</b></div>
+          <div class="product-badge badge-two"><span>⭐</span><b>Sabor premium</b></div>
+          <div class="price-bubble"><small>Desde</small><strong>$3,50</strong></div>
         </div>
       </div>
-      <div class="kitchenBoard" id="kitchenBoard">
-        <section class="kitchenColumn">
-          <header><span class="statusDot pendingDot"></span><h3>Nuevos</h3><b id="kitchenPendingCount">0</b></header>
-          <div id="kitchenPending" class="kitchenCards"></div>
-        </section>
-        <section class="kitchenColumn">
-          <header><span class="statusDot preparingDot"></span><h3>Preparando</h3><b id="kitchenPreparingCount">0</b></header>
-          <div id="kitchenPreparing" class="kitchenCards"></div>
-        </section>
-        <section class="kitchenColumn">
-          <header><span class="statusDot readyDot"></span><h3>Listos</h3><b id="kitchenReadyCount">0</b></header>
-          <div id="kitchenReady" class="kitchenCards"></div>
-        </section>
-      </div>
+
+      <div class="scroll-hint"><span></span>Descubre el menú</div>
     </section>
 
-
-   <section id="tab-pos" class="tab hidden">
-<section id="adminCashControl" class="panel adminCashControl">
-        <div>
-          <span class="eyebrow">CONTROL ADMINISTRATIVO</span>
-          <h3>Estado de la caja</h3>
-          <p id="cashRegisterMessage">Consultando estado…</p>
-        </div>
-        <div class="cashControlActions">
-          <span id="cashRegisterBadge" class="cashRegisterBadge">Consultando</span>
-          <button id="openCashRegisterBtn" class="success" type="button">Abrir caja</button>
-          <button id="closeCashRegisterBtn" class="danger" type="button">Cerrar caja</button>
-        </div>
-      </section>
-
-      <div class="posHeader">
-        <div class="posHeaderIntro">
-          <img class="posFocusLogo" src="media/logo.png" alt="Mordisco Fast Food">
-          <div>
-            <span class="eyebrow">MORDISCO OS</span>
-            <h2>Punto de venta</h2>
-            <p>Selecciona productos, envía la orden y cobra de forma rápida.</p>
-          </div>
-        </div>
-        <div class="posHeaderActions">
-          <div class="posHeaderStats">
-          <span>Cajero activo</span>
-          <b id="activeCashierName">Sin seleccionar</b>
-          <span>Venta actual</span>
-          <strong id="posHeaderTotal">$0.00</strong>
-          </div>
-          <button id="exitPosFocusBtn" class="posExitBtn" type="button">
-            <span>←</span> Volver al administrador
-          </button>
-        </div>
-      </div>
-
-      
-      <div id="cashRegisterClosedNotice" class="cashRegisterClosedNotice hidden">
-        <strong>🔒 Caja cerrada</strong>
-        <span>Un administrador debe abrir la caja antes de registrar o cobrar ventas.</span>
-      </div>
-
-<div class="posLayout">
-        <section class="posCatalog panel">
-          <div class="posCatalogTop">
-            <input id="posSearch" placeholder="Buscar producto...">
-            <select id="posCategory" class="categoryNativeHidden" aria-hidden="true" tabindex="-1"><option value="all">Todas las categorías</option></select><div id="posCategoryChips" class="categoryChips" aria-label="Categorías"></div>
-          </div>
-          <div id="posProducts" class="posProductGrid"></div>
-        </section>
-
-        <aside class="posTicket panel">
-          <div class="posTicketTitle">
-            <div><span class="eyebrow">ORDEN DE MOSTRADOR</span><h3>Nueva venta</h3></div>
-            <button class="danger posClearBtn" id="posClear">Vaciar</button>
-          </div>
-
-          <div id="posCart" class="posCart"></div>
-
-          <div class="posTotals">
-            <div><span>Subtotal</span><b id="posSubtotal">$0.00</b></div>
-
-            <div class="preDiscountBox">
-              <label>Descuento
-                <select id="posDiscountType">
-                  <option value="none">Sin descuento</option>
-                  <option value="percent">Porcentaje</option>
-                  <option value="fixed">Valor fijo</option>
-                </select>
-              </label>
-
-              <label>Valor
-                <input id="posDiscountValue" type="number" min="0" step="0.01" value="0">
-              </label>
-
-              <div class="quickDiscounts">
-                <button type="button" data-pos-discount="5">5%</button>
-                <button type="button" data-pos-discount="10">10%</button>
-                <button type="button" data-pos-discount="15">15%</button>
-                <button type="button" data-pos-discount="20">20%</button>
-              </div>
-
-              <div><span>Descuento aplicado</span><b id="posDiscountAmount">$0.00</b></div>
-            </div>
-
-            <div><span>Total</span><strong id="posTotal">$0.00</strong></div>
-          </div>
-
-          <div class="posEssentialData">
-            <label>Cliente
-              <input id="posCustomer" list="posCustomerList" autocomplete="off" placeholder="Consumidor final o buscar cliente"><datalist id="posCustomerList"></datalist>
-            </label>
-            <label>Teléfono
-              <input id="posPhone" placeholder="Opcional">
-            </label>
-            <label>Cajero
-              <select id="posCashier"><option value="">Seleccionar cajero</option></select>
-            </label>
-            <label>Tipo de pedido
-              <select id="posOrderType">
-                <option value="local">En el local</option>
-                <option value="pickup">Para llevar</option>
-              </select>
-            </label>
-          </div>
-
-          <button id="posDetailsToggle" class="posDetailsToggle" type="button">Más datos ▾</button>
-          <div id="posOptionalDetails" class="posOptionalDetails collapsed">
-            <div class="posOptionalGrid">
-              <label>Mesero
-                <select id="posWaiter"><option value="">Sin mesero</option></select>
-              </label>
-              <label>Notas
-                <textarea id="posNotes" placeholder="Sin cebolla, extra salsa, etc."></textarea>
-              </label>
-            </div>
-          </div>
-
-          <div class="paymentLaterNotice compactPaymentNotice">
-            <b>Pago pendiente</b>
-            <span>Envía a cocina y cobra desde la lista inferior cuando el cliente esté listo.</span>
-          </div>
-
-          <div class="posPrimaryActions">
-            <button class="primary posChargeBtn" id="posCharge">Enviar a cocina</button>
-          </div>
-        </aside>
-      </div>
-
-      <section class="panel posPendingPanel">
-        <div class="panelTitle posPendingHeader">
-          <div>
-            <span class="eyebrow">CAJA DEL LOCAL</span>
-            <h3>Pedidos pendientes de cobro</h3>
-            <p>Selecciona una orden cuando el cliente esté listo para pagar.</p>
-          </div>
-          <div class="posPendingActions">
-            <span class="pendingCount"><b id="posPendingCount">0</b> pendientes</span>
-            <button class="dark" id="refreshPosPending">Actualizar</button>
-          </div>
-        </div>
-        <div id="posPendingOrders" class="posPendingOrders">
-          <div class="notice">Cargando pedidos pendientes...</div>
-        </div>
-      </section>
-    </section>
-
-
-   <section id="tab-inventory" class="tab hidden">
-      <div class="inventoryHeader">
-        <div>
-          <h2>Inventario</h2>
-          <p>Controla ingredientes, stock, compras y recetas de tus productos.</p>
-        </div>
-        <div class="inventorySummary">
-          <div><span>Ingredientes</span><strong id="inventoryTotalCount">0</strong></div>
-          <div><span>Stock bajo</span><strong id="inventoryLowCount">0</strong></div>
-          <div><span>Valor estimado</span><strong id="inventoryValue">$0.00</strong></div>
-        </div>
-      </div>
-
-      <div class="inventoryTabs">
-        <button class="active" data-inventory-view="ingredients">Ingredientes</button>
-        <button data-inventory-view="movements">Entradas y salidas</button>
-        <button data-inventory-view="recipes">Recetas</button>
-      </div>
-
-      <div id="inventoryViewIngredients" class="inventoryView">
-        <div class="inventoryGrid">
-          <form id="ingredientForm" class="panel formGrid">
-            <input id="ingredientId" type="hidden">
-            <h3 class="wide">Nuevo ingrediente</h3>
-            <label class="wide">Nombre<input id="ingredientName" required placeholder="Ej. Carne de hamburguesa"></label>
-            <label>Unidad
-              <select id="ingredientUnit">
-                <option value="unidad">Unidad</option>
-                <option value="g">Gramos (g)</option>
-                <option value="kg">Kilogramos (kg)</option>
-                <option value="ml">Mililitros (ml)</option>
-                <option value="l">Litros (L)</option>
-                <option value="porción">Porción</option>
-              </select>
-            </label>
-            <label>Costo por unidad<input id="ingredientCost" type="number" min="0" step="0.0001" value="0"></label>
-            <label>Stock actual<input id="ingredientStock" type="number" min="0" step="0.001" value="0"></label>
-            <label>Stock mínimo<input id="ingredientMinimum" type="number" min="0" step="0.001" value="0"></label>
-            <label class="check wide"><input id="ingredientActive" type="checkbox" checked> Ingrediente activo</label>
-            <div class="wide formActions">
-              <button class="primary">Guardar ingrediente</button>
-              <button type="button" class="dark" id="clearIngredient">Limpiar</button>
-            </div>
-          </form>
-
-          <section class="panel inventoryListPanel">
-            <div class="panelToolbar">
-              <div>
-                <h3>Ingredientes registrados</h3>
-                <small>Los resaltados necesitan reposición.</small>
-              </div>
-              <input id="ingredientSearch" placeholder="Buscar ingrediente...">
-            </div>
-            <div id="ingredientList" class="ingredientList"></div>
-          </section>
-        </div>
-      </div>
-
-      <div id="inventoryViewMovements" class="inventoryView hidden">
-        <div class="inventoryGrid">
-          <form id="movementForm" class="panel formGrid">
-            <h3 class="wide">Registrar movimiento</h3>
-            <label class="wide">Ingrediente<select id="movementIngredient" required></select></label>
-            <label>Tipo
-              <select id="movementType">
-                <option value="purchase">Compra / entrada</option>
-                <option value="adjustment_in">Ajuste de entrada</option>
-                <option value="waste">Merma / desperdicio</option>
-                <option value="adjustment_out">Ajuste de salida</option>
-              </select>
-            </label>
-            <label>Cantidad<input id="movementQuantity" required type="number" min="0.001" step="0.001"></label>
-            <label>Costo unitario<input id="movementUnitCost" type="number" min="0" step="0.0001" value="0"></label>
-            <label>Proveedor<input id="movementSupplier" placeholder="Opcional"></label>
-            <label class="wide">Nota<textarea id="movementNote" placeholder="Factura, motivo del ajuste, etc."></textarea></label>
-            <div class="wide"><button class="primary">Registrar y actualizar stock</button></div>
-          </form>
-
-          <section class="panel inventoryListPanel">
-            <div class="panelToolbar"><div><h3>Historial de movimientos</h3><small>Últimos movimientos registrados.</small></div><button class="dark" id="refreshMovements">Actualizar</button></div>
-            <div id="movementList" class="movementList"></div>
-          </section>
-        </div>
-      </div>
-
-      <div id="inventoryViewRecipes" class="inventoryView hidden">
-        <div class="inventoryGrid">
-          <form id="recipeForm" class="panel formGrid">
-            <h3 class="wide">Agregar ingrediente a una receta</h3>
-            <label class="wide">Producto<select id="recipeProduct" required></select></label>
-            <label class="wide">Ingrediente<select id="recipeIngredient" required></select></label>
-            <label class="wide">Cantidad consumida por producto<input id="recipeQuantity" required type="number" min="0.001" step="0.001"></label>
-            <div class="wide"><button class="primary">Guardar en receta</button></div>
-            <p class="wide helperText">Ejemplo: para 150 gramos de carne, selecciona gramos y registra 150.</p>
-          </form>
-
-          <section class="panel inventoryListPanel">
-            <div class="panelToolbar">
-              <div><h3>Recetas configuradas</h3><small>El inventario se descuenta al registrar una venta.</small></div>
-              <select id="recipeProductFilter"></select>
-            </div>
-            <div id="recipeList" class="recipeList"></div>
-          </section>
-        </div>
-      </div>
-    </section>
-
-
-
-   <section id="tab-tables" class="tab hidden">
-      <div class="tablesHeader">
-        <div>
-          <h2>Mesas y comandas</h2>
-          <p>Administra mesas, toma pedidos y envíalos directamente a cocina.</p>
-        </div>
-        <div class="tablesStats">
-          <div><span>Libres</span><strong id="tablesFreeCount">0</strong></div>
-          <div><span>Ocupadas</span><strong id="tablesBusyCount">0</strong></div>
-          <div><span>Pendientes</span><strong id="tablesPaymentCount">0</strong></div>
-        </div>
-      </div>
-
-      <div class="tablesToolbar panel">
-        <div class="inlineForm tableManagerCreate">
-          <select id="newTableType" aria-label="Tipo de espacio">
-            <option value="table">Mesa</option>
-            <option value="bar">Barra</option>
-          </select>
-          <input id="newTableName" placeholder="Ej. Mesa 1 o Barra principal">
-          <input id="newTableSeats" type="number" min="1" value="4" placeholder="Puestos">
-          <button class="primary" id="createTableBtn">Crear espacio</button>
-        </div>
-        <div class="tableLegend">
-          <span><i class="free"></i>Libre</span>
-          <span><i class="occupied"></i>Ocupada</span>
-          <span><i class="preparing"></i>Preparando</span>
-          <span><i class="payment"></i>Por cobrar</span>
-        </div>
-      </div>
-
-      <div id="tablesGrid" class="tablesGrid"></div>
-    </section>
-
-
-   <section id="tab-shifts" class="tab hidden">
-      <div class="tablesHeader">
-        <div>
-          <h2>Turnos de trabajo</h2>
-          <p>Control de entrada, salida y ventas realizadas por cada cajero.</p>
-        </div>
-        <div class="tablesStats">
-          <div><span>Turnos abiertos</span><strong id="openShiftCount">0</strong></div>
-          <div><span>Ventas del día</span><strong id="shiftSalesCount">0</strong></div>
-          <div><span>Total cobrado</span><strong id="shiftSalesTotal">$0.00</strong></div>
-        </div>
-      </div>
-      
-      <section id="adminShiftManager" class="panel adminShiftManager">
-        <div class="panelTitle">
-          <div>
-            <span class="eyebrow">CONTROL DEL ADMINISTRADOR</span>
-            <h3>Abrir y cerrar turnos de empleados</h3>
-            <p>Selecciona al empleado que podrá trabajar y cobrar durante este turno.</p>
-          </div>
-        </div>
-        <div class="adminShiftGrid">
-          <label>Empleado
-            <select id="adminShiftEmployee">
-              <option value="">Selecciona un empleado</option>
-            </select>
-          </label>
-          <label>Efectivo inicial
-            <input id="adminShiftOpeningCash" type="number" min="0" step="0.01" value="0">
-          </label>
-          <label>Efectivo contado al cierre
-            <input id="adminShiftClosingCash" type="number" min="0" step="0.01" value="0">
-          </label>
-          <div class="adminShiftActions">
-            <button id="adminOpenShiftBtn" class="primary" type="button">Abrir turno</button>
-            <button id="adminCloseShiftBtn" class="danger" type="button">Cerrar turno</button>
-            <button id="adminRefreshShiftBtn" class="dark" type="button">Actualizar</button>
-          </div>
-        </div>
-        <div id="adminShiftStatus" class="adminShiftStatus">Selecciona un empleado.</div>
-      </section>
-
-<div class="panel shiftToolbar employeeShiftToolbar">
-        <button class="primary" id="startShiftBtn">Iniciar turno</button>
-        <button class="danger" id="closeShiftBtn">Cerrar mi turno</button>
-        <button class="dark" id="refreshShiftsBtn">Actualizar</button>
-      </div>
-      <div id="currentShiftCard" class="panel currentShiftCard"></div>
-      <div class="panel">
-        <h3>Historial de turnos</h3>
-        <div class="tableWrap">
-          <table class="dataTable">
-            <thead><tr><th>Empleado</th><th>Rol</th><th>Entrada</th><th>Salida</th><th>Ventas</th><th>Total</th><th>Estado</th></tr></thead>
-            <tbody id="shiftHistoryBody"></tbody>
-          </table>
-        </div>
-      </div>
-   </section>
-
-   
-<section id="tab-finance" class="tab hidden v21Workspace">
-  <div class="tablesHeader">
-    <div><h2>Contabilidad</h2><p>Ingresos, egresos y resultado del negocio.</p></div>
-    <div class="tablesStats">
-      <div><span>Ingresos</span><strong id="financeIncome">$0.00</strong></div>
-      <div><span>Egresos</span><strong id="financeExpense">$0.00</strong></div>
-      <div><span>Resultado</span><strong id="financeBalance">$0.00</strong></div>
-    </div>
-  </div>
-  <div class="dashboardGrid financeGrid v21FinanceMain">
-    <form id="financeForm" class="panel formGrid">
-      <input type="hidden" id="financeId">
-      <h3 class="wide">Nuevo movimiento</h3>
-      <label>Tipo<select id="financeType"><option value="income">Ingreso</option><option value="expense">Egreso</option></select></label>
-      <label>Categoría<select id="financeCategory">
-        <option>Ventas</option><option>Compra de insumos</option><option>Proveedores</option>
-        <option>Sueldos</option><option>Servicios</option><option>Transporte</option>
-        <option>Mantenimiento</option><option>Publicidad</option><option>Otros</option>
-      </select></label>
-      <label>Monto<input id="financeAmount" type="number" min="0.01" step="0.01" required></label>
-      <label>Método<select id="financeMethod"><option value="cash">Efectivo</option><option value="transfer">Transferencia</option><option value="card">Tarjeta</option><option value="other">Otro</option></select></label>
-      <label>Fecha<input id="financeDate" type="date" required></label>
-      <label>Referencia<input id="financeReference" placeholder="Factura o comprobante"></label>
-      <label class="wide">Descripción<textarea id="financeDescription" required></textarea></label>
-      <div class="wide"><button class="primary">Guardar movimiento</button><button type="button" class="dark" id="clearFinance">Limpiar</button></div>
-    </form>
-    <section class="panel">
-      <div class="panelTitle"><h3>Movimientos</h3><div><input id="financeMonth" type="month"><button class="dark" id="refreshFinance">Actualizar</button></div></div>
-      <div class="tableWrap"><table class="dataTable">
-        <thead><tr><th>Fecha</th><th>Tipo</th><th>Categoría</th><th>Descripción</th><th>Método</th><th>Monto</th><th></th></tr></thead>
-        <tbody id="financeBody"></tbody>
-      </table></div>
-    </section>
-  </div>
-
-  <div class="accountsHeader">
-    <div class="tablesStats">
-      <div><span>Por cobrar</span><strong id="accountsReceivableTotal">$0.00</strong></div>
-      <div><span>Por pagar</span><strong id="accountsPayableTotal">$0.00</strong></div>
-      <div><span>Vencidas</span><strong id="accountsOverdueCount">0</strong></div>
-    </div>
-  </div>
-
-  <div class="dashboardGrid accountsGrid v21AccountsMain">
-    <form id="financeAccountForm" class="panel formGrid">
-      <input type="hidden" id="financeAccountId">
-      <h3 class="wide">Nueva cuenta</h3>
-      <label>Tipo
-        <select id="financeAccountKind">
-          <option value="receivable">Cuenta por cobrar</option>
-          <option value="payable">Cuenta por pagar</option>
-        </select>
-      </label>
-      <label>Cliente / Proveedor<input id="financeAccountParty" required></label>
-      <label>Monto total<input id="financeAccountAmount" type="number" min="0.01" step="0.01" required></label>
-      <label>Fecha de vencimiento<input id="financeAccountDue" type="date" required></label>
-      <label>Estado
-        <select id="financeAccountStatus">
-          <option value="pending">Pendiente</option>
-          <option value="partial">Pago parcial</option>
-          <option value="paid">Pagada</option>
-        </select>
-      </label>
-      <label>Monto pagado<input id="financeAccountPaid" type="number" min="0" step="0.01" value="0"></label>
-      <label>Método
-        <select id="financeAccountMethod">
-          <option value="cash">Efectivo</option>
-          <option value="transfer">Transferencia</option>
-          <option value="card">Tarjeta</option>
-          <option value="other">Otro</option>
-        </select>
-      </label>
-      <label>Referencia<input id="financeAccountReference" placeholder="Factura, comprobante..."></label>
-      <label class="wide">Descripción<textarea id="financeAccountDescription" required></textarea></label>
-      <div class="wide">
-        <button class="primary">Guardar cuenta</button>
-        <button type="button" class="dark" id="clearFinanceAccount">Limpiar</button>
-      </div>
-    </form>
-
-    <section class="panel">
-      <div class="panelTitle">
-        <h3>Cuentas pendientes</h3>
-        <select id="financeAccountFilter">
-          <option value="all">Todas</option>
-          <option value="receivable">Por cobrar</option>
-          <option value="payable">Por pagar</option>
-          <option value="overdue">Vencidas</option>
-          <option value="paid">Pagadas</option>
-        </select>
-      </div>
-      <div class="tableWrap">
-        <table class="dataTable">
-          <thead>
-            <tr><th>Vence</th><th>Tipo</th><th>Cliente / Proveedor</th><th>Descripción</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th></th></tr>
-          </thead>
-          <tbody id="financeAccountsBody"></tbody>
-        </table>
-      </div>
-    </section>
-  </div>
-</section>
-
-<section id="tab-customers" class="tab hidden">
-  <div class="tablesHeader customersFocusHeader">
-    <div class="customersHeaderIntro">
-      <img src="media/logo.png" alt="Mordisco Fast Food" class="customersFocusLogo">
+    <div class="category-marquee" aria-hidden="true">
       <div>
-        <span class="eyebrow">MORDISCO OS</span>
-        <h2>Base de clientes</h2>
-        <p>Información, historial y fidelización.</p>
+        <span>HAMBURGUESAS</span><i>✦</i><span>SÁNDWICHES</span><i>✦</i>
+        <span>PAPAS</span><i>✦</i><span>BEBIDAS</span><i>✦</i><span>COMBOS</span><i>✦</i>
+        <span>HAMBURGUESAS</span><i>✦</i><span>SÁNDWICHES</span><i>✦</i>
+        <span>PAPAS</span><i>✦</i><span>BEBIDAS</span><i>✦</i><span>COMBOS</span>
       </div>
     </div>
-    <div class="customersHeaderRight">
-      <div class="tablesStats">
-      <div><span>Clientes</span><strong id="customerCount">0</strong></div>
-      <div><span>Frecuentes</span><strong id="frequentCount">0</strong></div>
-      <div><span>VIP</span><strong id="vipCount">0</strong></div>
-      </div>
-      <button id="exitCustomersFocusBtn" class="customersExitBtn" type="button">
-        ← Volver al panel
-      </button>
-    </div>
-  </div>
-  <div class="dashboardGrid customersGrid">
-    <form id="customerFormAdmin" class="panel formGrid">
-      <input type="hidden" id="customerIdAdmin">
-      <h3 class="wide">Agregar o editar cliente</h3>
-      <label>Nombre<input id="customerFullName" required></label>
-      <label>Teléfono / WhatsApp<input id="customerPhoneAdmin" required></label>
-      <label>Correo<input id="customerEmailAdmin" type="email"></label>
-      <label>Cumpleaños<input id="customerBirthday" type="date"></label>
-      <label class="wide">Dirección<textarea id="customerAddressAdmin"></textarea></label>
-      <label>Clasificación<select id="customerTier"><option value="new">Nuevo</option><option value="frequent">Frecuente</option><option value="vip">VIP</option></select></label>
-      <label>Puntos<input id="customerPoints" type="number" min="0" value="0"></label>
-      <label class="wide">Notas<textarea id="customerNotesAdmin"></textarea></label>
-      <label class="check"><input id="customerActiveAdmin" type="checkbox" checked> Activo</label>
-      <div class="wide customerFormActions"><button class="primary">Guardar cliente</button><button type="button" class="dark" id="clearCustomerAdmin">Limpiar formulario</button></div>
-    </form>
-    <section class="panel">
-      <div class="panelTitle"><h3>Clientes registrados</h3><input id="customerAdminSearch" placeholder="Buscar nombre, teléfono o correo"></div>
-      <div id="customerAdminList" class="customerAdminList"></div>
-    </section>
-  </div>
-</section>
 
-<section id="tab-promotions" class="tab hidden">
-  <div class="tablesHeader"><div><h2>Promociones</h2><p>Crea campañas visibles en la web.</p></div></div>
-  <div class="dashboardGrid">
-    <form id="promotionForm" class="panel formGrid">
-      <input type="hidden" id="promotionId">
-      <h3 class="wide">Crear promoción</h3>
-      <label>Título<input id="promotionTitle" required></label>
-      <label>Etiqueta<input id="promotionBadge" placeholder="2x1, Nuevo, Oferta"></label>
-      <label class="wide">Descripción<textarea id="promotionDescription" required></textarea></label>
-      <label>Precio promocional<input id="promotionPrice" type="number" min="0" step="0.01"></label>
-      <input id="promotionImage" type="hidden">
-      <label class="promotionImagePicker">Subir imagen desde la computadora
-        <input id="promotionImageFile" type="file" accept="image/png,image/jpeg,image/webp">
-        <small>PNG, JPG o WEBP. Máximo 5 MB.</small>
-      </label>
-      <div class="promotionPreview">
-        <img id="promotionPreviewImage" class="hidden" alt="Vista previa de la promoción">
-        <span id="promotionNoImage">Sin imagen seleccionada</span>
-      </div>
-      <label>Inicio<input id="promotionStart" type="date"></label>
-      <label>Final<input id="promotionEnd" type="date"></label>
-      <label>Enlace<input id="promotionLink" placeholder="/pagina/combo-del-mes"></label>
-      <label>Orden<input id="promotionSort" type="number" value="0"></label>
-      <label class="check"><input id="promotionFeatured" type="checkbox"> Destacada en inicio</label>
-      <label class="check"><input id="promotionActive" type="checkbox" checked> Publicada</label>
-      <div class="wide"><button class="primary" id="savePromotionBtn">Guardar promoción</button><button type="button" class="dark" id="clearPromotion">Limpiar</button><button type="button" class="danger hidden" id="removePromotionImage">Quitar imagen</button></div>
-    </form>
-    <section class="panel"><h3>Promociones creadas</h3><div id="adminPromotionList" class="adminList"></div></section>
-  </div>
-</section>
-
-<section id="tab-pages" class="tab hidden">
-  <div class="tablesHeader"><div><h2>Subpáginas</h2><p>Crea páginas para campañas, eventos, información y promociones.</p></div></div>
-  <div class="dashboardGrid">
-    <form id="pageForm" class="panel formGrid">
-      <input type="hidden" id="pageId">
-      <h3 class="wide">Editor de página</h3>
-      <label>Título<input id="pageTitle" required></label>
-      <label>Dirección URL<input id="pageSlug" required placeholder="combo-del-mes"></label>
-      <label class="wide">Resumen<textarea id="pageSummary"></textarea></label>
-      <label class="wide">Imagen principal URL<input id="pageHeroImage" placeholder="https://...">
-<div class="page-upload-box">
-  <input id="pageImageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
-  <button id="pageImageSelectBtn" class="secondary" type="button">📁 Elegir imagen desde la computadora</button>
-  <button id="pageImageUploadBtn" class="secondary" type="button" disabled>⬆️ Subir imagen</button>
-  <span id="pageImageUploadStatus" class="page-upload-status">Ningún archivo seleccionado</span>
-  <img id="pageImagePreview" class="page-image-preview" alt="Vista previa de la imagen" hidden>
-</div></label>
-      <label class="wide">Contenido<textarea id="pageContent" rows="12" required placeholder="Escribe el contenido de la página..."></textarea></label>
-      <label>Texto del botón<input id="pageButtonText" placeholder="Pedir ahora"></label>
-      <label>Enlace del botón<input id="pageButtonLink" placeholder="/app"></label>
-      <label>Orden<input id="pageSort" type="number" value="0"></label>
-      <label class="check"><input id="pageShowMenu" type="checkbox"> Mostrar en navegación</label>
-      <label class="check"><input id="pagePublished" type="checkbox" checked> Publicada</label>
-      <div class="wide"><button class="primary">Guardar página</button><button type="button" class="dark" id="clearPage">Limpiar</button></div>
-    </form>
-    <section class="panel"><h3>Páginas creadas</h3><div id="adminPageList" class="adminList"></div></section>
-  </div>
-</section>
-
-<section id="tab-staff" class="tab hidden">
-      <div class="staffHeader">
-        <div>
-          <h2>Personal</h2>
-          <p>Crea meseros, cajeros y personal de cocina para organizar las operaciones.</p>
-        </div>
-        <div class="staffStats">
-          <div><span>Activos</span><strong id="staffActiveCount">0</strong></div>
-          <div><span>Meseros</span><strong id="staffWaiterCount">0</strong></div>
-          <div><span>Cajeros</span><strong id="staffCashierCount">0</strong></div>
-        </div>
+    <section class="menu-section section" id="menu">
+      <div class="section-heading reveal">
+        <div class="eyebrow dark"><span></span>NUESTRO MENÚ</div>
+        <h2>Elige tu próximo Mordisco</h2>
+        <p>Productos preparados al momento, con sabor intenso y calidad que se nota.</p>
       </div>
 
-      <div class="staffLayout">
-        <form id="staffForm" class="panel formGrid staffForm" autocomplete="off">
-          <input id="staffId" type="hidden">
-          <h3 class="wide">Registrar empleado</h3>
-          <label class="wide">Nombre completo
-            <input id="staffName" required placeholder="Ej. Carlos Mendoza">
-          </label>
-          <label>Rol
-            <select id="staffRole">
-              <option value="waiter">Mesero</option>
-              <option value="cashier">Cajero</option>
-              <option value="kitchen">Cocina</option>
-            </select>
-          </label>
-          <label>Teléfono
-            <input id="staffPhone" name="employee_phone_number" type="tel" inputmode="tel" autocomplete="off" placeholder="Ej. 0991234567">
-          </label>
-          <label class="wide">PIN de acceso
-            <input id="staffPin" name="employee_access_pin" autocomplete="new-password" type="password" inputmode="numeric" maxlength="6" placeholder="4 a 6 números">
-          </label>
-          <label class="check wide">
-            <input id="staffActive" type="checkbox" checked> Empleado activo
-          </label>
+      <div class="category-pills reveal" id="category-filters">
+        <button class="active" data-category="all">Todos</button>
+        <button data-category="hamburguesas">Hamburguesas</button>
+        <button data-category="combos">Combos</button>
+        <button data-category="papas">Papas</button>
+        <button data-category="bebidas">Bebidas</button>
+      </div>
 
-          <fieldset class="wide staffPermissionsBox">
-            <legend>Permisos del empleado</legend>
-            <p>Selecciona únicamente las funciones que podrá utilizar.</p>
-            <div class="staffPermissionGrid">
-              <label class="check"><input type="checkbox" name="staffPermission" value="pos"> POS / Caja</label>
-              <label class="check"><input type="checkbox" name="staffPermission" value="kitchen"> Cocina</label>
-              <label class="check"><input type="checkbox" name="staffPermission" value="orders"> Pedidos web</label>
-              <label class="check"><input type="checkbox" name="staffPermission" value="tables"> Mesas</label>
-              <label class="check"><input type="checkbox" name="staffPermission" value="shifts"> Turnos</label>
-              <label class="check"><input type="checkbox" name="staffPermission" value="customers"> Clientes</label>
-            </div>
-            <small>Meseros siempre entran a Comandas. El administrador conserva acceso completo.</small>
-          </fieldset>
+      <div class="products-grid" id="featured-products">
+        <article class="product-card loading">
+          <div class="product-image skeleton"></div>
+          <div class="product-body"><div class="line"></div><div class="line short"></div></div>
+        </article>
+      </div>
 
-          <div class="wide formActions">
-            <button class="primary">Guardar empleado</button>
-            <button type="button" class="dark" id="clearStaff">Limpiar</button>
-          </div>
-          <p class="wide helperText">El PIN se guarda cifrado en Supabase. Al editar, déjalo vacío para conservar el PIN actual.</p>
-        </form>
-
-        <section class="panel staffListPanel">
-          <div class="panelToolbar">
-            <div>
-              <h3>Empleados registrados</h3>
-              <small>Administra roles y disponibilidad.</small>
-            </div>
-            <div class="staffFilters">
-              <div class="staffSearchBox"><input id="staffSearch" name="employee_directory_search" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Buscar empleado..."><button type="button" id="clearStaffSearch" class="dark">Limpiar</button></div>
-              <select id="staffRoleFilter">
-                <option value="all">Todos los roles</option>
-                <option value="waiter">Meseros</option>
-                <option value="cashier">Cajeros</option>
-                <option value="kitchen">Cocina</option>
-              </select>
-            </div>
-          </div>
-          <div id="staffList" class="staffList"></div>
-        </section>
+      <div class="section-action reveal">
+        <a class="btn btn-primary btn-xl" href="/pedir">Ver menú completo</a>
       </div>
     </section>
 
-   
-<section id="tab-extras" class="tab hidden">
-  <div class="dashboardGrid extrasGrid">
-    <form id="extraOptionForm" class="panel formGrid">
-      <input type="hidden" id="extraOptionId">
-      <h3 class="wide">Crear extra o empaque</h3>
-
-      <label>Nombre
-        <input id="extraOptionName" required placeholder="Ej. Extra queso">
-      </label>
-
-      <label>Tipo
-        <select id="extraOptionType">
-          <option value="extra">Extra de producto</option>
-          <option value="packaging">Empaque especial</option>
-        </select>
-      </label>
-
-      <label>Precio adicional
-        <input id="extraOptionPrice" type="number" min="0" step="0.01" required>
-      </label>
-
-      <label>Categoría
-        <select id="extraOptionCategory">
-          <option value="">Todas las categorías</option>
-        </select>
-      </label>
-
-      <label class="wide">Descripción
-        <textarea id="extraOptionDescription" placeholder="Ej. Queso cheddar adicional"></textarea>
-      </label>
-
-      <label>Orden
-        <input id="extraOptionOrder" type="number" min="0" value="0">
-      </label>
-
-      <label class="check">
-        <input id="extraOptionActive" type="checkbox" checked>
-        Disponible para clientes
-      </label>
-
-      <label class="check">
-        <input id="extraOptionFeatured" type="checkbox">
-        Destacado
-      </label>
-
-      <div class="wide">
-        <button class="primary">Guardar opción</button>
-        <button type="button" class="dark" id="clearExtraOption">Limpiar</button>
-      </div>
-    </form>
-
-    <section class="panel">
-      <div class="panelTitle">
-        <div>
-          <h3>Extras y empaques disponibles</h3>
-          <small>Estas opciones aparecerán automáticamente en Pedir en línea.</small>
+    <section class="promo-section section" id="promos">
+      <div class="promo-card reveal">
+        <div class="promo-content">
+          <div class="eyebrow"><span></span>OFERTA DE LA CASA</div>
+          <h2>El combo que<br><strong>no perdona.</strong></h2>
+          <p>Hamburguesa, papas y bebida. Todo lo que necesitas para matar el antojo.</p>
+          <a class="btn btn-light btn-xl" href="/promociones">Ver promociones</a>
+        </div>
+        <div class="promo-visual">
+          <div class="promo-number">20%</div>
+          <img src="/media/hamburguesa.png" alt="Combo promocional Mordisco">
         </div>
       </div>
-      <div id="extraOptionsList" class="extraOptionsList"></div>
     </section>
-  </div>
-</section>
 
-<section id="tab-settings" class="tab hidden">
-
-<section class="panel passwordPanel">
-  <div class="panelTitle">
-    <div>
-      <h3>Seguridad de mi cuenta</h3>
-      <small>Cambia tu contraseña sin enviar correos.</small>
-    </div>
-  </div>
-  <form id="changeAdminPasswordForm" class="formGrid">
-    <label>Nueva contraseña
-      <input id="newAdminPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Mínimo 8 caracteres" required>
-    </label>
-    <label>Confirmar contraseña
-      <input id="confirmAdminPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Repite la contraseña" required>
-    </label>
-    <div class="wide">
-      <button id="changeAdminPasswordButton" class="primary" type="submit">Cambiar mi contraseña</button>
-    </div>
-  </form>
-</section>
-
-  <div class="dashboardGrid settingsGrid">
-    <form id="settingsForm" class="panel formGrid">
-      <h3 class="wide">Información del negocio</h3>
-      <label>Nombre<input id="sName"></label>
-      <label>WhatsApp<input id="sWhatsapp" placeholder="593999999999"></label>
-      <label class="wide">Descripción<textarea id="sDescription"></textarea></label>
-      <label>Dirección<input id="sAddress"></label>
-      <label>Resumen del horario<input id="sSchedule" placeholder="Se genera automáticamente"></label>
-      <label>Costo delivery<input id="sDelivery" type="number" min="0" step="0.01"></label>
-      <label>Pedido mínimo<input id="sMinimum" type="number" min="0" step="0.01"></label>
-      <label class="check"><input id="sAccepting" type="checkbox"> Recibir pedidos</label>
-      <div class="wide"><button class="primary">Guardar cambios</button></div>
-    </form>
-
-    <section class="panel">
-      <div class="panelTitle">
-        <div><h3>Horarios de atención</h3><small>Configura cada día de la semana.</small></div>
-        <button class="primary" type="button" id="saveBusinessHours">Guardar horarios</button>
+    <section class="experience-section" id="nosotros">
+      <div class="experience-photo reveal">
+        <img src="/media/hamburguesa.png" alt="Hamburguesa artesanal Mordisco">
+        <span class="stamp">HECHO<br>AL MOMENTO</span>
       </div>
-      <div id="businessHoursEditor" class="businessHoursEditor"></div>
+      <div class="experience-copy reveal">
+        <div class="eyebrow dark"><span></span>LA EXPERIENCIA MORDISCO</div>
+        <h2>No es comida rápida.<br>Es un antojo serio.</h2>
+        <p>Carne jugosa, queso derretido, ingredientes frescos y combinaciones diseñadas para que cada mordisco se sienta.</p>
+        <div class="experience-list">
+          <div><span>01</span><p><b>Ingredientes frescos</b><small>Seleccionados para cada preparación.</small></p></div>
+          <div><span>02</span><p><b>Preparado al momento</b><small>Porque el sabor no se recalienta.</small></p></div>
+          <div><span>03</span><p><b>Pedido sin complicaciones</b><small>Desde el celular, rápido y directo.</small></p></div>
+        </div>
+      </div>
     </section>
-  </div>
-</section>
- </div>
-</section>
 
-<div id="loginModal" class="modal adminLoginVisible"><div class="modalCard loginCard"><button class="close" data-close="loginModal">×</button><img src="media/logo.png" alt="Mordisco"><span class="eyebrow">MORDISCO OS</span><h2>Acceso de administrador</h2><p>Ingresa con tu correo y contraseña de administración.</p><div style="display:grid;gap:10px;margin-top:18px">
-<a href="/acceso-admin" class="primary" style="display:block;text-align:center;text-decoration:none;padding:14px;border-radius:11px">Abrir acceso seguro</a>
-<small style="display:block;text-align:center;color:#666;line-height:1.4">Podrás entrar con contraseña, enlace por Gmail o crear una contraseña nueva.</small>
-</div></div></div>
-
-<div id="cartDrawer" class="drawer"><div class="drawerHead"><h2>Tu pedido</h2><button id="closeCart">×</button></div><div id="cartItems"></div><div class="totals"><p><span>Subtotal</span><b id="subtotal">$0.00</b></p><p><span>Delivery</span><b id="deliveryTotal">$0.00</b></p><p class="grand"><span>Total</span><b id="grandTotal">$0.00</b></p></div><form id="orderForm"><input id="customerName" placeholder="Nombre" required><input id="customerPhone" placeholder="Teléfono" required><select id="orderType"><option value="delivery">Delivery</option><option value="pickup">Retiro</option><option value="local">En el local</option></select><input id="customerAddress" placeholder="Dirección de entrega"><select id="paymentMethod"><option value="cash">Efectivo</option><option value="transfer">Transferencia</option><option value="card">Tarjeta</option></select><textarea id="orderNotes" placeholder="Notas del pedido"></textarea><button class="primary">Confirmar pedido</button></form></div>
-
-
-<div id="chargeOrderModal" class="modal hidden">
-  <div class="modalCard chargeOrderCard">
-    <button class="close" data-close="chargeOrderModal">×</button>
-    <span class="eyebrow">COBRO DE VENTA</span>
-    <h2 id="chargeOrderTitle">Cobrar pedido</h2>
-
-    <div class="chargeSummary">
-      <div><span>Subtotal</span><b id="chargeSubtotal">$0.00</b></div>
-      <div><span>Descuento</span><b id="chargeDiscountAmount">− $0.00</b></div>
-      <div class="chargeOrderTotal"><span>Total final</span><strong id="chargeOrderTotal">$0.00</strong></div>
-    </div>
-
-    <div class="discountControls">
-      <label>Tipo de descuento
-        <select id="chargeDiscountType">
-          <option value="none">Sin descuento</option>
-          <option value="percent">Porcentaje (%)</option>
-          <option value="fixed">Valor fijo ($)</option>
-        </select>
-      </label>
-      <label>Valor del descuento
-        <input id="chargeDiscountValue" type="number" min="0" step="0.01" value="0" disabled>
-      </label>
-    </div>
-
-    <label>Método de pago
-      <select id="chargePaymentMethod">
-        <option value="cash">Efectivo</option>
-        <option value="card">Tarjeta</option>
-        <option value="transfer">Transferencia bancaria</option>
-        <option value="deuna">DeUna</option>
-        <option value="ahorita">Ahorita</option>
-      </select>
-    </label>
-
-    <label id="chargeReceivedWrap">Efectivo recibido
-      <input id="chargeReceived" type="number" min="0" step="0.01" value="0">
-    </label>
-    <div class="chargeChange"><span>Cambio</span><strong id="chargeChange">$0.00</strong></div>
-    <div id="chargeOperationStatus" class="chargeOperationStatus hidden" role="status"></div>
-    <button class="primary full" id="confirmChargeOrder">Confirmar cobro</button>
-  </div>
-</div>
-
-
-  <div id="quickCheckoutModal" class="modal hidden">
-    <div class="modalCard quickCheckoutCard">
-      <button class="close" id="quickCheckoutClose" type="button">×</button>
-      <span class="eyebrow">COBRO RÁPIDO</span>
-      <h2 id="quickCheckoutTitle">Cobrar venta</h2>
-
-      <div class="quickCheckoutSummary">
-        <span>Total a cobrar</span>
-        <strong id="quickCheckoutAmount">$0,00</strong>
+    <section class="reviews-section section">
+      <div class="section-heading reveal">
+        <div class="eyebrow dark"><span></span>LO QUE DICEN</div>
+        <h2>Clientes con ganas de volver</h2>
       </div>
-
-      <div class="quickCheckoutGrid">
-        <label>Tipo de descuento
-          <select id="quickDiscountType">
-            <option value="none">Sin descuento</option>
-            <option value="percent">Porcentaje</option>
-            <option value="fixed">Valor fijo</option>
-          </select>
-        </label>
-
-        <label>Valor
-          <input id="quickDiscountValue" type="number" min="0" step="0.01" value="0">
-        </label>
+      <div class="reviews-grid">
+        <article class="review reveal">
+          <div class="stars">★★★★★</div>
+          <p>“La hamburguesa llegó caliente, grande y con muchísimo sabor. Se volvió mi favorita.”</p>
+          <b>— Cliente Mordisco</b>
+        </article>
+        <article class="review reveal">
+          <div class="stars">★★★★★</div>
+          <p>“El pedido en línea fue rápido y sencillo. Las papas estaban perfectas.”</p>
+          <b>— Cliente frecuente</b>
+        </article>
+        <article class="review reveal">
+          <div class="stars">★★★★★</div>
+          <p>“Se siente artesanal y la presentación está al nivel de una cadena grande.”</p>
+          <b>— Fan del sabor</b>
+        </article>
       </div>
+    </section>
 
-      <div class="quickDiscountButtons">
-        <button type="button" data-quick-discount="5">5%</button>
-        <button type="button" data-quick-discount="10">10%</button>
-        <button type="button" data-quick-discount="15">15%</button>
-        <button type="button" data-quick-discount="20">20%</button>
-      </div>
 
-      <label>Método de pago
-        <div class="quickPaymentMethods">
-          <button type="button" data-quick-payment="cash" class="active">Efectivo</button>
-          <button type="button" data-quick-payment="card">Tarjeta</button>
-          <button type="button" data-quick-payment="deuna">De una</button>
-          <button type="button" data-quick-payment="ahorita">Ahorita</button>
-        </div>
-      </label>
-
-      <div id="quickCashFields" class="quickCashFields">
-        <label>Recibido
-          <input id="quickCashReceived" type="number" min="0" step="0.01" value="0">
-        </label>
-        <div class="quickChangeBox">
-          <span>Cambio</span>
-          <strong id="quickCashChange">$0,00</strong>
+    <section class="club-public-section" id="club-mordisco">
+      <div class="club-public-copy reveal">
+        <span class="club-new-badge">🔥 NUEVO</span>
+        <div class="eyebrow"><span></span>CLUB MORDISCO</div>
+        <h2>Compra. Acumula.<br><strong>Gana comida gratis.</strong></h2>
+        <p>Usa el mismo número de teléfono en tus pedidos, acumula puntos y desbloquea recompensas.</p>
+        <a class="club-public-button" href="/recompensas">
+          <span>🎁</span>
+          <div><small>ABRIR AHORA</small><b>Mi tarjeta de recompensas</b></div>
+          <strong>→</strong>
+        </a>
+        <div class="club-public-benefits">
+          <span>⭐ 1 punto por dólar</span>
+          <span>🍔 Premios gratis</span>
+          <span>📱 Sin instalar aplicaciones</span>
         </div>
       </div>
 
-      <button id="confirmQuickCheckoutBtn" class="primary full quickConfirmBtn" type="button">
-        Confirmar cobro
-      </button>
-    </div>
-  </div>
-
-<div id="receiptModal" class="modal hidden">
-  <div class="modalCard receiptModalCard">
-    <button class="close" id="receiptCloseBtn" type="button" aria-label="Cerrar comprobante">×</button>
-    <div id="receiptContent" class="receiptPaper"></div>
-    <div class="receiptActions">
-      <button class="dark" id="printReceipt">Imprimir comprobante</button>
-      <button class="primary" id="receiptNewSaleBtn" type="button">Nueva venta</button>
-    </div>
-  </div>
-</div>
-
-
-<div id="employeeLoginModal" class="modal hidden">
-  <div class="modalCard employeeLoginCard">
-    <button class="close" data-close="employeeLoginModal">×</button>
-    <div class="employeeLoginLogo"><img src="mordisco-logo.png" alt="Mordisco"></div>
-    <span class="eyebrow">ACCESO DEL PERSONAL</span>
-    <h2>Ingresa con tu PIN</h2>
-    <label>Empleado<select id="employeeLoginStaff"></select></label>
-    <label>PIN<input id="employeeLoginPin" type="password" inputmode="numeric" maxlength="6" placeholder="4 a 6 números"></label>
-    <button class="primary full" id="employeeLoginSubmit">Entrar</button>
-  </div>
-</div>
-
-
-  <div id="tableManageModal" class="modal hidden">
-    <div class="modalCard tableManageCard">
-      <button class="close" type="button" data-close="tableManageModal">×</button>
-      <span class="eyebrow">CONTROL DEL ADMINISTRADOR</span>
-      <h2>Editar espacio</h2>
-      <input id="editTableId" type="hidden">
-
-      <label>Tipo de espacio
-        <select id="editTableType">
-          <option value="table">Mesa</option>
-          <option value="bar">Barra</option>
-        </select>
-      </label>
-
-      <label>Nombre
-        <input id="editTableName" placeholder="Ej. Mesa 1">
-      </label>
-
-      <label>Puestos
-        <input id="editTableSeats" type="number" min="1" value="4">
-      </label>
-
-      <div class="tableManageActions">
-        <button id="saveTableChangesBtn" class="primary" type="button">Guardar cambios</button>
-        <button id="deleteTableBtn" class="danger" type="button">Eliminar espacio</button>
-        <button class="ghost" type="button" data-close="tableManageModal">Cancelar</button>
-      </div>
-
-      <p id="tableManageMessage" class="muted"></p>
-    </div>
-  </div>
-
-<div id="tableOrderModal" class="modal hidden">
-  <div class="modalCard tableOrderCard">
-    <button class="close" data-close="tableOrderModal">×</button>
-    <div class="tableOrderHead">
-      <div><span class="eyebrow">COMANDA</span><h2 id="tableOrderTitle">Mesa</h2></div>
-      <span id="tableOrderStatus" class="statusBadge">Libre</span>
-    </div>
-    <div class="tableOrderLayout">
-      <section class="tableCatalog">
-        <div class="tableCatalogToolbar">
-          <input id="tableProductSearch" placeholder="Buscar producto...">
-          <select id="tableCategory"><option value="all">Todas las categorías</option></select>
+      <div class="club-public-card reveal">
+        <div class="club-card-top">
+          <span>CLUB MORDISCO</span>
+          <img src="/mordisco-logo.png" alt="">
         </div>
-        <div id="tableProducts" class="posProductGrid"></div>
-      </section>
-      <aside class="tableTicket">
-        <div id="tableCart" class="posCart"></div>
-        <label>Cliente<input id="tableCustomer" placeholder="Opcional"></label>
-        <label>Notas<textarea id="tableNotes" placeholder="Indicaciones para cocina"></textarea></label>
-        <div class="posTotals"><div><span>Total</span><strong id="tableTotal">$0.00</strong></div></div>
-        <button class="primary full" id="sendTableOrder">Enviar a cocina</button>
-        <button class="dark full" id="markTablePayment">Marcar por cobrar</button>
-        <button class="success full" id="freeTable">Liberar mesa</button>
-        <button class="tableCloseBottom full" id="closeTableOrderBottom" type="button">Cerrar ventana</button>
-      </aside>
+        <small>TARJETA DIGITAL</small>
+        <h3>CLIENTE MORDISCO</h3>
+        <div class="club-card-points"><b>120</b><span>ORO</span></div>
+        <div class="club-card-progress"><i></i></div>
+        <p>Tu próxima recompensa está cerca.</p>
+      </div>
+    </section>
+
+    <section class="order-cta" id="contacto">
+      <div class="cta-content reveal">
+        <div class="eyebrow"><span></span>¿LISTO PARA MORDER?</div>
+        <h2>Tu próxima hamburguesa está a un clic.</h2>
+        <p>Haz tu pedido ahora y nosotros nos encargamos del resto.</p>
+      </div>
+      <a class="btn btn-light btn-xl reveal" href="/pedir">Pedir ahora →</a>
+    </section>
+  </main>
+
+  <a class="whatsapp-button" href="https://wa.me/593999999999" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp">✆</a>
+
+
+  <a class="mobile-admin-access" href="/admin" aria-label="Acceso de administrador">⚙ Admin</a>
+
+  <footer>
+    <div class="footer-brand">
+      <div class="brand">
+        <img src="/mordisco-logo.png" alt="Mordisco">
+        <span><strong>MORDISCO</strong><small>FAST FOOD</small></span>
+      </div>
+      <p>El sabor que te hace volver.</p>
     </div>
-  </div>
-</div>
+    <div class="footer-links">
+      <a href="#menu">Menú</a>
+      <a href="/promociones">Promociones</a>
+      <a href="/pedir">Pedir ahora</a>
+      <a href="/admin">Administración</a>
+    </div>
+    <p class="copyright">© 2026 Mordisco Fast Food.</p>
+  </footer>
 
-
-<div id="shiftPinModal" class="modal hidden">
-  <div class="modalCard employeeLoginCard">
-    <button class="close" data-close="shiftPinModal">×</button>
-    <span class="eyebrow">CONTROL DE TURNO</span>
-    <h2 id="shiftPinTitle">Confirmar PIN</h2>
-    <p id="shiftPinHelp">Ingresa tu PIN para continuar.</p>
-    <label>PIN<input id="shiftPinInput" type="password" inputmode="numeric" maxlength="6" placeholder="4 a 6 números"></label>
-    <label id="openingCashLabel">Efectivo inicial<input id="openingCashInput" type="number" min="0" step="0.01" value="0"></label>
-    <label id="closingCashLabel" class="hidden">Efectivo contado<input id="closingCashInput" type="number" min="0" step="0.01" value="0"></label>
-    <button class="primary full" id="shiftPinConfirm">Confirmar</button>
-  </div>
-</div>
-<div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=v21-single-exit"></script>
-
-
-
-<div id="v18VersionMarker">Mordisco OS V20</div>
-</body></html>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/public-site.js?v=21.0.0"></script>
+</body>
+</html>
