@@ -5,9 +5,154 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=stable-cash-accounting-1">
+<link rel="stylesheet" href="/admin-v18.css?v=pos-clean-review-1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
+
+<style id="mordiscoPosCleanReviewStyles">
+/* Solo administrador/POS: la web pública conserva sus imágenes */
+#posProducts,
+#tableProducts{
+  grid-template-columns:repeat(auto-fill,minmax(145px,1fr))!important;
+  gap:8px!important;
+}
+#posProducts .posProductTextOnly,
+#tableProducts .posProductTextOnly{
+  min-height:82px!important;
+  height:auto!important;
+  padding:12px!important;
+  display:flex!important;
+  align-items:stretch!important;
+  text-align:left!important;
+  border:1px solid #e0d4c2!important;
+  border-radius:12px!important;
+  background:#fff!important;
+  box-shadow:none!important;
+}
+#posProducts .posProductTextOnly .posProductInfo,
+#tableProducts .posProductTextOnly .posProductInfo{
+  width:100%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:4px!important;
+  justify-content:center!important;
+  padding:0!important;
+}
+#posProducts .posProductTextOnly small,
+#tableProducts .posProductTextOnly small{
+  color:#8a7d6b!important;
+  font-size:.65rem!important;
+}
+#posProducts .posProductTextOnly b,
+#tableProducts .posProductTextOnly b{
+  font-size:.82rem!important;
+  line-height:1.12!important;
+}
+#posProducts .posProductTextOnly strong,
+#tableProducts .posProductTextOnly strong{
+  margin-top:auto!important;
+  font-size:1rem!important;
+  color:#17130f!important;
+}
+
+/* Revisión antes de Cocina */
+.posReviewCard{max-width:650px!important}
+.posReviewHelp{margin:-4px 0 16px;color:#70665a}
+.posReviewItems{
+  display:grid;gap:7px;max-height:280px;overflow:auto;
+  border-top:1px solid #e5d9c8;border-bottom:1px solid #e5d9c8;
+  padding:10px 0
+}
+.posReviewItem{
+  display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;
+  align-items:center;padding:8px 4px
+}
+.posReviewItem div{display:flex;flex-direction:column;gap:2px}
+.posReviewItem small{color:#817668}
+.posReviewMeta{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0
+}
+.posReviewMeta>div{
+  padding:10px;border-radius:10px;background:#f5f0e7;
+  display:flex;flex-direction:column;gap:3px
+}
+.posReviewMeta .wide{grid-column:1/-1}
+.posReviewMeta span{font-size:.68rem;color:#756a5d}
+.posReviewGrand{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:13px 15px;border-radius:12px;background:#17130f;color:#fff
+}
+.posReviewGrand strong{font-size:1.65rem;color:#ffc400}
+.posReviewActions{display:grid;grid-template-columns:1fr 1.2fr;gap:8px;margin-top:12px}
+.posReviewActions button{min-height:48px!important;border-radius:11px!important}
+
+/* Cobro: misma lógica, diseño más simple */
+#chargeOrderModal .chargeOrderCard{
+  width:min(94vw,520px)!important;
+  max-width:520px!important;
+  padding:24px!important;
+  border-radius:22px!important;
+}
+#chargeOrderModal .chargeSummary{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:8px!important;
+  margin:14px 0!important;
+}
+#chargeOrderModal .chargeSummary>div{
+  padding:10px 12px!important;
+  border-radius:11px!important;
+  background:#f5f0e7!important;
+}
+#chargeOrderModal .chargeOrderTotal{
+  grid-column:1/-1!important;
+  background:#17130f!important;
+  color:#fff!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+}
+#chargeOrderModal .chargeOrderTotal strong{
+  color:#ffc400!important;
+  font-size:2rem!important;
+}
+#chargeOrderModal .discountControls{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:8px!important;
+}
+#chargeOrderModal label{
+  font-size:.78rem!important;
+  font-weight:850!important;
+}
+#chargeOrderModal select,
+#chargeOrderModal input{
+  min-height:44px!important;
+  border-radius:10px!important;
+  border:1px solid #d7c8b3!important;
+  background:#fff!important;
+}
+#chargeOrderModal #confirmChargeOrder{
+  min-height:52px!important;
+  margin-top:12px!important;
+  border-radius:12px!important;
+  font-size:1rem!important;
+  background:#ffc400!important;
+  color:#17130f!important;
+}
+#chargeOrderModal .chargeChange{
+  padding:10px 12px!important;
+  border-radius:10px!important;
+  background:#eef8ef!important;
+}
+@media(max-width:620px){
+  .posReviewMeta{grid-template-columns:1fr}
+  .posReviewMeta .wide{grid-column:auto}
+  .posReviewActions{grid-template-columns:1fr}
+  #chargeOrderModal .discountControls{grid-template-columns:1fr}
+}
+</style>
+
 </head>
 <body>
 <header class="topbar hidden">
@@ -953,6 +1098,34 @@
 <div id="cartDrawer" class="drawer"><div class="drawerHead"><h2>Tu pedido</h2><button id="closeCart">×</button></div><div id="cartItems"></div><div class="totals"><p><span>Subtotal</span><b id="subtotal">$0.00</b></p><p><span>Delivery</span><b id="deliveryTotal">$0.00</b></p><p class="grand"><span>Total</span><b id="grandTotal">$0.00</b></p></div><form id="orderForm"><input id="customerName" placeholder="Nombre" required><input id="customerPhone" placeholder="Teléfono" required><select id="orderType"><option value="delivery">Delivery</option><option value="pickup">Retiro</option><option value="local">En el local</option></select><input id="customerAddress" placeholder="Dirección de entrega"><select id="paymentMethod"><option value="cash">Efectivo</option><option value="transfer">Transferencia</option><option value="card">Tarjeta</option></select><textarea id="orderNotes" placeholder="Notas del pedido"></textarea><button class="primary">Confirmar pedido</button></form></div>
 
 
+
+<div id="posReviewModal" class="modal hidden">
+  <div class="modalCard posReviewCard">
+    <button class="close" id="posReviewClose" type="button">×</button>
+    <span class="eyebrow">REVISAR PEDIDO</span>
+    <h2>Confirma antes de enviar a cocina</h2>
+    <p class="posReviewHelp">Si algo está mal, vuelve a la orden y corrígelo antes de enviarlo.</p>
+
+    <div id="posReviewItems" class="posReviewItems"></div>
+
+    <div class="posReviewMeta">
+      <div><span>Cliente</span><b id="posReviewCustomer">Consumidor final</b></div>
+      <div><span>Teléfono</span><b id="posReviewPhone">Sin teléfono</b></div>
+      <div class="wide"><span>Notas</span><b id="posReviewNotes">Sin notas</b></div>
+    </div>
+
+    <div class="posReviewGrand">
+      <span>Total</span>
+      <strong id="posReviewTotal">$0,00</strong>
+    </div>
+
+    <div class="posReviewActions">
+      <button class="dark" id="posReviewBack" type="button">← Volver y corregir</button>
+      <button class="primary" id="posReviewConfirm" type="button">Enviar a cocina</button>
+    </div>
+  </div>
+</div>
+
 <div id="chargeOrderModal" class="modal hidden">
   <div class="modalCard chargeOrderCard">
     <button class="close" data-close="chargeOrderModal">×</button>
@@ -1155,7 +1328,7 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=stable-cash-accounting-1"></script>
+<script src="/admin-v18.js?v=pos-clean-review-1"></script>
 
 
 

@@ -1,0 +1,37 @@
+MORDISCO — POS LIMPIO, REVISIÓN Y COBRO SIMPLE
+
+CAMBIOS
+- POS/Caja muestra productos solo con nombre, categoría y precio.
+- Mesas también muestra productos sin imágenes.
+- La WEB PÚBLICA no se modifica y conserva todas sus fotos.
+- Antes de enviar una venta nueva a Cocina se abre una pantalla de revisión.
+- Desde revisión puedes volver y corregir la orden o enviarla a Cocina.
+- Pedidos creados desde Mesas siguen llegando a Caja como pendientes y allí solo se cobran.
+- El cobro conserva exactamente la lógica estable; solo cambia su presentación visual.
+- La ventana de cobro es más compacta y clara.
+
+NO CAMBIA
+- Supabase
+- Contabilidad
+- Pedidos web
+- WhatsApp
+- Club Mordisco
+- Horarios
+- Web pública
+- Lógica de cobro
+
+INSTALACIÓN
+1. Extrae el ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Simplificar POS y revisar antes de cocina
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Abre:
+   https://mordiscofastfood.com/admin?v=pos-clean-review-1
+9. Ctrl + Shift + R.
+
+NO EJECUTES SQL.

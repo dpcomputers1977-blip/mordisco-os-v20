@@ -1013,9 +1013,12 @@ function getPosProducts(){
 function renderPosProducts(){
   if(!$('#posProducts'))return;
   const list=getPosProducts();
-  $('#posProducts').innerHTML=list.length?list.map(p=>`<button class="posProduct" data-pos-add="${p.id}">
-    ${p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(p.name)}">`:'<div class="posProductNoImage">Sin imagen</div>'}
-    <span class="posProductInfo"><small>${esc(p.categories?.name||'Sin categoría')}</small><b>${esc(p.name)}</b><strong>${money(p.price)}</strong></span>
+  $('#posProducts').innerHTML=list.length?list.map(p=>`<button class="posProduct posProductTextOnly" data-pos-add="${p.id}">
+    <span class="posProductInfo">
+      <small>${esc(p.categories?.name||'Sin categoría')}</small>
+      <b>${esc(p.name)}</b>
+      <strong>${money(p.price)}</strong>
+    </span>
   </button>`).join(''):'<div class="notice">No hay productos disponibles.</div>';
   $$('[data-pos-add]').forEach(b=>b.onclick=()=>addPosItem(b.dataset.posAdd));
 }
@@ -1206,7 +1209,50 @@ $$('[data-pos-discount]').forEach(button=>button.onclick=()=>{
   renderPosCart();
 });
 
-if(document.querySelector('#posCharge'))document.querySelector('#posCharge').onclick=completePosSale;
+
+function renderPosReview(){
+  const totals=posTotals();
+  const items=posCart.map(item=>{
+    const product=products.find(p=>String(p.id)===String(item.id));
+    if(!product)return '';
+    return `<div class="posReviewItem">
+      <div><b>${esc(product.name)}</b><small>${money(product.price)} c/u</small></div>
+      <span>${item.qty} ×</span>
+      <strong>${money(Number(product.price)*item.qty)}</strong>
+    </div>`;
+  }).join('');
+
+  $('#posReviewItems').innerHTML=items||'<div class="notice">No hay productos.</div>';
+  $('#posReviewCustomer').textContent=$('#posCustomer').value.trim()||'Consumidor final';
+  $('#posReviewPhone').textContent=$('#posPhone').value.trim()||'Sin teléfono';
+  $('#posReviewNotes').textContent=$('#posNotes').value.trim()||'Sin notas';
+  $('#posReviewTotal').textContent=money(totals.total);
+}
+
+function openPosReview(){
+  if(!posCart.length)return toast('Agrega al menos un producto');
+  renderPosReview();
+  $('#posReviewModal')?.classList.remove('hidden');
+}
+
+if(document.querySelector('#posCharge'))document.querySelector('#posCharge').onclick=openPosReview;
+$('#posReviewBack')?.addEventListener('click',()=>$('#posReviewModal')?.classList.add('hidden'));
+$('#posReviewClose')?.addEventListener('click',()=>$('#posReviewModal')?.classList.add('hidden'));
+$('#posReviewConfirm')?.addEventListener('click',async()=>{
+  const button=$('#posReviewConfirm');
+  if(!button||button.disabled)return;
+  button.disabled=true;
+  const original=button.textContent;
+  button.textContent='Enviando...';
+  try{
+    await completePosSale();
+    $('#posReviewModal')?.classList.add('hidden');
+  }finally{
+    button.disabled=false;
+    button.textContent=original;
+  }
+});
+
 if(document.querySelector('#printReceipt'))document.querySelector('#printReceipt').onclick=()=>window.print();
 
 
@@ -1792,9 +1838,12 @@ function getTableProducts(){
 }
 function renderTableProducts(){
   const list=getTableProducts();
-  $('#tableProducts').innerHTML=list.map(p=>`<button class="posProduct" data-table-add="${p.id}">
-    ${p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(p.name)}">`:'<div class="posProductNoImage">Sin imagen</div>'}
-    <span class="posProductInfo"><small>${esc(p.categories?.name||'')}</small><b>${esc(p.name)}</b><strong>${money(p.price)}</strong></span>
+  $('#tableProducts').innerHTML=list.map(p=>`<button class="posProduct posProductTextOnly" data-table-add="${p.id}">
+    <span class="posProductInfo">
+      <small>${esc(p.categories?.name||'')}</small>
+      <b>${esc(p.name)}</b>
+      <strong>${money(p.price)}</strong>
+    </span>
   </button>`).join('');
   $$('[data-table-add]').forEach(b=>b.onclick=()=>{const r=tableCart.find(x=>String(x.id)===String(b.dataset.tableAdd));if(r)r.qty++;else tableCart.push({id:b.dataset.tableAdd,qty:1});renderTableCart()});
 }
