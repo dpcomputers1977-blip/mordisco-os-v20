@@ -182,7 +182,9 @@ document.querySelector("#onlineOrderForm").onsubmit=async event=>{
       p_items:selectedItems.map(item=>({
         product_id:item.product_id,
         quantity:item.quantity
-      }))
+      })),
+      p_payment_method:"pending",
+      p_extras:[]
     });
 
     if(error)throw error;

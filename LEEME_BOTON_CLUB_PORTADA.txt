@@ -1,0 +1,32 @@
+MORDISCO — BOTÓN CLUB MORDISCO EN PORTADA
+
+CORRIGE
+- Club Mordisco no aparece dentro del menú móvil.
+- Añade un solo botón visible debajo de Ver menú.
+- Abre /recompensas.
+- Conserva la corrección de pedidos web y WhatsApp.
+
+NO CAMBIA
+- Caja
+- Ventas
+- Supabase
+- Administrador
+- Cocina
+- Turnos
+- Contabilidad
+
+INSTALACIÓN
+1. Extrae el ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Agregar botón Club Mordisco en portada
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Cierra todas las pestañas de Mordisco en el teléfono.
+9. Abre:
+   https://mordiscofastfood.com/?v=club-boton-portada
+
+NO EJECUTES SQL.

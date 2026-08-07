@@ -1,0 +1,38 @@
+MORDISCO — CORREGIR FUNCIÓN DE PEDIDOS WEB
+
+CAUSA
+Supabase tiene varias funciones create_web_order con diferentes parámetros.
+La llamada anterior era ambigua y Supabase no sabía cuál ejecutar.
+
+CORRIGE
+- Envía p_payment_method = "pending".
+- Envía p_extras = [].
+- Obliga a Supabase a usar la función completa correcta.
+- Mantiene confirmación por WhatsApp.
+- Conserva el carrito si ocurre un error.
+
+NO CAMBIA
+- Base de datos
+- SQL
+- Caja
+- Administrador
+- Club Mordisco
+- Cocina
+- Turnos
+- Contabilidad
+
+INSTALACIÓN
+1. Extrae el ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Corregir función de pedidos web
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Cierra todas las pestañas de Mordisco.
+9. Abre:
+   https://mordiscofastfood.com/pedir?v=rpc-web-order-fixed
+
+NO EJECUTES SQL.

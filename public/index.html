@@ -212,6 +212,51 @@ const staff = document.createElement('a');
 }
 </style>
 
+
+<style id="clubHomeMobileButtonStyle">
+.club-home-mobile-button{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:12px;
+  width:min(100%,594px);
+  margin:12px auto 0;
+  padding:14px 16px;
+  border-radius:16px;
+  background:linear-gradient(135deg,#ffd21f,#ff9f00);
+  color:#17130f;
+  text-decoration:none;
+  font-weight:950;
+  box-shadow:0 14px 30px rgba(255,170,0,.25);
+}
+.club-home-mobile-button>span{
+  display:grid;
+  place-items:center;
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  background:rgba(255,255,255,.45);
+  font-size:1.2rem;
+}
+.club-home-mobile-button small{
+  display:block;
+  font-size:.63rem;
+  letter-spacing:1.3px;
+}
+.club-home-mobile-button b{
+  display:block;
+  margin-top:2px;
+}
+.club-home-mobile-button>strong{
+  font-size:1.5rem;
+}
+@media(min-width:901px){
+  .club-home-mobile-button{
+    max-width:520px;
+  }
+}
+</style>
+
 </head>
 <body>
   <div class="promo-bar">
@@ -261,6 +306,16 @@ const staff = document.createElement('a');
           <div class="hero-actions">
             <a class="btn btn-primary btn-xl" href="/pedir">Ordenar ahora</a>
             <a class="btn btn-dark btn-xl" href="#menu">Ver menú</a>
+
+<a class="club-home-mobile-button" href="/recompensas">
+  <span>🎁</span>
+  <div>
+    <small>CLUB MORDISCO</small>
+    <b>Ver mis recompensas</b>
+  </div>
+  <strong>→</strong>
+</a>
+
           </div>
 
           <div class="hero-proof">
