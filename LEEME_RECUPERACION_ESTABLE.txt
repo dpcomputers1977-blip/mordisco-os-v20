@@ -1,0 +1,57 @@
+MORDISCO — RECUPERAR CAJA Y CONTABILIDAD ESTABLE
+
+OBJETIVO
+Esta actualización no agrega diseños nuevos.
+Restaura los archivos del administrador desde la última versión conocida
+donde el cobro funcionaba correctamente.
+
+RESTAURA
+- Cobro desde Caja.
+- Ventana de confirmación de cobro.
+- Métodos de pago de Caja.
+- Registro y consulta de movimientos en Contabilidad.
+- Actualización de Caja y Contabilidad después del cobro.
+
+MANTIENE
+- Cobrar únicamente desde Caja.
+- Pedidos web sin botón Cobrar.
+- Ventas y datos guardados en Supabase.
+
+NO TOCA
+- index.html
+- Página pública
+- Pedidos en línea
+- WhatsApp
+- Club Mordisco
+- Horarios del restaurante
+- Supabase ni SQL
+
+ARCHIVOS INCLUIDOS
+- admin.html
+- admin-v18.js
+- admin-v18.css
+- Copias equivalentes dentro de public/
+
+INSTALACIÓN
+1. Haz una copia de la carpeta actual mordisco-os-v20.
+2. Extrae este ZIP.
+3. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+4. Selecciona Reemplazar archivos.
+5. GitHub Desktop:
+   Summary: Recuperar Caja y Contabilidad estable
+6. Commit to main.
+7. Push origin.
+8. Espera Vercel Ready.
+9. Abre:
+   https://mordiscofastfood.com/admin?v=stable-cash-accounting-1
+10. Presiona Ctrl + Shift + R.
+
+PRUEBA
+1. Crea un pedido de prueba.
+2. En Caja pulsa Cobrar.
+3. Selecciona el método de pago.
+4. Confirma el cobro.
+5. Abre Contabilidad y pulsa Actualizar.
+
+NO EJECUTES SQL.
