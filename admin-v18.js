@@ -492,26 +492,31 @@ function renderPosPendingOrders(){
   if($('#posPendingCount'))$('#posPendingCount').textContent=pending.length;
 
   $('#posPendingOrders').innerHTML=pending.length?pending.map(o=>`
-    <article class="posPendingCard">
-      <div class="posPendingMain">
-        <div class="posPendingNumber">
-          <small>PEDIDO</small>
-          <strong>#${o.order_number}</strong>
-        </div>
-        <div class="posPendingInfo">
-          <h4>${esc(o.customer_name||'Consumidor final')}</h4>
-          <p>${o.order_items?.map(i=>`${i.quantity}× ${esc(i.product_name)}`).join(', ')||'Sin detalle'}</p>
-          <small>
-            ${o.restaurant_tables?.name?`🍽️ ${esc(o.restaurant_tables.name)} · `:''}
-            ${orderTypeLabel(o.order_type)} ·
-            ${new Date(o.created_at).toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'})}
-          </small>
-        </div>
+    <article class="posPendingCard posPendingCardPro">
+      <div class="posPendingNumber">
+        <small>PEDIDO</small>
+        <strong>#${o.order_number}</strong>
       </div>
-      <div class="posPendingPayment">
+
+      <div class="posPendingInfo">
+        <h4>${esc(o.customer_name||'Consumidor final')}</h4>
+        <p>${o.order_items?.map(i=>`${i.quantity}× ${esc(i.product_name)}`).join(', ')||'Sin detalle'}</p>
+        <small>
+          ${o.restaurant_tables?.name?`🍽️ ${esc(o.restaurant_tables.name)} · `:''}
+          ${orderTypeLabel(o.order_type)} ·
+          ${new Date(o.created_at).toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'})}
+        </small>
+      </div>
+
+      <div class="posPendingTotal">
         <span>Pendiente</span>
         <strong>${money(o.total)}</strong>
-        <button class="primary posPayNowBtn" data-pos-pay="${o.id}">Cobrar ahora</button>
+      </div>
+
+      <div class="posPendingActionsPro">
+        <button type="button" class="pendingEditBtn" data-pending-edit="${o.id}">✏ Editar</button>
+        <button type="button" class="primary pendingChargeBtn" data-pos-pay="${o.id}">💵 Cobrar</button>
+        <button type="button" class="danger pendingCancelBtn" data-pending-cancel="${o.id}">✕</button>
       </div>
     </article>
   `).join(''):`<div class="posPendingEmpty">
@@ -522,6 +527,118 @@ function renderPosPendingOrders(){
   $$('[data-pos-pay]').forEach(button=>{
     button.onclick=()=>openChargeOrder(button.dataset.posPay);
   });
+
+  $$('[data-pending-edit]').forEach(button=>{
+    button.onclick=()=>openPendingOrderEditor(button.dataset.pendingEdit);
+  });
+
+  $$('[data-pending-cancel]').forEach(button=>{
+    button.onclick=()=>cancelPendingOrder(button.dataset.pendingCancel);
+  });
+}
+
+let pendingOrderEditId=null;
+
+function openPendingOrderEditor(id){
+  const order=orders.find(item=>String(item.id)===String(id));
+  if(!order)return toast('Pedido no encontrado');
+
+  pendingOrderEditId=order.id;
+  $('#pendingEditTitle').textContent=`Editar pedido #${order.order_number}`;
+  $('#pendingEditCustomer').value=order.customer_name||'';
+  $('#pendingEditPhone').value=order.customer_phone||'';
+  $('#pendingEditNotes').value=order.notes||'';
+
+  $('#pendingEditItems').innerHTML=(order.order_items||[]).map(item=>`
+    <div class="pendingEditItem" data-edit-item="${item.id}">
+      <div>
+        <b>${esc(item.product_name||'Producto')}</b>
+        <small>${money(item.unit_price||0)} c/u</small>
+      </div>
+      <div class="pendingEditQty">
+        <button type="button" data-edit-minus="${item.id}">−</button>
+        <input type="number" min="1" step="1" value="${Number(item.quantity||1)}"
+               data-edit-qty="${item.id}" data-unit-price="${Number(item.unit_price||0)}">
+        <button type="button" data-edit-plus="${item.id}">+</button>
+      </div>
+    </div>
+  `).join('')||'<div class="notice">Este pedido no tiene productos editables.</div>';
+
+  $$('[data-edit-minus]').forEach(button=>button.onclick=()=>{
+    const input=$(`[data-edit-qty="${button.dataset.editMinus}"]`);
+    input.value=Math.max(1,Number(input.value||1)-1);
+  });
+  $$('[data-edit-plus]').forEach(button=>button.onclick=()=>{
+    const input=$(`[data-edit-qty="${button.dataset.editPlus}"]`);
+    input.value=Number(input.value||1)+1;
+  });
+
+  $('#pendingOrderEditModal').classList.remove('hidden');
+}
+
+async function savePendingOrderEditor(){
+  const order=orders.find(item=>String(item.id)===String(pendingOrderEditId));
+  if(!order)return toast('Pedido no encontrado');
+
+  const customer_name=$('#pendingEditCustomer').value.trim()||'Consumidor final';
+  const customer_phone=$('#pendingEditPhone').value.trim();
+  const notes=$('#pendingEditNotes').value.trim();
+
+  const itemChanges=$$('[data-edit-qty]').map(input=>({
+    id:input.dataset.editQty,
+    quantity:Math.max(1,Number(input.value||1)),
+    unit_price:Number(input.dataset.unitPrice||0)
+  }));
+
+  const total=itemChanges.reduce((sum,item)=>sum+(item.quantity*item.unit_price),0);
+
+  const saveButton=$('#savePendingOrderEdit');
+  saveButton.disabled=true;
+  saveButton.textContent='Guardando...';
+
+  const {error:orderError}=await db.from('orders').update({
+    customer_name,
+    customer_phone,
+    notes,
+    subtotal:total,
+    total
+  }).eq('id',order.id);
+
+  if(orderError){
+    saveButton.disabled=false;
+    saveButton.textContent='Guardar cambios';
+    return toast('No se pudo editar: '+orderError.message);
+  }
+
+  for(const item of itemChanges){
+    const {error}=await db.from('order_items').update({
+      quantity:item.quantity,
+      subtotal:item.quantity*item.unit_price
+    }).eq('id',item.id);
+    if(error){
+      saveButton.disabled=false;
+      saveButton.textContent='Guardar cambios';
+      return toast('Pedido actualizado parcialmente: '+error.message);
+    }
+  }
+
+  saveButton.disabled=false;
+  saveButton.textContent='Guardar cambios';
+  $('#pendingOrderEditModal').classList.add('hidden');
+  toast('Pedido corregido');
+  await loadOrders();
+}
+
+async function cancelPendingOrder(id){
+  const order=orders.find(item=>String(item.id)===String(id));
+  if(!order)return;
+  if(!confirm(`¿Cancelar el pedido #${order.order_number}?`))return;
+
+  const {error}=await db.from('orders').update({status:'cancelled'}).eq('id',id);
+  if(error)return toast('No se pudo cancelar: '+error.message);
+
+  toast('Pedido cancelado');
+  await loadOrders();
 }
 
 if($('#refreshPosPending'))if(document.querySelector('#refreshPosPending'))document.querySelector('#refreshPosPending').onclick=async()=>{
@@ -805,7 +922,6 @@ function renderOrders(){
     <p>${new Date(o.created_at).toLocaleString('es-EC')}</p>
     <div class="orderActions">
       <select data-status="${o.id}">${Object.entries(statusLabels).map(([value,label])=>`<option ${value===o.status?'selected':''} value="${value}">${label}</option>`).join('')}</select>
-      ${(isAdminSession||currentEmployee?.role==='cashier')&&o.payment_status!=='paid'?`<button class="primary chargeOrderBtn" data-charge-order="${o.id}">Cobrar</button>`:''}
       ${isAdminSession?`<button class="danger deleteSaleBtn" data-delete-order="${o.id}">Eliminar venta</button>`:''}
     </div>
   </article>`).join(''):'<div class="notice">No hay pedidos con ese estado.</div>';
@@ -816,7 +932,6 @@ function renderOrders(){
     else{toast('Estado actualizado');await loadOrders()}
   });
 
-  $$('[data-charge-order]').forEach(b=>b.onclick=()=>openChargeOrder(b.dataset.chargeOrder));
   $$('[data-delete-order]').forEach(b=>b.onclick=()=>deleteSale(b.dataset.deleteOrder));
 }
 function elapsedLabel(createdAt){
@@ -4244,3 +4359,54 @@ document.querySelector('#exitPosFocusBtn')?.addEventListener('click',event=>{
     syncReturnButton();
   });
 })();
+
+/* ===== PEDIDOS PENDIENTES: EDICIÓN SEGURA ===== */
+if(document.querySelector('#savePendingOrderEdit')){
+  document.querySelector('#savePendingOrderEdit').onclick=savePendingOrderEditor;
+}
+if(document.querySelector('#closePendingOrderEdit')){
+  document.querySelector('#closePendingOrderEdit').onclick=()=>{
+    document.querySelector('#pendingOrderEditModal').classList.add('hidden');
+  };
+}
+if(document.querySelector('#cancelPendingOrderEdit')){
+  document.querySelector('#cancelPendingOrderEdit').onclick=()=>{
+    document.querySelector('#pendingOrderEditModal').classList.add('hidden');
+  };
+}
+
+/* ===== CONTABILIDAD POR ACCESOS ===== */
+function setFinanceWorkspace(view){
+  const movementForm=document.querySelector('#financeForm');
+  const accountsForm=document.querySelector('#financeAccountForm');
+  const movements=document.querySelector('#financeMovementsPanel');
+  const accounts=document.querySelector('#financeAccountsPanel');
+
+  [movementForm,accountsForm,movements,accounts].forEach(node=>node?.classList.add('financeSectionHidden'));
+
+  if(view==='income'||view==='expense'){
+    movementForm?.classList.remove('financeSectionHidden');
+    const type=document.querySelector('#financeType');
+    if(type)type.value=view;
+    movementForm?.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  if(view==='movements'){
+    movements?.classList.remove('financeSectionHidden');
+    loadFinance();
+  }
+  if(view==='accounts'){
+    accountsForm?.classList.remove('financeSectionHidden');
+    accounts?.classList.remove('financeSectionHidden');
+    if(typeof loadFinanceAccounts==='function')loadFinanceAccounts();
+  }
+}
+
+document.querySelectorAll('[data-finance-view]').forEach(button=>{
+  button.addEventListener('click',()=>setFinanceWorkspace(button.dataset.financeView));
+});
+document.querySelectorAll('[data-finance-close]').forEach(button=>{
+  button.addEventListener('click',()=>{
+    button.closest('#financeForm,#financeAccountForm,#financeMovementsPanel,#financeAccountsPanel')
+      ?.classList.add('financeSectionHidden');
+  });
+});

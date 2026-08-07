@@ -1,0 +1,46 @@
+MORDISCO — CAJA, PEDIDOS WEB Y CONTABILIDAD PROFESIONAL
+
+CAMBIOS
+1. PEDIDOS WEB
+- Se elimina por completo la opción Cobrar.
+- El cobro queda exclusivamente en Caja.
+- Conserva estados y eliminación administrativa.
+
+2. CAJA
+- Un solo botón Cobrar por pedido.
+- Botón Editar antes de cobrar.
+- Permite corregir cliente, teléfono, notas y cantidades.
+- Recalcula el total.
+- Botón Cancelar con confirmación.
+- Tarjetas más compactas.
+
+3. CONTABILIDAD
+- Accesos por iconos: Ingreso, Egreso, Movimientos y Cuentas.
+- Formularios ocultos hasta seleccionar una acción.
+- Tabla con más espacio.
+- Diseño más limpio.
+
+NO CAMBIA
+- Supabase
+- Ventas cobradas
+- Cocina
+- Turnos
+- Página pública
+- Club Mordisco
+- Pedidos por WhatsApp
+
+INSTALACIÓN
+1. Extrae el ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Mejorar Caja Pedidos y Contabilidad
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Abre:
+   https://mordiscofastfood.com/admin?v=operations-pro-1
+9. Presiona Ctrl + Shift + R.
+
+NO EJECUTES SQL.
