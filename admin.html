@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=v21-single-exit">
+<link rel="stylesheet" href="/admin-v18.css?v=mordisco-v22-navigation">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 </head>
@@ -51,17 +51,24 @@
  <aside class="sidebar"><img src="media/logo.png" alt="Mordisco"><button data-tab="dashboard"><span>▦</span> Resumen</button><button data-tab="products" class="active"><span>🍔</span> Productos</button><button data-tab="categories"><span>▤</span> Categorías</button><button data-tab="orders"><span>🌐</span> Pedidos web</button><button data-tab="kitchen"><span>♨</span> Cocina</button><button data-tab="pos"><span>▣</span> POS / Caja</button><button data-tab="inventory"><span>◇</span> Inventario</button><button data-tab="tables"><span>🍽</span> Mesas</button><button data-tab="shifts"><span>🕒</span> Turnos</button><button data-tab="finance"><span>💰</span> Contabilidad</button><button data-tab="customers"><span>👤</span> Clientes</button><button data-tab="promotions"><span>🎁</span> Promociones</button><button data-tab="pages"><span>📄</span> Páginas</button><button data-tab="staff"><span>👥</span> Personal</button><button data-tab="extras">➕ Extras y empaques</button>
 <button data-tab="settings"><span>⚙</span> Negocio</button><button id="logoutBtn"><span>↪</span> Cerrar sesión</button><button id="backToStore"><span>↗</span> Ver página</button></aside>
  <div class="adminContent">
-   <div class="adminTop">
+   <div class="adminTop v22AdminTop">
       <div class="adminTopTitle">
         <button id="toggleAdminSidebar" class="sidebarToggleV21" type="button" aria-label="Mostrar u ocultar menú">☰</button>
-        <div><span class="eyebrow">MORDISCO OS V21</span><h1 id="adminTitle">Productos</h1></div>
+        <button id="v22BackBtn" class="v22NavButton" type="button">← Volver</button>
+        <div><span class="eyebrow">MORDISCO OS V22</span><h1 id="adminTitle">Resumen</h1></div>
       </div>
       <div class="adminTopActions">
+        <button id="v22HomeBtn" class="v22NavButton v22HomeButton" type="button">⌂ Inicio</button>
         <button id="toggleModuleFocus" class="moduleFocusBtn" type="button">Pantalla amplia</button>
         <span class="cloudStatus">● Conectado a Supabase</span>
       </div>
     </div>
-   <section id="tab-dashboard" class="tab hidden">
+    <div id="v22FocusNavigation" class="v22FocusNavigation">
+      <button id="v22FocusBackBtn" type="button">← Volver</button>
+      <strong id="v22FocusTitle">Mordisco OS</strong>
+      <div><button id="v22FocusHomeBtn" type="button">⌂ Inicio</button><button id="v22FocusExitBtn" type="button">✕ Cerrar pantalla</button></div>
+    </div>
+    <section id="tab-dashboard" class="tab hidden">
       <div class="metrics">
         <article><span>Órdenes totales</span><b id="metricOrders">0</b></article>
         <article><span>Ventas acumuladas</span><b id="metricSales">$0.00</b></article>
@@ -225,10 +232,7 @@
           <span>Venta actual</span>
           <strong id="posHeaderTotal">$0.00</strong>
           </div>
-          <button id="exitPosFocusBtn" class="posExitBtn" type="button">
-            <span>←</span> Volver al administrador
-          </button>
-        </div>
+</div>
       </div>
 
       
@@ -1154,7 +1158,7 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=v21-single-exit"></script>
+<script src="/admin-v18.js?v=mordisco-v22-navigation"></script>
 
 
 

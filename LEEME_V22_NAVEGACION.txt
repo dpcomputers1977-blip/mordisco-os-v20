@@ -1,0 +1,23 @@
+MORDISCO OS V22 — NAVEGACIÓN PROFESIONAL
+
+AGREGA
+- Volver e Inicio en todos los módulos.
+- Historial para regresar al módulo anterior.
+- Barra flotante en pantalla completa.
+- Volver, Inicio y Cerrar en todas las ventanas.
+- Escape cierra ventanas o sale de pantalla completa.
+
+NO CAMBIA
+- Página pública.
+- Base de datos.
+- Lógica de ventas, cocina, mesas o contabilidad.
+
+APLICAR
+1. Extrae el ZIP.
+2. Copia todo en C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. Commit: Mordisco OS V22 navegación profesional
+5. Push origin.
+6. Prueba: https://mordiscofastfood.com/admin?session=ok&v=mordisco-v22-navigation
+
+NO ejecuta SQL.
