@@ -1,0 +1,35 @@
+MORDISCO — CONFIRMACIÓN DE PEDIDOS POR WHATSAPP
+
+CORRIGE
+- El botón Confirmar pedido por WhatsApp vuelve a responder.
+- Evita que Android/Chrome bloquee la apertura de WhatsApp.
+- Registra primero el pedido en Supabase.
+- Abre WhatsApp al 593959005534 con el resumen completo.
+- Si Supabase falla, muestra el error y conserva el carrito.
+- El carrito solo se vacía cuando el pedido fue registrado.
+
+NO CAMBIA
+- Página principal
+- Club Mordisco
+- Administrador
+- Caja
+- Cocina
+- Turnos
+- Contabilidad
+- Base de datos
+
+INSTALACIÓN
+1. Extrae el ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Corregir confirmación de pedidos por WhatsApp
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Cierra todas las pestañas de Mordisco en el teléfono.
+9. Abre:
+   https://mordiscofastfood.com/pedir?v=whatsapp-functional-2
+
+NO EJECUTES SQL.
