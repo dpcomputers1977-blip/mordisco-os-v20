@@ -1,0 +1,42 @@
+MORDISCO — CLUB EN PORTADA + CONFIRMACIÓN WEB POR WHATSAPP
+
+INCLUYE
+1. Club Mordisco:
+   - Un solo acceso en la página principal.
+   - No aparece duplicado dentro del menú.
+
+2. Pedidos web:
+   - Valida el teléfono antes de registrar.
+   - Registra el pedido normalmente en Supabase.
+   - Abre WhatsApp al número oficial 593959005534.
+   - Incluye pedido, cliente, teléfono, dirección, productos, total y notas.
+   - El cliente debe pulsar Enviar en WhatsApp para confirmar.
+
+IMPORTANTE
+- Abrir WhatsApp confirma que el cliente dispone de una cuenta para comunicarse.
+- El mensaje no se envía solo: WhatsApp exige que el cliente pulse Enviar.
+- La venta sigue apareciendo en Pedidos web como antes.
+
+NO CAMBIA
+- Caja
+- Cobros
+- Cocina
+- Turnos
+- Contabilidad
+- Panel administrador
+- Base de datos
+
+INSTALACIÓN
+1. Extrae el ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Agregar confirmación web por WhatsApp
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Prueba en incógnito:
+   https://mordiscofastfood.com/pedir?v=whatsapp-confirmation-1
+
+NO EJECUTES SQL.

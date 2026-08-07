@@ -1,0 +1,32 @@
+MORDISCO — CLUB MORDISCO SOLO EN LA PANTALLA PRINCIPAL
+
+ÚNICO CAMBIO
+- Quita Club Mordisco del menú.
+- Elimina duplicados.
+- Deja un solo acceso visible en la página principal.
+- Conserva Empleados y Administración.
+
+NO CAMBIA
+- Pedidos
+- WhatsApp
+- Caja
+- Ventas
+- Supabase
+- Administrador
+- Cocina
+- Turnos
+
+INSTALACIÓN
+1. Extrae el ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Dejar Club Mordisco solo en portada
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Cierra las pestañas de Mordisco en el teléfono.
+9. Abre nuevamente la web o usa incógnito.
+
+NO EJECUTES SQL.

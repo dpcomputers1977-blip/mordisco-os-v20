@@ -145,16 +145,7 @@ document.addEventListener('DOMContentLoaded', function(){
   const links = Array.from(nav.querySelectorAll('a'));
   const menuLink = links.find(a => (a.textContent||'').trim().toLowerCase().includes('menú') || (a.textContent||'').trim().toLowerCase().includes('menu'));
   const promoLink = links.find(a => (a.textContent||'').trim().toLowerCase().includes('promoc'));
-
-  const club = document.createElement('a');
-  club.href='/recompensas';
-  club.className='mordisco-mobile-extra-link mordisco-mobile-club';
-  club.textContent='🎁 Club Mordisco';
-
-  if(menuLink) menuLink.insertAdjacentElement('afterend', club);
-  else nav.prepend(club);
-
-  const staff = document.createElement('a');
+const staff = document.createElement('a');
   staff.href='/staff';
   staff.className='mordisco-mobile-extra-link mordisco-mobile-staff';
   staff.textContent='👥 Empleados';
@@ -165,6 +156,61 @@ document.addEventListener('DOMContentLoaded', function(){
   else nav.appendChild(staff);
 });
 </script>
+
+
+<style id="clubOnlyHomepageStyle">
+.club-home-access{
+  max-width:1180px;
+  margin:28px auto;
+  padding:24px 28px;
+  border-radius:22px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:22px;
+  background:linear-gradient(135deg,#17130f,#2a2114);
+  color:#fff;
+  box-shadow:0 18px 45px rgba(0,0,0,.22);
+}
+.club-home-access-copy span{
+  color:#ffc400;
+  font-size:.75rem;
+  font-weight:950;
+  letter-spacing:1.5px;
+}
+.club-home-access-copy h2{
+  margin:6px 0 4px;
+  font-size:clamp(1.5rem,3vw,2.5rem);
+  line-height:1.05;
+}
+.club-home-access-copy p{
+  margin:0;
+  color:#d8cebe;
+}
+.club-home-access>a{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:48px;
+  padding:12px 18px;
+  border-radius:13px;
+  background:linear-gradient(135deg,#ffd21f,#ff9f00);
+  color:#17130f;
+  text-decoration:none;
+  font-weight:950;
+  box-shadow:0 10px 24px rgba(255,170,0,.25);
+}
+@media(max-width:760px){
+  .club-home-access{
+    margin:20px 14px;
+    padding:20px;
+    flex-direction:column;
+    align-items:stretch;
+  }
+  .club-home-access>a{width:100%}
+}
+</style>
 
 </head>
 <body>
@@ -187,14 +233,14 @@ document.addEventListener('DOMContentLoaded', function(){
     <nav class="main-nav" aria-label="Navegación principal">
       <a href="#inicio">Inicio</a>
       <a href="#menu">Menú</a>
-      <a class="clubMenuLink" href="/recompensas">🎁 Club Mordisco</a>
+      
       <a href="/promociones">Promociones</a>
       <a href="#nosotros">Nosotros</a>
       <a href="#contacto">Contacto</a>
     </nav>
 
     <div class="header-actions">
-      <a class="btn btn-outline rewards-header-link" href="/recompensas">🎁 Club Mordisco</a>
+      
       <a class="btn btn-outline employee-link" href="/staff">Empleados</a>
       <a class="btn btn-primary" href="/pedir">Pedir ahora <span>→</span></a>
     </div>
@@ -331,39 +377,16 @@ document.addEventListener('DOMContentLoaded', function(){
       </div>
     </section>
 
-
-    <section class="club-public-section" id="club-mordisco">
-      <div class="club-public-copy reveal">
-        <span class="club-new-badge">🔥 NUEVO</span>
-        <div class="eyebrow"><span></span>CLUB MORDISCO</div>
-        <h2>Compra. Acumula.<br><strong>Gana comida gratis.</strong></h2>
-        <p>Usa el mismo número de teléfono en tus pedidos, acumula puntos y desbloquea recompensas.</p>
-        <a class="club-public-button" href="/recompensas">
-          <span>🎁</span>
-          <div><small>ABRIR AHORA</small><b>Mi tarjeta de recompensas</b></div>
-          <strong>→</strong>
-        </a>
-        <div class="club-public-benefits">
-          <span>⭐ 1 punto por dólar</span>
-          <span>🍔 Premios gratis</span>
-          <span>📱 Sin instalar aplicaciones</span>
-        </div>
+    <section class="club-home-access" aria-label="Club Mordisco">
+      <div class="club-home-access-copy">
+        <span>🎁 CLUB MORDISCO</span>
+        <h2>Tus compras ahora tienen recompensa.</h2>
+        <p>Consulta tus puntos y descubre tus premios.</p>
       </div>
-
-      <div class="club-public-card reveal">
-        <div class="club-card-top">
-          <span>CLUB MORDISCO</span>
-          <img src="/mordisco-logo.png" alt="">
-        </div>
-        <small>TARJETA DIGITAL</small>
-        <h3>CLIENTE MORDISCO</h3>
-        <div class="club-card-points"><b>120</b><span>ORO</span></div>
-        <div class="club-card-progress"><i></i></div>
-        <p>Tu próxima recompensa está cerca.</p>
-      </div>
+      <a href="/recompensas">Ver mis recompensas →</a>
     </section>
 
-    <section class="order-cta" id="contacto">
+<section class="order-cta" id="contacto">
       <div class="cta-content reveal">
         <div class="eyebrow"><span></span>¿LISTO PARA MORDER?</div>
         <h2>Tu próxima hamburguesa está a un clic.</h2>
