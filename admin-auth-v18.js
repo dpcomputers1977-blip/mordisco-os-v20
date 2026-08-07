@@ -1,67 +1,85 @@
-<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#11100e">
-  <title>Promociones | Mordisco Fast Food</title>
-  <link rel="stylesheet" href="/public-site.css?v=19.1.0">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
-<header class="siteHeader">
-  <a class="siteBrand" href="/"><img src="/mordisco-logo.png" alt="Mordisco"><span>MORDISCO <small>FAST FOOD</small></span></a>
-  <nav><a href="/">Inicio</a><a href="/#menu">Menú</a><a href="/promociones">Promociones</a><a href="/#contacto">Contacto</a></nav>
-  <a class="orderHeader" href="/pedir.html">Pedir ahora</a>
-</header>
+(() => {
+  'use strict';
 
-<main>
-  <section class="publicSection promoSection publicPromotionsPage">
-    <div class="sectionTitle">
-      <div><span>PROMOCIONES</span><h1>Ofertas que merecen un Mordisco</h1></div>
-      <a href="/pedir.html">Hacer pedido →</a>
-    </div>
-    <div id="publicPromotions" class="promoGrid"><p class="loading">Cargando promociones…</p></div>
-  </section>
-</main>
+  const SUPABASE_URL = 'https://nmmjthqflxwucpmmmrks.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0';
 
-<footer class="siteFooter">
-  <div><img src="/mordisco-logo.png"><span>© 2026 Mordisco Fast Food</span></div>
-</footer>
-
-<script>
-const db=supabase.createClient(
-  "https://nmmjthqflxwucpmmmrks.supabase.co",
-  "sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0"
-);
-const money=n=>new Intl.NumberFormat("es-EC",{style:"currency",currency:"USD"}).format(Number(n||0));
-const esc=s=>String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-
-async function loadPromotions(){
-  const now=new Date().toISOString().slice(0,10);
-  const {data,error}=await db.from("promotions").select("*").order("sort_order");
-
-  const node=document.querySelector("#publicPromotions");
-  if(error){
-    node.innerHTML=`<p class="catalogStatus">No se pudieron cargar las promociones: ${esc(error.message)}</p>`;
-    return;
+  function showLoginMessage(message, error = false) {
+    let box = document.querySelector('#loginDirectMessage');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'loginDirectMessage';
+      box.style.marginTop = '10px';
+      box.style.padding = '10px 12px';
+      box.style.borderRadius = '10px';
+      box.style.font = '700 13px system-ui,sans-serif';
+      const form = document.querySelector('#loginForm');
+      form?.appendChild(box);
+    }
+    box.textContent = message;
+    box.style.background = error ? '#ffe0dc' : '#fff1b8';
+    box.style.color = error ? '#8d1e16' : '#6a5100';
   }
 
-  const current=(data||[]).filter(p=>p.active&&(!p.starts_on||p.starts_on<=now)&&(!p.ends_on||p.ends_on>=now));
-  const active=(data||[]).filter(p=>p.active);
-  const list=current.length?current:active;
-  node.innerHTML=list.map(p=>`<article class="promoCard">
-    ${p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(p.title)}">`:""}
-    <div class="promoCardBody">
-      ${p.badge?`<span>${esc(p.badge)}</span>`:""}
-      <h3>${esc(p.title)}</h3>
-      <p>${esc(p.description)}</p>
-      ${p.promo_price!=null?`<b>${money(p.promo_price)}</b>`:""}
-      <a class="yellowButton" href="${esc(p.link_url||'/pedir')}">Pedir promoción</a>
-    </div>
-  </article>`).join("")||'<div class="catalogStatus"><h3>No hay promociones publicadas todavía</h3><p>Créala desde Administración → Promociones y marca la opción Activa.</p><a class="yellowButton" href="/pedir.html">Ver menú y pedir</a></div>';
-}
-loadPromotions();
-</script>
-</body>
-</html>
+
+
+  async function start() {
+    const form = document.querySelector('#loginForm');
+    if (!form) return;
+
+    const client = window.mordiscoSupabaseClient || window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
+    if (client) window.mordiscoSupabaseClient = client;
+    if (!client) {
+      showLoginMessage('No se pudo cargar la conexión con Supabase.', true);
+      return;
+    }
+
+    // If a session already exists, let the main panel continue normally.
+    const { data: sessionData } = await client.auth.getSession();
+    if (sessionData?.session) return;
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      const email = (document.querySelector('#loginEmail')?.value || '').trim();
+      const password = document.querySelector('#loginPassword')?.value || '';
+      const button = form.querySelector('button[type="submit"], button');
+
+      if (!email || !password) {
+        showLoginMessage('Escribe el correo y la contraseña.', true);
+        return;
+      }
+
+      if (button) {
+        button.disabled = true;
+        button.textContent = 'Ingresando...';
+      }
+      showLoginMessage('Verificando acceso...');
+
+      try {
+        const { error } = await client.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+
+        showLoginMessage('Acceso correcto. Abriendo el panel...');
+        window.location.replace('/admin?session=ok&v=18.3');
+      } catch (error) {
+        console.error('LOGIN DIRECTO V18.3:', error);
+        showLoginMessage(
+          'No se pudo iniciar sesión: ' + (error?.message || 'Error desconocido'),
+          true
+        );
+        if (button) {
+          button.disabled = false;
+          button.textContent = 'Ingresar';
+        }
+      }
+    }, true);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start, { once: true });
+  } else {
+    start();
+  }
+})();
