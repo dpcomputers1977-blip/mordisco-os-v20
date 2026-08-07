@@ -4114,7 +4114,7 @@ document.querySelector('#exitPosFocusBtn')?.addEventListener('click',event=>{
 const mordiscoV22Navigation={history:[],current:'dashboard',navigating:false};
 function getVisibleModuleV22(){const t=document.querySelector('#adminView .tab:not(.hidden)');return t?.id?.replace(/^tab-/,'')||mordiscoV22Navigation.current||'dashboard'}
 function moduleLabelV22(m){return({dashboard:'Resumen',products:'Productos',categories:'Categorías',orders:'Pedidos web',kitchen:'Cocina',pos:'POS / Caja',inventory:'Inventario',tables:'Mesas',shifts:'Turnos',finance:'Contabilidad',customers:'Clientes',promotions:'Promociones',pages:'Páginas',staff:'Personal',extras:'Extras y empaques',settings:'Negocio'})[m]||'Mordisco OS'}
-function updateNavigationV22(){const c=getVisibleModuleV22();mordiscoV22Navigation.current=c;const b=document.querySelector('#v22BackBtn');if(b)b.disabled=c==='dashboard'&&!mordiscoV22Navigation.history.length;const f=document.querySelector('#v22FocusTitle');if(f&&f.textContent!==moduleLabelV22(c))f.textContent=moduleLabelV22(c)}
+function updateNavigationV22(){const c=getVisibleModuleV22();mordiscoV22Navigation.current=c;const b=document.querySelector('#v22BackBtn');if(b)b.disabled=c==='dashboard'&&!mordiscoV22Navigation.history.length;const f=document.querySelector('#v22FocusTitle');if(f)f.textContent=moduleLabelV22(c)}
 function closeTopModalV22(){const a=[...document.querySelectorAll('.modal:not(.hidden)')].filter(m=>getComputedStyle(m).display!=='none');const m=a.at(-1);if(!m)return false;m.classList.add('hidden');m.setAttribute('aria-hidden','true');document.body.classList.remove('modal-open','no-scroll');return true}
 function closeAllModalsV22(){document.querySelectorAll('.modal:not(.hidden)').forEach(m=>{m.classList.add('hidden');m.setAttribute('aria-hidden','true')});document.body.classList.remove('modal-open','no-scroll')}
 function exitFocusModesV22(){document.body.classList.remove('posFocusMode','moduleFocusV21','customersFocusMode');document.documentElement.classList.remove('posFocusModeRoot','customersFocusModeRoot');document.body.dataset.focusTab='';const b=document.querySelector('#toggleModuleFocus');if(b)b.textContent='Pantalla amplia'}
@@ -4127,11 +4127,5 @@ function enhanceAllModalsV22(){document.querySelectorAll('#adminView .modal').fo
 document.querySelectorAll('.sidebar [data-tab]').forEach(button=>button.addEventListener('click',()=>{if(mordiscoV22Navigation.navigating)return;const d=button.dataset.tab,p=getVisibleModuleV22();if(p&&p!==d){mordiscoV22Navigation.history.push(p);if(mordiscoV22Navigation.history.length>20)mordiscoV22Navigation.history.shift()}requestAnimationFrame(updateNavigationV22)},true));
 document.querySelector('#v22BackBtn')?.addEventListener('click',goBackV22);document.querySelector('#v22HomeBtn')?.addEventListener('click',goHomeV22);document.querySelector('#v22FocusBackBtn')?.addEventListener('click',goBackV22);document.querySelector('#v22FocusHomeBtn')?.addEventListener('click',goHomeV22);document.querySelector('#v22FocusExitBtn')?.addEventListener('click',closeFocusV22);
 document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(closeTopModalV22()){e.preventDefault();return}if(document.body.classList.contains('posFocusMode')||document.body.classList.contains('moduleFocusV21')){e.preventDefault();closeFocusV22()}});
-// V22.1: navegación sin MutationObserver para evitar ciclos infinitos.
-function initializeNavigationV221(){
-  mordiscoV22Navigation.current=getVisibleModuleV22();
-  enhanceAllModalsV22();
-  updateNavigationV22();
-}
-window.addEventListener('load',initializeNavigationV221,{once:true});
-window.addEventListener('pageshow',initializeNavigationV221);
+const modalObserverV22=new MutationObserver(()=>{enhanceAllModalsV22();updateNavigationV22()});
+window.addEventListener('load',()=>{mordiscoV22Navigation.current=getVisibleModuleV22();enhanceAllModalsV22();updateNavigationV22();const a=document.querySelector('#adminView');if(a)modalObserverV22.observe(a,{subtree:true,childList:true,attributes:true,attributeFilter:['class']})});window.addEventListener('pageshow',()=>{enhanceAllModalsV22();updateNavigationV22()});
