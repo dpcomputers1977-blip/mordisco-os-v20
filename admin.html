@@ -5,309 +5,153 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=club-boom-1">
+<link rel="stylesheet" href="/admin-v18.css?v=v21-single-exit">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 
-
-
-
-<style id="clubMordiscoBoomStyles">
-.publicQuickLinks{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
-}
-.rewardsPublicLink{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-height:42px;
-  padding:9px 15px;
-  border-radius:12px;
-  background:linear-gradient(135deg,#ffd21f,#ff9f00);
-  color:#17130f;
-  text-decoration:none;
-  font-weight:950;
-  box-shadow:0 8px 22px rgba(255,180,0,.25);
-}
-
-.clubMordiscoBoom{
-  position:relative;
-  isolation:isolate;
-  display:grid;
-  grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);
-  align-items:center;
-  gap:40px;
-  max-width:1240px;
-  margin:50px auto;
-  padding:58px;
-  overflow:hidden;
-  border-radius:34px;
-  background:
-    radial-gradient(circle at top right,rgba(255,198,0,.20),transparent 30%),
-    linear-gradient(145deg,#11100e 0%,#1c1812 55%,#0f0e0c 100%);
-  color:#fff;
-  box-shadow:0 30px 80px rgba(24,18,8,.28);
-}
-
-.clubBoomGlow{
-  position:absolute;
-  border-radius:50%;
-  filter:blur(14px);
-  opacity:.55;
-  z-index:-1;
-}
-.clubBoomGlowOne{
-  width:260px;
-  height:260px;
-  right:-80px;
-  top:-100px;
-  background:#ffbf00;
-}
-.clubBoomGlowTwo{
-  width:180px;
-  height:180px;
-  left:-70px;
-  bottom:-80px;
-  background:#ff7b00;
-}
-
-.clubBoomBadge{
-  display:inline-flex;
-  padding:8px 12px;
-  border:1px solid rgba(255,255,255,.18);
-  border-radius:999px;
-  background:rgba(255,255,255,.08);
-  font-size:.76rem;
-  font-weight:950;
-  letter-spacing:1.4px;
-}
-.clubBoomContent .eyebrow{
-  display:block;
-  margin-top:20px;
-  color:#ffc400;
-}
-.clubBoomContent h2{
-  margin:10px 0 18px;
-  font-size:clamp(2.7rem,5vw,5.8rem);
-  line-height:.92;
-  letter-spacing:-2px;
-}
-.clubBoomContent h2 strong{
-  color:#ffc400;
-}
-.clubBoomContent p{
-  max-width:660px;
-  margin:0;
-  color:#d8cebe;
-  font-size:1.08rem;
-  line-height:1.65;
-}
-
-.clubBoomActions{
-  margin-top:28px;
-}
-.clubBoomPrimary{
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  align-items:center;
-  gap:14px;
-  width:min(100%,520px);
-  padding:15px 17px;
-  border-radius:18px;
-  background:linear-gradient(135deg,#ffd21f,#ff9f00);
-  color:#17130f;
-  text-decoration:none;
-  box-shadow:0 16px 36px rgba(255,169,0,.28);
-  transform:translateY(0);
-  transition:.2s ease;
-}
-.clubBoomPrimary:hover{
-  transform:translateY(-4px) scale(1.01);
-  box-shadow:0 22px 44px rgba(255,169,0,.38);
-}
-.clubBoomPrimary>span{
-  display:grid;
-  place-items:center;
-  width:48px;
-  height:48px;
-  border-radius:14px;
-  background:rgba(255,255,255,.45);
-  font-size:1.35rem;
-}
-.clubBoomPrimary small{
-  display:block;
-  font-size:.65rem;
-  font-weight:950;
-  letter-spacing:1.4px;
-}
-.clubBoomPrimary b{
-  display:block;
-  margin-top:2px;
-  font-size:1.05rem;
-}
-.clubBoomPrimary>strong{
-  font-size:1.6rem;
-}
-
-.clubBoomBenefits{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-top:16px;
-}
-.clubBoomBenefits span{
-  padding:8px 10px;
-  border-radius:999px;
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.1);
-  font-size:.78rem;
-  font-weight:800;
-}
-
-.clubBoomVisual{
-  position:relative;
-  min-height:410px;
-  display:grid;
-  place-items:center;
-}
-.clubBoomCard{
-  width:min(100%,420px);
-  padding:28px;
-  border-radius:28px;
-  background:
-    linear-gradient(145deg,rgba(255,255,255,.38),rgba(255,255,255,.07)),
-    linear-gradient(145deg,#ffc400,#ff9700);
-  color:#17130f;
-  box-shadow:
-    0 28px 70px rgba(0,0,0,.35),
-    inset 0 1px 0 rgba(255,255,255,.7);
-  transform:rotate(4deg);
-}
-.clubBoomCardTop,
-.clubBoomPoints{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-}
-.clubBoomCardTop span{
-  font-size:.74rem;
-  font-weight:950;
-  letter-spacing:1.8px;
-}
-.clubBoomCardTop img{
-  width:88px;
-  height:58px;
-  object-fit:contain;
-}
-.clubBoomMember{
-  margin:38px 0 26px;
-}
-.clubBoomMember small{
-  display:block;
-  font-size:.68rem;
-  font-weight:900;
-  opacity:.65;
-}
-.clubBoomMember strong{
-  display:block;
-  margin-top:4px;
-  font-size:1.35rem;
-}
-.clubBoomPoints small{
-  display:block;
-  font-size:.7rem;
-  font-weight:900;
-}
-.clubBoomPoints strong{
-  display:block;
-  font-size:4.8rem;
-  line-height:.9;
-}
-.clubBoomPoints>span{
-  padding:8px 12px;
-  border-radius:999px;
-  background:#17130f;
-  color:#fff;
-  font-weight:950;
-}
-.clubBoomProgress{
-  height:13px;
-  margin:22px 0 10px;
-  overflow:hidden;
-  border-radius:999px;
-  background:rgba(255,255,255,.55);
-}
-.clubBoomProgress i{
-  display:block;
-  width:72%;
-  height:100%;
-  border-radius:999px;
-  background:#17130f;
-}
-.clubBoomCard p{
-  margin:0;
-  font-size:.8rem;
-  font-weight:850;
-}
-.clubBoomReward{
-  position:absolute;
-  right:0;
-  bottom:32px;
-  padding:12px 16px;
-  border-radius:14px;
-  background:#fff;
-  color:#17130f;
-  box-shadow:0 14px 35px rgba(0,0,0,.22);
-  font-size:.76rem;
-  font-weight:950;
-  transform:rotate(-4deg);
-  animation:clubRewardFloat 2.4s ease-in-out infinite;
-}
-@keyframes clubRewardFloat{
-  0%,100%{transform:translateY(0) rotate(-4deg)}
-  50%{transform:translateY(-8px) rotate(-4deg)}
-}
-
-@media(max-width:860px){
-  .clubMordiscoBoom{
-    grid-template-columns:1fr;
-    margin:28px 14px;
-    padding:32px 24px;
-    border-radius:26px;
+<style id="safeWindowsPatchStyles">
+  .safeReturnAdminBtn{
+    position:fixed;
+    top:12px;
+    right:14px;
+    z-index:15000;
+    min-height:34px;
+    padding:5px 9px;
+    border:1px solid #d5c5ad;
+    border-radius:10px;
+    background:#fff;
+    color:#17130f;
+    box-shadow:0 8px 24px rgba(0,0,0,.18);
+    font-size:.76rem;
+    font-weight:900;
+    cursor:pointer;
   }
-  .clubBoomVisual{
-    min-height:350px;
+  .safeReturnAdminBtn:hover{background:#17130f;color:#fff}
+  .modal .modalCard{position:relative}
+  .safeWindowClose{
+    position:absolute!important;
+    top:10px!important;
+    right:12px!important;
+    z-index:60!important;
+    width:40px!important;
+    height:40px!important;
+    min-width:40px!important;
+    padding:0!important;
+    display:grid!important;
+    place-items:center!important;
+    border:1px solid #d5c5ad!important;
+    border-radius:10px!important;
+    background:#fff!important;
+    color:#17130f!important;
+    box-shadow:0 5px 16px rgba(0,0,0,.13)!important;
+    font-size:25px!important;
+    line-height:1!important;
+    font-weight:900!important;
   }
-  .clubBoomCard{
-    transform:rotate(2deg);
+  .safeWindowClose:hover{background:#17130f!important;color:#fff!important}
+  body.posFocusMode #exitPosFocusBtn,
+  body.posFocusMode #exitPosToAdminV21{display:none!important}
+  @media(max-width:650px){
+    .safeReturnAdminBtn{
+      top:6px;
+      right:6px;
+      min-height:32px;
+      padding:4px 7px;
+      font-size:.7rem;
+    }
+    .safeWindowClose{
+      top:7px!important;
+      right:7px!important;
+      width:36px!important;
+      height:36px!important;
+      min-width:36px!important;
+      font-size:22px!important;
+    }
   }
-}
-@media(max-width:520px){
-  .clubMordiscoBoom{
-    padding:26px 18px;
+</style>
+
+
+<style id="mobileAdminCompleteMenuStyles">
+.mobileAdminMenuBtn,
+.mobileAdminBackdrop{display:none}
+
+@media(max-width:900px){
+  .mobileAdminMenuBtn{
+    position:fixed!important;
+    top:10px!important;
+    left:10px!important;
+    z-index:20000!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-height:42px!important;
+    padding:8px 12px!important;
+    border:1px solid #e1cda8!important;
+    border-radius:11px!important;
+    background:#17130f!important;
+    color:#fff!important;
+    box-shadow:0 8px 24px rgba(0,0,0,.24)!important;
+    font-size:.8rem!important;
+    font-weight:950!important;
+    cursor:pointer!important;
   }
-  .clubBoomContent h2{
-    font-size:2.65rem;
-    letter-spacing:-1px;
+
+  .mobileAdminBackdrop{
+    position:fixed!important;
+    inset:0!important;
+    z-index:19980!important;
+    display:block!important;
+    background:rgba(0,0,0,.55)!important;
+    backdrop-filter:blur(2px)!important;
   }
-  .clubBoomPrimary{
-    grid-template-columns:auto 1fr;
+  .mobileAdminBackdrop.hidden{display:none!important}
+
+  #adminView .sidebar{
+    position:fixed!important;
+    top:0!important;
+    left:0!important;
+    bottom:0!important;
+    z-index:19990!important;
+    width:min(86vw,320px)!important;
+    max-width:320px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    overflow-y:auto!important;
+    padding:18px 14px 28px!important;
+    transform:translateX(-105%)!important;
+    transition:transform .22s ease!important;
+    box-shadow:18px 0 45px rgba(0,0,0,.35)!important;
   }
-  .clubBoomPrimary>strong{
-    display:none;
+
+  #adminView.mobileMenuOpen .sidebar{
+    transform:translateX(0)!important;
   }
-  .clubBoomBenefits{
-    display:grid;
+
+  #adminView .sidebar img{
+    display:block!important;
+    max-width:105px!important;
+    height:auto!important;
+    margin:5px auto 18px!important;
   }
-  .clubBoomCard{
-    padding:22px;
+
+  #adminView .sidebar button,
+  #adminView .sidebar a{
+    display:flex!important;
+    width:100%!important;
+    min-height:46px!important;
+    align-items:center!important;
+    gap:10px!important;
+    flex:0 0 auto!important;
   }
-  .clubBoomPoints strong{
-    font-size:3.8rem;
+
+  #adminView .adminContent{
+    width:100%!important;
+    margin-left:0!important;
+    padding-top:58px!important;
+  }
+
+  body.mobileAdminMenuLocked{
+    overflow:hidden!important;
   }
 }
 </style>
@@ -318,10 +162,7 @@
   <a class="brand" href="#inicio"><img src="media/logo.png" alt="Mordisco"><span>MORDISCO</span></a>
   <nav><a href="#inicio">Inicio</a><a href="#menu">Menú</a><a href="/promociones">Promociones</a><a href="#contacto">Contacto</a></nav>
   <div class="top-actions"><button class="cartBtn" id="cartBtn">🛒 <b id="cartCount">0</b></button></div>
-<div class="publicQuickLinks">
-  <a class="clientAppLink" href="/app">📱 Pedir desde la app</a>
-  <a class="rewardsPublicLink" href="/recompensas">🎁 Mis recompensas</a>
-</div></header>
+<a class="clientAppLink" href="/app">📱 Pedir desde la app</a></header>
 
 <main id="publicView" class="hidden">
 <section class="hero" id="inicio">
@@ -344,70 +185,6 @@
  <div class="productGrid" id="productGrid"></div>
 </section>
 
-
-
-<section class="clubMordiscoBoom" id="club-mordisco">
-  <div class="clubBoomGlow clubBoomGlowOne"></div>
-  <div class="clubBoomGlow clubBoomGlowTwo"></div>
-
-  <div class="clubBoomContent">
-    <div class="clubBoomBadge">🔥 NUEVO EN MORDISCO</div>
-    <span class="eyebrow">CLUB MORDISCO</span>
-    <h2>Compra. Acumula.<br><strong>Gana comida gratis.</strong></h2>
-    <p>
-      Cada pedido suma puntos. Consulta tu tarjeta digital,
-      desbloquea premios y vuelve por más.
-    </p>
-
-    <div class="clubBoomActions">
-      <a class="clubBoomPrimary" href="/recompensas">
-        <span>🎁</span>
-        <div>
-          <small>ABRIR AHORA</small>
-          <b>Mi tarjeta de recompensas</b>
-        </div>
-        <strong>→</strong>
-      </a>
-
-      <div class="clubBoomBenefits">
-        <span>⭐ 1 punto por dólar</span>
-        <span>🍔 Premios gratis</span>
-        <span>📱 Sin descargar app</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="clubBoomVisual">
-    <div class="clubBoomCard">
-      <div class="clubBoomCardTop">
-        <span>CLUB MORDISCO</span>
-        <img src="/media/logo.png" alt="Mordisco">
-      </div>
-
-      <div class="clubBoomMember">
-        <small>TARJETA DIGITAL</small>
-        <strong>CLIENTE MORDISCO</strong>
-      </div>
-
-      <div class="clubBoomPoints">
-        <div>
-          <small>PUNTOS</small>
-          <strong>120</strong>
-        </div>
-        <span>ORO</span>
-      </div>
-
-      <div class="clubBoomProgress">
-        <i></i>
-      </div>
-
-      <p>Tu próxima recompensa está cerca.</p>
-    </div>
-
-    <div class="clubBoomReward">🍟 PREMIO DISPONIBLE</div>
-  </div>
-</section>
-
 <section class="contact" id="contacto"><div><span class="eyebrow">PIDE DIRECTO</span><h2>Tu próximo mordisco está cerca.</h2><p>📍 <span id="businessAddress">Dirección por configurar</span></p><p>🕒 <span id="businessSchedule">Horario por configurar</span></p></div><button class="primary" id="orderNowBtn">Hacer pedido</button></section>
 <footer class="publicFooter">
   <span>© Mordisco Fast Food</span>
@@ -418,7 +195,12 @@
 </footer>
 </main>
 
-<section id="adminView" class="hidden adminShell">
+<section id="adminView" class="adminShell hidden">
+  <button id="mobileAdminMenuBtn" class="mobileAdminMenuBtn" type="button" aria-label="Abrir menú administrador">☰ Menú</button>
+  <div id="mobileAdminBackdrop" class="mobileAdminBackdrop hidden"></div>
+  <button id="safeReturnAdminBtn" class="safeReturnAdminBtn hidden" type="button" title="Volver al administrador" aria-label="Volver al administrador">
+    ← Volver
+  </button>
  <aside class="sidebar"><img src="media/logo.png" alt="Mordisco"><button data-tab="dashboard"><span>▦</span> Resumen</button><button data-tab="products" class="active"><span>🍔</span> Productos</button><button data-tab="categories"><span>▤</span> Categorías</button><button data-tab="orders"><span>🌐</span> Pedidos web</button><button data-tab="kitchen"><span>♨</span> Cocina</button><button data-tab="pos"><span>▣</span> POS / Caja</button><button data-tab="inventory"><span>◇</span> Inventario</button><button data-tab="tables"><span>🍽</span> Mesas</button><button data-tab="shifts"><span>🕒</span> Turnos</button><button data-tab="finance"><span>💰</span> Contabilidad</button><button data-tab="customers"><span>👤</span> Clientes</button><button data-tab="promotions"><span>🎁</span> Promociones</button><button data-tab="pages"><span>📄</span> Páginas</button><button data-tab="staff"><span>👥</span> Personal</button><button data-tab="extras">➕ Extras y empaques</button>
 <button data-tab="settings"><span>⚙</span> Negocio</button><button id="logoutBtn"><span>↪</span> Cerrar sesión</button><button id="backToStore"><span>↗</span> Ver página</button></aside>
  <div class="adminContent">
@@ -1525,9 +1307,59 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=v21-single-exit"></script>
+<script src="/admin-v18.js?v=mobile-menu-complete"></script>
 
 
 
 <div id="v18VersionMarker">Mordisco OS V20</div>
+
+<script id="mobileAdminCompleteMenuScript">
+(function(){
+  const adminView=document.querySelector('#adminView');
+  const button=document.querySelector('#mobileAdminMenuBtn');
+  const backdrop=document.querySelector('#mobileAdminBackdrop');
+  const sidebar=adminView?.querySelector('.sidebar');
+
+  if(!adminView||!button||!backdrop||!sidebar)return;
+
+  function openMenu(){
+    adminView.classList.add('mobileMenuOpen');
+    backdrop.classList.remove('hidden');
+    document.body.classList.add('mobileAdminMenuLocked');
+    button.textContent='✕ Cerrar';
+    button.setAttribute('aria-label','Cerrar menú administrador');
+  }
+
+  function closeMenu(){
+    adminView.classList.remove('mobileMenuOpen');
+    backdrop.classList.add('hidden');
+    document.body.classList.remove('mobileAdminMenuLocked');
+    button.textContent='☰ Menú';
+    button.setAttribute('aria-label','Abrir menú administrador');
+  }
+
+  button.addEventListener('click',()=>{
+    adminView.classList.contains('mobileMenuOpen')?closeMenu():openMenu();
+  });
+
+  backdrop.addEventListener('click',closeMenu);
+
+  sidebar.querySelectorAll('button,a').forEach(item=>{
+    item.addEventListener('click',()=>{
+      if(window.innerWidth<=900)setTimeout(closeMenu,40);
+    });
+  });
+
+  document.addEventListener('keydown',event=>{
+    if(event.key==='Escape'&&adminView.classList.contains('mobileMenuOpen')){
+      closeMenu();
+    }
+  });
+
+  window.addEventListener('resize',()=>{
+    if(window.innerWidth>900)closeMenu();
+  });
+})();
+</script>
+
 </body></html>
