@@ -1,0 +1,22 @@
+MORDISCO OS V22.1 — CORRECCIÓN DE PÁGINA BLOQUEADA
+
+CAUSA CORREGIDA
+La navegación V22 usaba un observador que volvía a activarse al actualizar el título del módulo. Esto producía un ciclo infinito y Chrome mostraba “La página no responde”.
+
+CORRIGE
+- Elimina el ciclo infinito.
+- El acceso de administrador vuelve a responder.
+- Conserva Volver, Inicio y navegación V22.
+- No modifica Supabase ni la página pública.
+
+APLICAR
+1. Cierra la pestaña bloqueada con “Salir de la página”.
+2. Extrae este ZIP.
+3. Copia todo en C:\Users\USER\Documents\GitHub\mordisco-os-v20
+4. Reemplaza archivos.
+5. GitHub Desktop: “Corregir bloqueo navegación V22.1”
+6. Commit to main y Push origin.
+7. Espera Vercel Ready.
+8. Abre https://mordiscofastfood.com/admin?logout=1&v=mordisco-v22-1-unfreeze
+
+NO EJECUTES SQL.
