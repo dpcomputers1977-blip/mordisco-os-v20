@@ -305,6 +305,113 @@ document.addEventListener('DOMContentLoaded', function(){
 }
 </style>
 
+
+<style id="financeWorkspaceModalStyles">
+.financeWorkspaceOverlay{
+  position:fixed!important;
+  inset:0!important;
+  z-index:25000!important;
+  display:grid!important;
+  place-items:center!important;
+  padding:24px!important;
+  background:rgba(0,0,0,.58)!important;
+  backdrop-filter:blur(5px)!important;
+}
+.financeWorkspaceOverlay.hidden{display:none!important}
+.financeWorkspaceWindow{
+  position:relative!important;
+  width:min(96vw,1100px)!important;
+  max-height:90vh!important;
+  overflow:auto!important;
+  padding:24px!important;
+  border-radius:22px!important;
+  background:#f5f0e7!important;
+  box-shadow:0 30px 90px rgba(0,0,0,.38)!important;
+}
+.financeWorkspaceClose{
+  position:sticky!important;
+  top:0!important;
+  float:right!important;
+  z-index:3!important;
+  width:40px!important;
+  height:40px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:12px!important;
+  background:#17130f!important;
+  color:#fff!important;
+  font-size:1.35rem!important;
+  font-weight:900!important;
+}
+#financeWorkspaceMount>.panel,
+#financeWorkspaceMount>form{
+  display:block!important;
+  width:100%!important;
+  margin:0!important;
+}
+body.financeWorkspaceOpen{overflow:hidden!important}
+@media(max-width:700px){
+  .financeWorkspaceOverlay{padding:10px!important}
+  .financeWorkspaceWindow{
+    width:100%!important;
+    max-height:94vh!important;
+    padding:16px!important;
+    border-radius:18px!important;
+  }
+}
+</style>
+
+
+<style id="cashPendingButtonsFix">
+#posPendingOrders .posPendingCardPro{
+  display:grid!important;
+  grid-template-columns:72px minmax(0,1fr) auto!important;
+  gap:10px!important;
+  align-items:center!important;
+  padding:12px!important;
+}
+#posPendingOrders .posPendingActionsPro{
+  grid-column:1/-1!important;
+  display:grid!important;
+  grid-template-columns:minmax(110px,1fr) minmax(110px,1fr) 42px!important;
+  gap:8px!important;
+  width:100%!important;
+}
+#posPendingOrders .posPendingActionsPro button{
+  display:flex!important;
+  visibility:visible!important;
+  opacity:1!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:42px!important;
+  width:100%!important;
+  position:relative!important;
+  transform:none!important;
+}
+#posPendingOrders .pendingChargeBtn{
+  background:#ffc400!important;
+  color:#17130f!important;
+}
+#posPendingOrders .pendingEditBtn{
+  background:#fff!important;
+  color:#17130f!important;
+  border:1px solid #d9cab5!important;
+}
+#posPendingOrders .pendingCancelBtn{
+  background:#bd3028!important;
+  color:#fff!important;
+}
+@media(max-width:650px){
+  #posPendingOrders .posPendingCardPro{
+    grid-template-columns:58px minmax(0,1fr)!important;
+  }
+  #posPendingOrders .posPendingTotal{
+    grid-column:1/-1!important;
+    align-items:flex-start!important;
+  }
+}
+</style>
+
 </head>
 <body>
 <header class="topbar hidden">
@@ -1463,7 +1570,7 @@ document.addEventListener('DOMContentLoaded', function(){
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=operations-pro-1"></script>
+<script src="/admin-v18.js?v=cash-finance-fixed-2"></script>
 
 
 
@@ -1538,6 +1645,14 @@ document.addEventListener('DOMContentLoaded', function(){
       <button type="button" class="dark" id="cancelPendingOrderEdit">Cancelar</button>
       <button type="button" class="primary" id="savePendingOrderEdit">Guardar cambios</button>
     </div>
+  </div>
+</div>
+
+
+<div id="financeWorkspaceOverlay" class="financeWorkspaceOverlay hidden" aria-hidden="true">
+  <div class="financeWorkspaceWindow">
+    <button type="button" class="financeWorkspaceClose" id="financeWorkspaceClose" aria-label="Cerrar">×</button>
+    <div id="financeWorkspaceMount"></div>
   </div>
 </div>
 

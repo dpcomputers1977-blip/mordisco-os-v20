@@ -483,57 +483,118 @@ function renderAdminCategories(){$('#adminCategories').innerHTML=categories.map(
 
 
 function renderPosPendingOrders(){
-  if(!$('#posPendingOrders'))return;
+  const container=document.querySelector('#posPendingOrders');
+  if(!container)return;
 
   const pending=orders
-    .filter(o=>(o.payment_status||'unpaid')!=='paid'&&o.status!=='cancelled')
-    .sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+    .filter(order=>{
+      const payment=String(order.payment_status||'unpaid').toLowerCase();
+      const status=String(order.status||'pending').toLowerCase();
+      return payment!=='paid'&&status!=='cancelled';
+    })
+    .sort((a,b)=>new Date(a.created_at||0)-new Date(b.created_at||0));
 
-  if($('#posPendingCount'))$('#posPendingCount').textContent=pending.length;
+  const count=document.querySelector('#posPendingCount');
+  if(count)count.textContent=String(pending.length);
 
-  $('#posPendingOrders').innerHTML=pending.length?pending.map(o=>`
-    <article class="posPendingCard posPendingCardPro">
-      <div class="posPendingNumber">
-        <small>PEDIDO</small>
-        <strong>#${o.order_number}</strong>
-      </div>
+  if(!pending.length){
+    container.innerHTML=`
+      <div class="posPendingEmpty">
+        <span>✓</span>
+        <div>
+          <b>No hay pedidos pendientes</b>
+          <p>Las órdenes enviadas a cocina aparecerán aquí para cobrarlas.</p>
+        </div>
+      </div>`;
+    return;
+  }
 
-      <div class="posPendingInfo">
-        <h4>${esc(o.customer_name||'Consumidor final')}</h4>
-        <p>${o.order_items?.map(i=>`${i.quantity}× ${esc(i.product_name)}`).join(', ')||'Sin detalle'}</p>
-        <small>
-          ${o.restaurant_tables?.name?`🍽️ ${esc(o.restaurant_tables.name)} · `:''}
-          ${orderTypeLabel(o.order_type)} ·
-          ${new Date(o.created_at).toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'})}
-        </small>
-      </div>
+  container.innerHTML=pending.map(order=>{
+    const items=Array.isArray(order.order_items)?order.order_items:[];
+    const details=items.length
+      ?items.map(item=>{
+          const name=item.product_name||item.products?.name||item.name||'Producto';
+          return `${Number(item.quantity||1)}× ${esc(name)}`;
+        }).join(', ')
+      :'Sin detalle de productos';
 
-      <div class="posPendingTotal">
-        <span>Pendiente</span>
-        <strong>${money(o.total)}</strong>
-      </div>
+    const customer=order.customer_name||order.customer?.full_name||'Consumidor final';
+    const orderNumber=order.order_number||order.id||'—';
+    const total=Number(order.total||order.subtotal||0);
+    const tableName=order.restaurant_tables?.name||order.table_name||'';
+    const type=typeof orderTypeLabel==='function'
+      ?orderTypeLabel(order.order_type)
+      :(order.order_type||'En el local');
 
-      <div class="posPendingActionsPro">
-        <button type="button" class="pendingEditBtn" data-pending-edit="${o.id}">✏ Editar</button>
-        <button type="button" class="primary pendingChargeBtn" data-pos-pay="${o.id}">💵 Cobrar</button>
-        <button type="button" class="danger pendingCancelBtn" data-pending-cancel="${o.id}">✕</button>
-      </div>
-    </article>
-  `).join(''):`<div class="posPendingEmpty">
-    <span>✓</span>
-    <div><b>No hay pedidos pendientes</b><p>Las órdenes enviadas a cocina aparecerán aquí para cobrarlas.</p></div>
-  </div>`;
+    let time='';
+    try{
+      time=new Date(order.created_at).toLocaleTimeString('es-EC',{
+        hour:'2-digit',
+        minute:'2-digit'
+      });
+    }catch{}
 
-  $$('[data-pos-pay]').forEach(button=>{
-    button.onclick=()=>openChargeOrder(button.dataset.posPay);
+    return `
+      <article class="posPendingCard posPendingCardPro">
+        <div class="posPendingNumber">
+          <small>PEDIDO</small>
+          <strong>#${esc(String(orderNumber))}</strong>
+        </div>
+
+        <div class="posPendingInfo">
+          <h4>${esc(customer)}</h4>
+          <p>${details}</p>
+          <small>
+            ${tableName?`🍽️ ${esc(tableName)} · `:''}
+            ${esc(type)}${time?` · ${esc(time)}`:''}
+          </small>
+        </div>
+
+        <div class="posPendingTotal">
+          <span>Pendiente</span>
+          <strong>${money(total)}</strong>
+        </div>
+
+        <div class="posPendingActionsPro">
+          <button type="button"
+                  class="pendingEditBtn"
+                  data-pending-edit="${esc(String(order.id))}">
+            ✏ Editar
+          </button>
+
+          <button type="button"
+                  class="primary pendingChargeBtn"
+                  data-pos-pay="${esc(String(order.id))}">
+            💵 Cobrar
+          </button>
+
+          <button type="button"
+                  class="danger pendingCancelBtn"
+                  data-pending-cancel="${esc(String(order.id))}"
+                  aria-label="Cancelar pedido">
+            ✕
+          </button>
+        </div>
+      </article>`;
+  }).join('');
+
+  container.querySelectorAll('[data-pos-pay]').forEach(button=>{
+    button.addEventListener('click',()=>{
+      const id=button.dataset.posPay;
+      if(typeof openChargeOrder==='function'){
+        openChargeOrder(id);
+      }else{
+        toast('No se pudo abrir el cobro');
+      }
+    });
   });
 
-  $$('[data-pending-edit]').forEach(button=>{
-    button.onclick=()=>openPendingOrderEditor(button.dataset.pendingEdit);
+  container.querySelectorAll('[data-pending-edit]').forEach(button=>{
+    button.addEventListener('click',()=>openPendingOrderEditor(button.dataset.pendingEdit));
   });
 
-  $$('[data-pending-cancel]').forEach(button=>{
-    button.onclick=()=>cancelPendingOrder(button.dataset.pendingCancel);
+  container.querySelectorAll('[data-pending-cancel]').forEach(button=>{
+    button.addEventListener('click',()=>cancelPendingOrder(button.dataset.pendingCancel));
   });
 }
 
@@ -4376,37 +4437,96 @@ if(document.querySelector('#cancelPendingOrderEdit')){
 }
 
 /* ===== CONTABILIDAD POR ACCESOS ===== */
-function setFinanceWorkspace(view){
-  const movementForm=document.querySelector('#financeForm');
-  const accountsForm=document.querySelector('#financeAccountForm');
-  const movements=document.querySelector('#financeMovementsPanel');
-  const accounts=document.querySelector('#financeAccountsPanel');
+const financeWorkspaceState={
+  mount:null,
+  overlay:null,
+  placeholder:null,
+  activeNode:null
+};
 
-  [movementForm,accountsForm,movements,accounts].forEach(node=>node?.classList.add('financeSectionHidden'));
+function closeFinanceWorkspace(){
+  const {overlay,placeholder,activeNode}=financeWorkspaceState;
+
+  if(activeNode&&placeholder?.parentNode){
+    placeholder.parentNode.insertBefore(activeNode,placeholder);
+    placeholder.remove();
+    activeNode.classList.add('financeSectionHidden');
+  }
+
+  financeWorkspaceState.activeNode=null;
+  financeWorkspaceState.placeholder=null;
+
+  overlay?.classList.add('hidden');
+  overlay?.setAttribute('aria-hidden','true');
+  document.body.classList.remove('financeWorkspaceOpen');
+}
+
+function openFinanceWorkspace(view){
+  const overlay=document.querySelector('#financeWorkspaceOverlay');
+  const mount=document.querySelector('#financeWorkspaceMount');
+
+  const selectors={
+    income:'#financeForm',
+    expense:'#financeForm',
+    movements:'#financeMovementsPanel',
+    accounts:'#financeAccountsPanel'
+  };
+
+  const node=document.querySelector(selectors[view]);
+  if(!overlay||!mount||!node)return;
+
+  closeFinanceWorkspace();
+
+  const placeholder=document.createComment('finance-workspace-placeholder');
+  node.parentNode.insertBefore(placeholder,node);
+
+  financeWorkspaceState.overlay=overlay;
+  financeWorkspaceState.mount=mount;
+  financeWorkspaceState.placeholder=placeholder;
+  financeWorkspaceState.activeNode=node;
+
+  node.classList.remove('financeSectionHidden');
+  mount.appendChild(node);
 
   if(view==='income'||view==='expense'){
-    movementForm?.classList.remove('financeSectionHidden');
     const type=document.querySelector('#financeType');
     if(type)type.value=view;
-    movementForm?.scrollIntoView({behavior:'smooth',block:'start'});
+    const title=node.querySelector('h3');
+    if(title)title.textContent=view==='income'?'Nuevo ingreso':'Nuevo egreso';
   }
+
   if(view==='movements'){
-    movements?.classList.remove('financeSectionHidden');
     loadFinance();
   }
-  if(view==='accounts'){
-    accountsForm?.classList.remove('financeSectionHidden');
-    accounts?.classList.remove('financeSectionHidden');
-    if(typeof loadFinanceAccounts==='function')loadFinanceAccounts();
+
+  if(view==='accounts'&&typeof loadFinanceAccounts==='function'){
+    loadFinanceAccounts();
   }
+
+  overlay.classList.remove('hidden');
+  overlay.setAttribute('aria-hidden','false');
+  document.body.classList.add('financeWorkspaceOpen');
 }
 
 document.querySelectorAll('[data-finance-view]').forEach(button=>{
-  button.addEventListener('click',()=>setFinanceWorkspace(button.dataset.financeView));
+  button.addEventListener('click',()=>openFinanceWorkspace(button.dataset.financeView));
 });
+
+document.querySelector('#financeWorkspaceClose')?.addEventListener('click',closeFinanceWorkspace);
+
+document.querySelector('#financeWorkspaceOverlay')?.addEventListener('click',event=>{
+  if(event.target===document.querySelector('#financeWorkspaceOverlay')){
+    closeFinanceWorkspace();
+  }
+});
+
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape'&&!document.querySelector('#financeWorkspaceOverlay')?.classList.contains('hidden')){
+    closeFinanceWorkspace();
+  }
+});
+
 document.querySelectorAll('[data-finance-close]').forEach(button=>{
-  button.addEventListener('click',()=>{
-    button.closest('#financeForm,#financeAccountForm,#financeMovementsPanel,#financeAccountsPanel')
-      ?.classList.add('financeSectionHidden');
-  });
+  button.addEventListener('click',closeFinanceWorkspace);
 });
+
