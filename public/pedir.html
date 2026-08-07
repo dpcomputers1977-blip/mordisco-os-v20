@@ -28,6 +28,75 @@
 }
 </style>
 
+
+<style id="onlineOrderingProfessionalPatch">
+.onlineStoreStatus{
+  display:flex;align-items:center;gap:11px;margin:0 0 18px;padding:12px 14px;
+  border-radius:14px;border:1px solid #ded6c9;background:#fff;color:#17130f
+}
+.onlineStoreStatus .storeStatusDot{
+  width:12px;height:12px;border-radius:50%;background:#d8a600;box-shadow:0 0 0 5px rgba(216,166,0,.14)
+}
+.onlineStoreStatus div{display:flex;flex-direction:column;gap:2px}
+.onlineStoreStatus small{color:#746b60}
+.onlineStoreStatus.open{background:#ecf9ef;border-color:#b9e5c3;color:#17642d}
+.onlineStoreStatus.open .storeStatusDot{background:#23a34a;box-shadow:0 0 0 5px rgba(35,163,74,.14)}
+.onlineStoreStatus.closed{background:#fff0ee;border-color:#efc0ba;color:#9a261c}
+.onlineStoreStatus.closed .storeStatusDot{background:#c83a2c;box-shadow:0 0 0 5px rgba(200,58,44,.14)}
+
+.paymentHelp{
+  margin:-3px 0 5px;padding:9px 11px;border-radius:10px;
+  background:#f4efe6;color:#6f665a;font-size:.8rem
+}
+
+.floatingCartButton{
+  position:fixed;right:18px;bottom:20px;z-index:8500;
+  display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;
+  min-width:250px;max-width:calc(100vw - 36px);padding:11px 13px;
+  border:0;border-radius:17px;background:#ffc400;color:#17130f;
+  box-shadow:0 16px 38px rgba(0,0,0,.28);font-weight:900;cursor:pointer
+}
+.floatingCartButton .floatingCartIcon{
+  display:grid;place-items:center;width:42px;height:42px;border-radius:12px;
+  background:rgba(255,255,255,.55);font-size:1.25rem
+}
+.floatingCartButton span:nth-child(2){display:flex;flex-direction:column;align-items:flex-start}
+.floatingCartButton small{font-size:.68rem;font-weight:750;opacity:.72}
+.floatingCartButton>strong{font-size:1.35rem}
+.floatingCartButton.hasItems{animation:cartPulse .35s ease}
+@keyframes cartPulse{50%{transform:scale(1.04)}}
+
+.closedStoreOverlay{
+  position:fixed;inset:0;z-index:12000;display:grid;place-items:center;
+  padding:20px;background:rgba(10,9,8,.76);backdrop-filter:blur(8px)
+}
+.closedStoreOverlay.hidden{display:none}
+.closedStoreCard{
+  width:min(100%,460px);padding:30px;border-radius:24px;text-align:center;
+  background:#fff;color:#17130f;box-shadow:0 28px 80px rgba(0,0,0,.38)
+}
+.closedStoreCard>span{font-size:3rem}
+.closedStoreCard h2{margin:10px 0 8px;font-size:2rem}
+.closedStoreCard p{color:#70675c;line-height:1.55}
+.closedStoreCard a{
+  display:inline-flex;margin-top:12px;padding:12px 16px;border-radius:12px;
+  background:#17130f;color:#fff;text-decoration:none;font-weight:900
+}
+body.storeClosed #sendOnlineOrder{
+  opacity:.5!important;pointer-events:none!important;filter:grayscale(.4)
+}
+body.storeClosed [data-add]{
+  opacity:.45!important;pointer-events:none!important
+}
+
+@media(max-width:700px){
+  .floatingCartButton{
+    left:14px;right:14px;bottom:14px;width:auto;min-width:0
+  }
+  body{padding-bottom:92px}
+}
+</style>
+
 </head>
 <body>
 <header class="orderTopbar">
@@ -37,6 +106,10 @@
 
 <main class="orderLayout">
   <section class="orderCatalog">
+    <div id="onlineStoreStatus" class="onlineStoreStatus checking">
+      <span class="storeStatusDot"></span>
+      <div><b>Comprobando horario…</b><small>Espera un momento.</small></div>
+    </div>
     <div class="orderHeading">
       <span>PEDIDO EN LÍNEA</span>
       <h1>Arma tu próximo Mordisco</h1>
@@ -68,6 +141,16 @@
         </select>
       </label>
       <label id="onlineAddressWrap" class="hidden">Dirección<input id="onlineAddress"></label>
+      <label>Método de pago
+        <select id="onlinePaymentMethod" required>
+          <option value="cash">Efectivo al recibir</option>
+          <option value="deuna">Deuna</option>
+          <option value="ahorita">Ahorita</option>
+          <option value="transfer">Transferencia bancaria</option>
+          <option value="card">Tarjeta en el local</option>
+        </select>
+      </label>
+      <p class="paymentHelp">El pago se confirma al entregar o retirar el pedido.</p>
       <label>Notas<textarea id="onlineNotes" placeholder="Sin cebolla, punto de referencia…"></textarea></label>
       <button id="sendOnlineOrder" type="submit">Confirmar pedido por WhatsApp</button>
       <p class="onlineNotice">
@@ -78,7 +161,22 @@
   </aside>
 </main>
 
+<button id="floatingCartButton" class="floatingCartButton" type="button" aria-label="Ir al carrito">
+  <span class="floatingCartIcon">🛒</span>
+  <span><b>Ver carrito</b><small id="floatingCartSummary">0 productos · $0,00</small></span>
+  <strong>→</strong>
+</button>
+
+<div id="closedStoreOverlay" class="closedStoreOverlay hidden" aria-hidden="true">
+  <div class="closedStoreCard">
+    <span>🌙</span>
+    <h2>Ahora estamos cerrados</h2>
+    <p id="closedStoreMessage">Revisa nuestro próximo horario de atención.</p>
+    <a href="/">Volver a la página principal</a>
+  </div>
+</div>
+
 <div id="onlineToast" class="onlineToast"></div>
-<script src="/online-v18.js?v=rpc-web-order-fixed"></script>
+<script src="/online-v18.js?v=hours-payments-cart-1"></script>
 </body>
 </html>

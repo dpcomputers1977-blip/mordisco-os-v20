@@ -3,6 +3,113 @@ const SUPABASE_KEY="sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let products=[],categories=[],cart=[],category="Todos",search="";
+let storeIsOpen=true;
+let businessHours=[];
+
+const PAYMENT_LABELS={
+  cash:"Efectivo al recibir",
+  deuna:"Deuna",
+  ahorita:"Ahorita",
+  transfer:"Transferencia bancaria",
+  card:"Tarjeta en el local"
+};
+
+function ecuadorNowParts(){
+  const parts=new Intl.DateTimeFormat("en-CA",{
+    timeZone:"America/Guayaquil",
+    weekday:"short",hour:"2-digit",minute:"2-digit",hour12:false
+  }).formatToParts(new Date());
+  const values=Object.fromEntries(parts.map(part=>[part.type,part.value]));
+  const dayMap={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};
+  return {
+    day:dayMap[values.weekday],
+    minutes:Number(values.hour)*60+Number(values.minute)
+  };
+}
+
+function timeToMinutes(value){
+  const [hours,minutes]=String(value||"00:00").slice(0,5).split(":").map(Number);
+  return (hours||0)*60+(minutes||0);
+}
+
+function evaluateStoreOpen(rows){
+  if(!Array.isArray(rows)||!rows.length){
+    return {open:true,message:"Horario no configurado; pedidos habilitados."};
+  }
+
+  const now=ecuadorNowParts();
+  const today=rows.find(row=>Number(row.day_of_week)===Number(now.day));
+  if(!today||today.closed){
+    const next=findNextOpening(rows,now.day);
+    return {open:false,message:next?`Volvemos ${next}.`:"No hay horarios de atención configurados."};
+  }
+
+  const opens=timeToMinutes(today.opens_at);
+  const closes=timeToMinutes(today.closes_at);
+  const openNow=closes>opens
+    ? now.minutes>=opens&&now.minutes<closes
+    : now.minutes>=opens||now.minutes<closes;
+
+  if(openNow){
+    return {open:true,message:`Abierto hasta ${String(today.closes_at).slice(0,5)}.`};
+  }
+
+  if(now.minutes<opens){
+    return {open:false,message:`Abrimos hoy a las ${String(today.opens_at).slice(0,5)}.`};
+  }
+
+  const next=findNextOpening(rows,now.day);
+  return {open:false,message:next?`Volvemos ${next}.`:"Estamos fuera del horario de atención."};
+}
+
+function findNextOpening(rows,currentDay){
+  const labels=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+  for(let offset=1;offset<=7;offset++){
+    const day=(currentDay+offset)%7;
+    const row=rows.find(item=>Number(item.day_of_week)===day&&!item.closed);
+    if(row)return `${labels[day]} a las ${String(row.opens_at).slice(0,5)}`;
+  }
+  return "";
+}
+
+function applyStoreStatus(result){
+  storeIsOpen=Boolean(result.open);
+  const status=document.querySelector("#onlineStoreStatus");
+  const overlay=document.querySelector("#closedStoreOverlay");
+  const message=result.message||"Consulta nuestro horario.";
+
+  document.body.classList.toggle("storeClosed",!storeIsOpen);
+  status?.classList.remove("checking","open","closed");
+  status?.classList.add(storeIsOpen?"open":"closed");
+  if(status){
+    status.querySelector("b").textContent=storeIsOpen?"Estamos abiertos":"Restaurante cerrado";
+    status.querySelector("small").textContent=message;
+  }
+  const closedMessage=document.querySelector("#closedStoreMessage");
+  if(closedMessage)closedMessage.textContent=message;
+  overlay?.classList.toggle("hidden",storeIsOpen);
+  overlay?.setAttribute("aria-hidden",storeIsOpen?"true":"false");
+
+  const submit=document.querySelector("#sendOnlineOrder");
+  if(submit){
+    submit.disabled=!storeIsOpen;
+    submit.textContent=storeIsOpen
+      ?"Confirmar pedido por WhatsApp"
+      :"Pedidos cerrados por horario";
+  }
+}
+
+async function loadBusinessHoursForOrdering(){
+  try{
+    const {data,error}=await db.from("business_hours").select("*").order("sort_order");
+    if(error)throw error;
+    businessHours=data||[];
+    applyStoreStatus(evaluateStoreOpen(businessHours));
+  }catch(error){
+    console.warn("No se pudo comprobar el horario:",error);
+    applyStoreStatus({open:true,message:"No se pudo comprobar el horario; pedidos habilitados."});
+  }
+}
 const money=n=>new Intl.NumberFormat("es-EC",{style:"currency",currency:"USD"}).format(Number(n||0));
 const esc=s=>String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 
@@ -16,7 +123,8 @@ function toast(message){
 async function load(){
   const [productsResult,categoriesResult]=await Promise.all([
     db.from("products").select("*,categories(name)").eq("active",true).order("sort_order"),
-    db.from("categories").select("*").eq("active",true).order("sort_order")
+    db.from("categories").select("*").eq("active",true).order("sort_order"),
+    loadBusinessHoursForOrdering()
   ]);
   if(productsResult.error)return toast(productsResult.error.message);
   products=productsResult.data||[];
@@ -50,6 +158,7 @@ function renderProducts(){
     </div>
   </article>`).join("")||"<p>No encontramos productos.</p>";
   document.querySelectorAll("[data-add]").forEach(button=>button.onclick=()=>{
+    if(!storeIsOpen)return toast("El restaurante está cerrado en este momento");
     const id=button.dataset.add;
     const row=cart.find(item=>String(item.id)===String(id));
     if(row)row.qty++;else cart.push({id,qty:1});
@@ -60,6 +169,12 @@ function renderProducts(){
 
 function renderCart(){
   const node=document.querySelector("#onlineCartItems");
+  if(!storeIsOpen){
+    toast("El restaurante está cerrado en este momento");
+    applyStoreStatus(evaluateStoreOpen(businessHours));
+    return;
+  }
+
   if(!cart.length){
     node.innerHTML="<p>Tu carrito está vacío.</p>";
   }else{
@@ -88,6 +203,14 @@ function renderCart(){
     return sum+Number(p.price)*item.qty;
   },0);
   document.querySelector("#onlineTotal").textContent=money(total);
+  const itemCount=cart.reduce((sum,item)=>sum+Number(item.qty||0),0);
+  const floatingSummary=document.querySelector("#floatingCartSummary");
+  if(floatingSummary)floatingSummary.textContent=`${itemCount} ${itemCount===1?"producto":"productos"} · ${money(total)}`;
+  const floatingButton=document.querySelector("#floatingCartButton");
+  if(floatingButton){
+    floatingButton.classList.toggle("hasItems",itemCount>0);
+    setTimeout(()=>floatingButton.classList.remove("hasItems"),380);
+  }
 }
 
 document.querySelector("#onlineSearch").oninput=event=>{
@@ -119,6 +242,7 @@ document.querySelector("#onlineOrderForm").onsubmit=async event=>{
   const type=document.querySelector("#onlineType").value;
   const address=document.querySelector("#onlineAddress").value.trim();
   const notes=document.querySelector("#onlineNotes").value.trim();
+  const paymentMethod=document.querySelector("#onlinePaymentMethod").value||"cash";
   const button=document.querySelector("#sendOnlineOrder");
 
   if(name.length<2){
@@ -183,7 +307,7 @@ document.querySelector("#onlineOrderForm").onsubmit=async event=>{
         product_id:item.product_id,
         quantity:item.quantity
       })),
-      p_payment_method:"pending",
+      p_payment_method:paymentMethod,
       p_extras:[]
     });
 
@@ -214,6 +338,7 @@ document.querySelector("#onlineOrderForm").onsubmit=async event=>{
       itemLines,
       "",
       `*Total: ${money(total)}*`,
+      `Método de pago: ${PAYMENT_LABELS[paymentMethod]||paymentMethod}`,
       notes?`Notas: ${notes}`:"",
       "",
       "Confirmo que deseo realizar este pedido.",
@@ -249,5 +374,13 @@ document.querySelector("#onlineOrderForm").onsubmit=async event=>{
     button.textContent="Confirmar pedido por WhatsApp";
   }
 };
+
+document.querySelector("#floatingCartButton")?.addEventListener("click",()=>{
+  document.querySelector(".onlineCart")?.scrollIntoView({behavior:"smooth",block:"start"});
+});
+
+setInterval(()=>{
+  if(businessHours.length)applyStoreStatus(evaluateStoreOpen(businessHours));
+},60000);
 
 load();

@@ -1,0 +1,39 @@
+MORDISCO — PEDIDOS SEGÚN HORARIO, PAGOS Y CARRITO FLOTANTE
+
+CAMBIOS
+- Consulta business_hours de Supabase.
+- Bloquea nuevos pedidos cuando el restaurante está cerrado.
+- Muestra si está abierto, cerrado y el próximo horario.
+- Revisa el estado nuevamente cada minuto.
+- Añade métodos de pago:
+  Efectivo, Deuna, Ahorita, transferencia y tarjeta.
+- Guarda el método seleccionado en el pedido.
+- Incluye el método de pago en el mensaje de WhatsApp.
+- Añade botón flotante 🛒 Ver carrito solo en /pedir.
+- El botón muestra cantidad de productos y total.
+- Al pulsarlo lleva directamente al carrito.
+
+NO CAMBIA
+- Página principal
+- Club Mordisco
+- Administrador
+- Caja
+- Cocina
+- Contabilidad
+- Supabase ni sus tablas
+
+INSTALACIÓN
+1. Extrae el ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Cerrar pedidos por horario y agregar pagos
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Cierra las pestañas de Mordisco en el teléfono.
+9. Abre:
+   https://mordiscofastfood.com/pedir?v=hours-payments-cart-1
+
+NO EJECUTES SQL.
