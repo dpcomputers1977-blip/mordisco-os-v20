@@ -5,40 +5,310 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=club-mordisco-1">
+<link rel="stylesheet" href="/admin-v18.css?v=club-boom-1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 
-<style id="clubMordiscoPublicStyles">
-.publicQuickLinks{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+
+
+<style id="clubMordiscoBoomStyles">
+.publicQuickLinks{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
 .rewardsPublicLink{
-  display:inline-flex;align-items:center;justify-content:center;
-  min-height:40px;padding:8px 13px;border-radius:10px;
-  background:#ffc400;color:#17130f;text-decoration:none;font-weight:900;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:42px;
+  padding:9px 15px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#ffd21f,#ff9f00);
+  color:#17130f;
+  text-decoration:none;
+  font-weight:950;
+  box-shadow:0 8px 22px rgba(255,180,0,.25);
 }
-.clubMordiscoHome{
-  display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);
-  gap:28px;align-items:center;margin:34px auto;padding:36px;
-  max-width:1180px;border-radius:24px;background:#17130f;color:#fff;
+
+.clubMordiscoBoom{
+  position:relative;
+  isolation:isolate;
+  display:grid;
+  grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);
+  align-items:center;
+  gap:40px;
+  max-width:1240px;
+  margin:50px auto;
+  padding:58px;
   overflow:hidden;
+  border-radius:34px;
+  background:
+    radial-gradient(circle at top right,rgba(255,198,0,.20),transparent 30%),
+    linear-gradient(145deg,#11100e 0%,#1c1812 55%,#0f0e0c 100%);
+  color:#fff;
+  box-shadow:0 30px 80px rgba(24,18,8,.28);
 }
-.clubMordiscoHome h2{font-size:clamp(2rem,4vw,4rem);line-height:.98;margin:10px 0 16px}
-.clubMordiscoHome p{max-width:650px;color:#ddd2c2;line-height:1.6}
-.clubMordiscoButton{display:inline-flex;margin-top:12px;text-decoration:none}
-.clubMordiscoMiniCard{
-  min-height:230px;padding:28px;border-radius:22px;
-  background:linear-gradient(145deg,#ffc400,#ff9f00);
-  color:#17130f;display:flex;flex-direction:column;justify-content:space-between;
-  box-shadow:0 22px 55px rgba(0,0,0,.3);transform:rotate(3deg);
+
+.clubBoomGlow{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(14px);
+  opacity:.55;
+  z-index:-1;
 }
-.clubMordiscoMiniCard small{font-weight:900;letter-spacing:2px}
-.clubMordiscoMiniCard strong{font-size:2rem}
-.clubMordiscoMiniCard span{font-weight:700}
-.clubMordiscoMiniCard b{font-size:1.2rem}
-@media(max-width:760px){
-  .clubMordiscoHome{grid-template-columns:1fr;margin:22px 12px;padding:24px}
-  .clubMordiscoMiniCard{min-height:190px}
-  .publicQuickLinks{width:100%}
+.clubBoomGlowOne{
+  width:260px;
+  height:260px;
+  right:-80px;
+  top:-100px;
+  background:#ffbf00;
+}
+.clubBoomGlowTwo{
+  width:180px;
+  height:180px;
+  left:-70px;
+  bottom:-80px;
+  background:#ff7b00;
+}
+
+.clubBoomBadge{
+  display:inline-flex;
+  padding:8px 12px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;
+  background:rgba(255,255,255,.08);
+  font-size:.76rem;
+  font-weight:950;
+  letter-spacing:1.4px;
+}
+.clubBoomContent .eyebrow{
+  display:block;
+  margin-top:20px;
+  color:#ffc400;
+}
+.clubBoomContent h2{
+  margin:10px 0 18px;
+  font-size:clamp(2.7rem,5vw,5.8rem);
+  line-height:.92;
+  letter-spacing:-2px;
+}
+.clubBoomContent h2 strong{
+  color:#ffc400;
+}
+.clubBoomContent p{
+  max-width:660px;
+  margin:0;
+  color:#d8cebe;
+  font-size:1.08rem;
+  line-height:1.65;
+}
+
+.clubBoomActions{
+  margin-top:28px;
+}
+.clubBoomPrimary{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:14px;
+  width:min(100%,520px);
+  padding:15px 17px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#ffd21f,#ff9f00);
+  color:#17130f;
+  text-decoration:none;
+  box-shadow:0 16px 36px rgba(255,169,0,.28);
+  transform:translateY(0);
+  transition:.2s ease;
+}
+.clubBoomPrimary:hover{
+  transform:translateY(-4px) scale(1.01);
+  box-shadow:0 22px 44px rgba(255,169,0,.38);
+}
+.clubBoomPrimary>span{
+  display:grid;
+  place-items:center;
+  width:48px;
+  height:48px;
+  border-radius:14px;
+  background:rgba(255,255,255,.45);
+  font-size:1.35rem;
+}
+.clubBoomPrimary small{
+  display:block;
+  font-size:.65rem;
+  font-weight:950;
+  letter-spacing:1.4px;
+}
+.clubBoomPrimary b{
+  display:block;
+  margin-top:2px;
+  font-size:1.05rem;
+}
+.clubBoomPrimary>strong{
+  font-size:1.6rem;
+}
+
+.clubBoomBenefits{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:16px;
+}
+.clubBoomBenefits span{
+  padding:8px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.1);
+  font-size:.78rem;
+  font-weight:800;
+}
+
+.clubBoomVisual{
+  position:relative;
+  min-height:410px;
+  display:grid;
+  place-items:center;
+}
+.clubBoomCard{
+  width:min(100%,420px);
+  padding:28px;
+  border-radius:28px;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.38),rgba(255,255,255,.07)),
+    linear-gradient(145deg,#ffc400,#ff9700);
+  color:#17130f;
+  box-shadow:
+    0 28px 70px rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.7);
+  transform:rotate(4deg);
+}
+.clubBoomCardTop,
+.clubBoomPoints{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.clubBoomCardTop span{
+  font-size:.74rem;
+  font-weight:950;
+  letter-spacing:1.8px;
+}
+.clubBoomCardTop img{
+  width:88px;
+  height:58px;
+  object-fit:contain;
+}
+.clubBoomMember{
+  margin:38px 0 26px;
+}
+.clubBoomMember small{
+  display:block;
+  font-size:.68rem;
+  font-weight:900;
+  opacity:.65;
+}
+.clubBoomMember strong{
+  display:block;
+  margin-top:4px;
+  font-size:1.35rem;
+}
+.clubBoomPoints small{
+  display:block;
+  font-size:.7rem;
+  font-weight:900;
+}
+.clubBoomPoints strong{
+  display:block;
+  font-size:4.8rem;
+  line-height:.9;
+}
+.clubBoomPoints>span{
+  padding:8px 12px;
+  border-radius:999px;
+  background:#17130f;
+  color:#fff;
+  font-weight:950;
+}
+.clubBoomProgress{
+  height:13px;
+  margin:22px 0 10px;
+  overflow:hidden;
+  border-radius:999px;
+  background:rgba(255,255,255,.55);
+}
+.clubBoomProgress i{
+  display:block;
+  width:72%;
+  height:100%;
+  border-radius:999px;
+  background:#17130f;
+}
+.clubBoomCard p{
+  margin:0;
+  font-size:.8rem;
+  font-weight:850;
+}
+.clubBoomReward{
+  position:absolute;
+  right:0;
+  bottom:32px;
+  padding:12px 16px;
+  border-radius:14px;
+  background:#fff;
+  color:#17130f;
+  box-shadow:0 14px 35px rgba(0,0,0,.22);
+  font-size:.76rem;
+  font-weight:950;
+  transform:rotate(-4deg);
+  animation:clubRewardFloat 2.4s ease-in-out infinite;
+}
+@keyframes clubRewardFloat{
+  0%,100%{transform:translateY(0) rotate(-4deg)}
+  50%{transform:translateY(-8px) rotate(-4deg)}
+}
+
+@media(max-width:860px){
+  .clubMordiscoBoom{
+    grid-template-columns:1fr;
+    margin:28px 14px;
+    padding:32px 24px;
+    border-radius:26px;
+  }
+  .clubBoomVisual{
+    min-height:350px;
+  }
+  .clubBoomCard{
+    transform:rotate(2deg);
+  }
+}
+@media(max-width:520px){
+  .clubMordiscoBoom{
+    padding:26px 18px;
+  }
+  .clubBoomContent h2{
+    font-size:2.65rem;
+    letter-spacing:-1px;
+  }
+  .clubBoomPrimary{
+    grid-template-columns:auto 1fr;
+  }
+  .clubBoomPrimary>strong{
+    display:none;
+  }
+  .clubBoomBenefits{
+    display:grid;
+  }
+  .clubBoomCard{
+    padding:22px;
+  }
+  .clubBoomPoints strong{
+    font-size:3.8rem;
+  }
 }
 </style>
 
@@ -75,18 +345,66 @@
 </section>
 
 
-<section class="clubMordiscoHome">
-  <div class="clubMordiscoCopy">
+
+<section class="clubMordiscoBoom" id="club-mordisco">
+  <div class="clubBoomGlow clubBoomGlowOne"></div>
+  <div class="clubBoomGlow clubBoomGlowTwo"></div>
+
+  <div class="clubBoomContent">
+    <div class="clubBoomBadge">🔥 NUEVO EN MORDISCO</div>
     <span class="eyebrow">CLUB MORDISCO</span>
-    <h2>Cada compra te acerca a algo delicioso.</h2>
-    <p>Registra tu teléfono en el pedido, acumula puntos y revisa tus recompensas desde cualquier dispositivo.</p>
-    <a class="primary clubMordiscoButton" href="/recompensas">Ver mi tarjeta digital</a>
+    <h2>Compra. Acumula.<br><strong>Gana comida gratis.</strong></h2>
+    <p>
+      Cada pedido suma puntos. Consulta tu tarjeta digital,
+      desbloquea premios y vuelve por más.
+    </p>
+
+    <div class="clubBoomActions">
+      <a class="clubBoomPrimary" href="/recompensas">
+        <span>🎁</span>
+        <div>
+          <small>ABRIR AHORA</small>
+          <b>Mi tarjeta de recompensas</b>
+        </div>
+        <strong>→</strong>
+      </a>
+
+      <div class="clubBoomBenefits">
+        <span>⭐ 1 punto por dólar</span>
+        <span>🍔 Premios gratis</span>
+        <span>📱 Sin descargar app</span>
+      </div>
+    </div>
   </div>
-  <div class="clubMordiscoMiniCard" aria-hidden="true">
-    <small>TARJETA DIGITAL</small>
-    <strong>CLUB MORDISCO</strong>
-    <span>Compra · Acumula · Disfruta</span>
-    <b>⭐ PUNTOS</b>
+
+  <div class="clubBoomVisual">
+    <div class="clubBoomCard">
+      <div class="clubBoomCardTop">
+        <span>CLUB MORDISCO</span>
+        <img src="/media/logo.png" alt="Mordisco">
+      </div>
+
+      <div class="clubBoomMember">
+        <small>TARJETA DIGITAL</small>
+        <strong>CLIENTE MORDISCO</strong>
+      </div>
+
+      <div class="clubBoomPoints">
+        <div>
+          <small>PUNTOS</small>
+          <strong>120</strong>
+        </div>
+        <span>ORO</span>
+      </div>
+
+      <div class="clubBoomProgress">
+        <i></i>
+      </div>
+
+      <p>Tu próxima recompensa está cerca.</p>
+    </div>
+
+    <div class="clubBoomReward">🍟 PREMIO DISPONIBLE</div>
   </div>
 </section>
 
