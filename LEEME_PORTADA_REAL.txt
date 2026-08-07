@@ -1,0 +1,34 @@
+CLUB MORDISCO — CORRECCIÓN DE PORTADA
+
+CAUSA
+La sección se agregó en admin.html, pero la portada pública se sirve desde index.html.
+
+ARCHIVOS AÑADIDOS
+- index.html
+- public/index.html
+- dist/index.html
+
+NO MODIFICA
+- Supabase
+- Ventas
+- Caja
+- Cocina
+- Turnos
+- Contabilidad
+- Sistema de puntos
+
+INSTALACIÓN
+1. Extrae este ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Selecciona Reemplazar archivos.
+4. GitHub Desktop:
+   Summary: Publicar Club Mordisco en portada real
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Abre:
+   https://mordiscofastfood.com/?v=club-portada-real
+9. Presiona Ctrl + Shift + R.
+
+NO EJECUTES SQL.
