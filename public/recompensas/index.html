@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#17130f">
+<title>Club Mordisco | Mis recompensas</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--gold:#ffc400;--ink:#17130f;--cream:#f4efe5;--muted:#786f62}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:var(--cream);color:var(--ink)}
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 5vw;background:#11100e;color:#fff}
+header a{color:#fff;text-decoration:none;font-weight:900}
+header img{width:74px;height:52px;object-fit:contain}
+.brand{display:flex;align-items:center;gap:10px}
+main{max-width:1080px;margin:auto;padding:36px 18px 70px}
+.hero{text-align:center;max-width:760px;margin:0 auto 28px}
+.hero span{color:#a66d00;font-weight:950;letter-spacing:2px}
+.hero h1{font-size:clamp(2.4rem,7vw,5.3rem);line-height:.9;margin:12px 0}
+.hero p{color:var(--muted);font-size:1.05rem;line-height:1.6}
+.lookup{max-width:620px;margin:25px auto;padding:18px;background:#fff;border-radius:18px;box-shadow:0 12px 35px rgba(30,22,10,.08)}
+.lookup label{display:block;font-weight:900;margin-bottom:7px}
+.lookupRow{display:grid;grid-template-columns:1fr auto;gap:8px}
+.lookup input{min-height:48px;padding:10px 12px;border:1px solid #d6c8b4;border-radius:10px;font-size:1rem}
+button{min-height:48px;padding:10px 18px;border:0;border-radius:10px;background:var(--gold);color:var(--ink);font-weight:950;cursor:pointer}
+.notice{margin-top:10px;padding:10px;border-radius:9px;background:#f5f0e7;color:#6e6254}
+.hidden{display:none!important}
+.card{
+  position:relative;overflow:hidden;max-width:620px;min-height:330px;
+  margin:30px auto;padding:28px;border-radius:27px;
+  background:linear-gradient(145deg,#ffc400,#ff9e00);color:#17130f;
+  box-shadow:0 28px 70px rgba(38,27,9,.25)
+}
+.card:after{content:"M";position:absolute;right:-28px;bottom:-80px;font-size:260px;font-weight:1000;opacity:.12}
+.cardHead,.pointsRow,.progressMeta{display:flex;justify-content:space-between;gap:14px;align-items:center}
+.cardHead small{font-weight:950;letter-spacing:2px}
+.cardHead img{width:86px;height:60px;object-fit:contain}
+.customerName{font-size:2rem;margin:28px 0 4px}
+.customerPhone{opacity:.68}
+.pointsRow{margin-top:28px;align-items:flex-end}
+.pointsRow span{display:block;font-size:.85rem;font-weight:800}
+.pointsRow strong{font-size:4rem;line-height:.9}
+.level{padding:8px 12px;border-radius:999px;background:#17130f;color:#fff;font-weight:900}
+.progress{height:13px;background:rgba(255,255,255,.55);border-radius:99px;overflow:hidden;margin:20px 0 8px}
+.progress i{display:block;height:100%;background:#17130f;border-radius:99px}
+.progressMeta{font-size:.83rem;font-weight:800}
+.rewards{margin-top:40px}
+.rewards h2{text-align:center;font-size:2rem}
+.rewardGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+.reward{background:#fff;padding:18px;border-radius:15px;border:1px solid #e4d9c8}
+.reward b{display:block;font-size:1.1rem;margin-bottom:7px}
+.reward span{display:inline-block;margin-top:12px;padding:6px 9px;border-radius:99px;background:#fff3c5;font-weight:900}
+.reward.available{border:2px solid #e2aa00;box-shadow:0 8px 25px rgba(226,170,0,.12)}
+.how{margin-top:35px;padding:25px;background:#17130f;color:#fff;border-radius:20px}
+.howGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.how article{padding:15px;background:rgba(255,255,255,.07);border-radius:13px}
+.how b{display:block;color:var(--gold);font-size:1.8rem;margin-bottom:6px}
+footer{text-align:center;padding:25px;color:#7b7165}
+@media(max-width:760px){
+ .lookupRow{grid-template-columns:1fr}
+ .rewardGrid{grid-template-columns:1fr 1fr}
+ .howGrid{grid-template-columns:1fr}
+ .card{padding:21px;min-height:310px}
+ .pointsRow strong{font-size:3.3rem}
+}
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="/"><img src="/media/logo.png" alt="Mordisco"><span>MORDISCO FAST FOOD</span></a>
+  <a href="/">← Volver al menú</a>
+</header>
+<main>
+<section class="hero">
+  <span>CLUB MORDISCO</span>
+  <h1>Tu sabor también tiene premio.</h1>
+  <p>Consulta tu tarjeta con el mismo teléfono que usaste al realizar tu pedido. Obtienes un punto por cada dólar pagado.</p>
+</section>
+
+<section class="lookup">
+  <label for="rewardPhone">Tu teléfono o WhatsApp</label>
+  <div class="lookupRow">
+    <input id="rewardPhone" inputmode="tel" autocomplete="tel" placeholder="Ej. 0991234567">
+    <button id="findRewards">Ver mi tarjeta</button>
+  </div>
+  <div id="lookupMessage" class="notice">Usa el teléfono registrado en tu compra.</div>
+</section>
+
+<section id="digitalCard" class="card hidden">
+  <div class="cardHead"><small>TARJETA DIGITAL</small><img src="/media/logo.png" alt=""></div>
+  <h2 id="cardName" class="customerName">Cliente Mordisco</h2>
+  <div id="cardPhone" class="customerPhone"></div>
+  <div class="pointsRow">
+    <div><span>PUNTOS DISPONIBLES</span><strong id="cardPoints">0</strong></div>
+    <div id="cardLevel" class="level">BRONCE</div>
+  </div>
+  <div class="progress"><i id="cardProgress" style="width:0%"></i></div>
+  <div class="progressMeta"><span id="currentLevelText">Nivel Bronce</span><span id="nextRewardText">Próximo premio</span></div>
+</section>
+
+<section class="rewards">
+  <h2>Premios disponibles</h2>
+  <div id="rewardGrid" class="rewardGrid"></div>
+</section>
+
+<section class="how">
+  <h2>¿Cómo funciona?</h2>
+  <div class="howGrid">
+    <article><b>1</b><strong>Compra en línea</strong><p>Escribe siempre tu mismo teléfono al confirmar el pedido.</p></article>
+    <article><b>2</b><strong>Acumula puntos</strong><p>Cuando el pedido se cobra, los puntos quedan registrados automáticamente.</p></article>
+    <article><b>3</b><strong>Canjea</strong><p>Muestra tu tarjeta en el local cuando tengas puntos suficientes.</p></article>
+  </div>
+</section>
+</main>
+<footer>© 2026 Mordisco Fast Food · Club Mordisco</footer>
+
+<script>
+const SUPABASE_URL='https://nmmjthqflxwucpmmmrks.supabase.co';
+const SUPABASE_KEY='sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0';
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const rewards=[
+ {name:'Gaseosa pequeña',points:25,description:'Una bebida pequeña para acompañar tu pedido.'},
+ {name:'Papas personales',points:50,description:'Una porción de papas personales.'},
+ {name:'Mordida clásica',points:100,description:'Una hamburguesa clásica gratis.'},
+ {name:'Combo Mordisco',points:180,description:'Un combo seleccionado por Mordisco.'}
+];
+let currentPoints=0;
+function normalizePhone(value){return String(value||'').replace(/\D/g,'').replace(/^593/,'0')}
+function levelFor(points){
+ if(points>=300)return{name:'DIAMANTE',start:300,next:500};
+ if(points>=150)return{name:'ORO',start:150,next:300};
+ if(points>=60)return{name:'PLATA',start:60,next:150};
+ return{name:'BRONCE',start:0,next:60};
+}
+function renderRewards(){
+ document.querySelector('#rewardGrid').innerHTML=rewards.map(r=>`
+  <article class="reward ${currentPoints>=r.points?'available':''}">
+   <b>${r.name}</b><p>${r.description}</p>
+   <span>${r.points} puntos${currentPoints>=r.points?' · Disponible':''}</span>
+  </article>`).join('');
+}
+async function lookup(){
+ const phone=normalizePhone(document.querySelector('#rewardPhone').value);
+ const msg=document.querySelector('#lookupMessage');
+ const card=document.querySelector('#digitalCard');
+ if(phone.length<8){msg.textContent='Escribe un teléfono válido.';card.classList.add('hidden');return}
+ msg.textContent='Buscando tu tarjeta…';
+ const {data,error}=await db.rpc('club_mordisco_lookup',{p_phone:phone});
+ if(error){msg.textContent='No se pudo consultar la tarjeta. Inténtalo nuevamente.';card.classList.add('hidden');return}
+ const customer=Array.isArray(data)?data[0]:data;
+ if(!customer){msg.textContent='Aún no encontramos compras con ese teléfono. Usa el mismo número en tu próximo pedido.';card.classList.add('hidden');currentPoints=0;renderRewards();return}
+ currentPoints=Number(customer.loyalty_points||0);
+ const level=levelFor(currentPoints);
+ const progress=Math.min(100,Math.max(0,((currentPoints-level.start)/(level.next-level.start))*100));
+ document.querySelector('#cardName').textContent=customer.full_name||'Cliente Mordisco';
+ document.querySelector('#cardPhone').textContent='•••• '+phone.slice(-4);
+ document.querySelector('#cardPoints').textContent=currentPoints;
+ document.querySelector('#cardLevel').textContent=level.name;
+ document.querySelector('#cardProgress').style.width=progress+'%';
+ document.querySelector('#currentLevelText').textContent='Nivel '+level.name;
+ const next=rewards.find(r=>r.points>currentPoints);
+ document.querySelector('#nextRewardText').textContent=next?`Faltan ${next.points-currentPoints} puntos para ${next.name}`:'¡Tienes todos los premios disponibles!';
+ card.classList.remove('hidden');
+ msg.textContent='Tarjeta encontrada. Tus puntos se actualizan al cobrarse el pedido.';
+ renderRewards();
+ localStorage.setItem('mordisco_rewards_phone',phone);
+}
+document.querySelector('#findRewards').onclick=lookup;
+document.querySelector('#rewardPhone').addEventListener('keydown',e=>{if(e.key==='Enter')lookup()});
+const saved=localStorage.getItem('mordisco_rewards_phone');
+if(saved)document.querySelector('#rewardPhone').value=saved;
+renderRewards();
+</script>
+</body>
+</html>

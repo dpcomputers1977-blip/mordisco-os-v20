@@ -1,0 +1,47 @@
+CLUB MORDISCO — TARJETA DIGITAL DE RECOMPENSAS
+
+QUÉ INCLUYE
+- Página pública /recompensas
+- Tarjeta digital por teléfono
+- 1 punto por cada dólar cobrado
+- Niveles Bronce, Plata, Oro y Diamante
+- Premios iniciales
+- Registro idempotente: una sola asignación por pedido
+- Botón Mis recompensas en la web pública
+- Sección Club Mordisco en la portada
+
+IMPORTANTE
+Los puntos se acreditan cuando payment_status cambia a paid.
+El cliente debe usar el mismo teléfono en sus compras.
+
+INSTALACIÓN
+A. ARCHIVOS
+1. Extrae el ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Agregar Club Mordisco recompensas
+5. Commit to main y Push origin.
+6. Espera Vercel Ready.
+
+B. BASE DE DATOS
+1. Abre Supabase > SQL Editor.
+2. Abre CLUB_MORDISCO.sql con Bloc de notas.
+3. Copia todo y pulsa Run UNA SOLA VEZ.
+4. Debe aparecer CLUB MORDISCO ACTIVO.
+
+PRUEBA
+1. Crea un pedido con teléfono.
+2. Cobra el pedido.
+3. Abre:
+   https://mordiscofastfood.com/recompensas
+4. Escribe el mismo teléfono.
+
+NO CAMBIA
+- Caja
+- Cocina
+- Turnos
+- Contabilidad
+- Mesas
+- Productos

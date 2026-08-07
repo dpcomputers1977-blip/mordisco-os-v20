@@ -5,69 +5,41 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=v21-single-exit">
+<link rel="stylesheet" href="/admin-v18.css?v=club-mordisco-1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 
-<style id="safeWindowsPatchStyles">
-  .safeReturnAdminBtn{
-    position:fixed;
-    top:12px;
-    right:14px;
-    z-index:15000;
-    min-height:34px;
-    padding:5px 9px;
-    border:1px solid #d5c5ad;
-    border-radius:10px;
-    background:#fff;
-    color:#17130f;
-    box-shadow:0 8px 24px rgba(0,0,0,.18);
-    font-size:.76rem;
-    font-weight:900;
-    cursor:pointer;
-  }
-  .safeReturnAdminBtn:hover{background:#17130f;color:#fff}
-  .modal .modalCard{position:relative}
-  .safeWindowClose{
-    position:absolute!important;
-    top:10px!important;
-    right:12px!important;
-    z-index:60!important;
-    width:40px!important;
-    height:40px!important;
-    min-width:40px!important;
-    padding:0!important;
-    display:grid!important;
-    place-items:center!important;
-    border:1px solid #d5c5ad!important;
-    border-radius:10px!important;
-    background:#fff!important;
-    color:#17130f!important;
-    box-shadow:0 5px 16px rgba(0,0,0,.13)!important;
-    font-size:25px!important;
-    line-height:1!important;
-    font-weight:900!important;
-  }
-  .safeWindowClose:hover{background:#17130f!important;color:#fff!important}
-  body.posFocusMode #exitPosFocusBtn,
-  body.posFocusMode #exitPosToAdminV21{display:none!important}
-  @media(max-width:650px){
-    .safeReturnAdminBtn{
-      top:6px;
-      right:6px;
-      min-height:32px;
-      padding:4px 7px;
-      font-size:.7rem;
-    }
-    .safeWindowClose{
-      top:7px!important;
-      right:7px!important;
-      width:36px!important;
-      height:36px!important;
-      min-width:36px!important;
-      font-size:22px!important;
-    }
-  }
+<style id="clubMordiscoPublicStyles">
+.publicQuickLinks{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rewardsPublicLink{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:40px;padding:8px 13px;border-radius:10px;
+  background:#ffc400;color:#17130f;text-decoration:none;font-weight:900;
+}
+.clubMordiscoHome{
+  display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);
+  gap:28px;align-items:center;margin:34px auto;padding:36px;
+  max-width:1180px;border-radius:24px;background:#17130f;color:#fff;
+  overflow:hidden;
+}
+.clubMordiscoHome h2{font-size:clamp(2rem,4vw,4rem);line-height:.98;margin:10px 0 16px}
+.clubMordiscoHome p{max-width:650px;color:#ddd2c2;line-height:1.6}
+.clubMordiscoButton{display:inline-flex;margin-top:12px;text-decoration:none}
+.clubMordiscoMiniCard{
+  min-height:230px;padding:28px;border-radius:22px;
+  background:linear-gradient(145deg,#ffc400,#ff9f00);
+  color:#17130f;display:flex;flex-direction:column;justify-content:space-between;
+  box-shadow:0 22px 55px rgba(0,0,0,.3);transform:rotate(3deg);
+}
+.clubMordiscoMiniCard small{font-weight:900;letter-spacing:2px}
+.clubMordiscoMiniCard strong{font-size:2rem}
+.clubMordiscoMiniCard span{font-weight:700}
+.clubMordiscoMiniCard b{font-size:1.2rem}
+@media(max-width:760px){
+  .clubMordiscoHome{grid-template-columns:1fr;margin:22px 12px;padding:24px}
+  .clubMordiscoMiniCard{min-height:190px}
+  .publicQuickLinks{width:100%}
+}
 </style>
 
 </head>
@@ -76,7 +48,10 @@
   <a class="brand" href="#inicio"><img src="media/logo.png" alt="Mordisco"><span>MORDISCO</span></a>
   <nav><a href="#inicio">Inicio</a><a href="#menu">Menú</a><a href="/promociones">Promociones</a><a href="#contacto">Contacto</a></nav>
   <div class="top-actions"><button class="cartBtn" id="cartBtn">🛒 <b id="cartCount">0</b></button></div>
-<a class="clientAppLink" href="/app">📱 Pedir desde la app</a></header>
+<div class="publicQuickLinks">
+  <a class="clientAppLink" href="/app">📱 Pedir desde la app</a>
+  <a class="rewardsPublicLink" href="/recompensas">🎁 Mis recompensas</a>
+</div></header>
 
 <main id="publicView" class="hidden">
 <section class="hero" id="inicio">
@@ -99,6 +74,22 @@
  <div class="productGrid" id="productGrid"></div>
 </section>
 
+
+<section class="clubMordiscoHome">
+  <div class="clubMordiscoCopy">
+    <span class="eyebrow">CLUB MORDISCO</span>
+    <h2>Cada compra te acerca a algo delicioso.</h2>
+    <p>Registra tu teléfono en el pedido, acumula puntos y revisa tus recompensas desde cualquier dispositivo.</p>
+    <a class="primary clubMordiscoButton" href="/recompensas">Ver mi tarjeta digital</a>
+  </div>
+  <div class="clubMordiscoMiniCard" aria-hidden="true">
+    <small>TARJETA DIGITAL</small>
+    <strong>CLUB MORDISCO</strong>
+    <span>Compra · Acumula · Disfruta</span>
+    <b>⭐ PUNTOS</b>
+  </div>
+</section>
+
 <section class="contact" id="contacto"><div><span class="eyebrow">PIDE DIRECTO</span><h2>Tu próximo mordisco está cerca.</h2><p>📍 <span id="businessAddress">Dirección por configurar</span></p><p>🕒 <span id="businessSchedule">Horario por configurar</span></p></div><button class="primary" id="orderNowBtn">Hacer pedido</button></section>
 <footer class="publicFooter">
   <span>© Mordisco Fast Food</span>
@@ -110,9 +101,6 @@
 </main>
 
 <section id="adminView" class="hidden adminShell">
-  <button id="safeReturnAdminBtn" class="safeReturnAdminBtn hidden" type="button" title="Volver al administrador" aria-label="Volver al administrador">
-    ← Volver
-  </button>
  <aside class="sidebar"><img src="media/logo.png" alt="Mordisco"><button data-tab="dashboard"><span>▦</span> Resumen</button><button data-tab="products" class="active"><span>🍔</span> Productos</button><button data-tab="categories"><span>▤</span> Categorías</button><button data-tab="orders"><span>🌐</span> Pedidos web</button><button data-tab="kitchen"><span>♨</span> Cocina</button><button data-tab="pos"><span>▣</span> POS / Caja</button><button data-tab="inventory"><span>◇</span> Inventario</button><button data-tab="tables"><span>🍽</span> Mesas</button><button data-tab="shifts"><span>🕒</span> Turnos</button><button data-tab="finance"><span>💰</span> Contabilidad</button><button data-tab="customers"><span>👤</span> Clientes</button><button data-tab="promotions"><span>🎁</span> Promociones</button><button data-tab="pages"><span>📄</span> Páginas</button><button data-tab="staff"><span>👥</span> Personal</button><button data-tab="extras">➕ Extras y empaques</button>
 <button data-tab="settings"><span>⚙</span> Negocio</button><button id="logoutBtn"><span>↪</span> Cerrar sesión</button><button id="backToStore"><span>↗</span> Ver página</button></aside>
  <div class="adminContent">
@@ -1219,7 +1207,7 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=small-back-button"></script>
+<script src="/admin-v18.js?v=v21-single-exit"></script>
 
 
 
