@@ -156,6 +156,73 @@
 }
 </style>
 
+
+<style id="mordiscoAdminMobileFullFix">
+@media(max-width:900px){
+  #adminView .sidebar{
+    top:0!important;
+    bottom:0!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    overscroll-behavior:contain!important;
+    -webkit-overflow-scrolling:touch!important;
+    padding:78px 14px 42px!important;
+    box-sizing:border-box!important;
+  }
+  #adminView .sidebar nav,
+  #adminView .sidebar .nav,
+  #adminView .sidebar .sidebar-nav{
+    display:flex!important;
+    flex-direction:column!important;
+    width:100%!important;
+    height:auto!important;
+    max-height:none!important;
+    overflow:visible!important;
+    flex:0 0 auto!important;
+  }
+  #adminView .sidebar button,
+  #adminView .sidebar a{
+    display:flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+    position:relative!important;
+    transform:none!important;
+    flex:0 0 auto!important;
+  }
+  #mobileAdminMenuBtn{
+    z-index:20010!important;
+  }
+}
+</style>
+<script id="mordiscoAdminMobileFullFixScript">
+document.addEventListener('DOMContentLoaded', function(){
+  const sidebar=document.querySelector('#adminView .sidebar');
+  if(!sidebar) return;
+
+  // Undo accidental mobile hiding on every actual navigation item.
+  sidebar.querySelectorAll('a,button').forEach(function(el){
+    if(el.id==='mobileAdminMenuBtn') return;
+    el.style.removeProperty('display');
+    el.style.removeProperty('visibility');
+    el.style.removeProperty('opacity');
+  });
+
+  // Keep menu at top whenever opened.
+  const btn=document.querySelector('#mobileAdminMenuBtn');
+  if(btn){
+    btn.addEventListener('click', function(){
+      setTimeout(function(){
+        if(document.querySelector('#adminView')?.classList.contains('mobileMenuOpen')){
+          sidebar.scrollTop=0;
+        }
+      },30);
+    });
+  }
+});
+</script>
+
 </head>
 <body>
 <header class="topbar hidden">

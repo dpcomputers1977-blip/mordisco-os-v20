@@ -1,0 +1,31 @@
+MORDISCO — CORRECCIÓN DE ACCESOS MÓVILES
+
+CORRIGE
+- Club Mordisco visible dentro del menú móvil, debajo de Menú.
+- Restaura acceso 👥 Empleados en el menú móvil.
+- Conserva Administración.
+- Menú administrador móvil ocupa toda la altura y permite desplazarse.
+- Todos los módulos del sidebar pueden verse y tocarse.
+
+NO CAMBIA
+- Portada/hero
+- Ventas
+- Caja
+- Supabase
+- Cocina
+- Contabilidad
+- Recompensas
+
+INSTALACIÓN
+1. Extrae este ZIP.
+2. Copia todo a:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Corregir accesos móviles Club Empleados y Admin
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. En el teléfono CIERRA todas las pestañas de Mordisco.
+9. Abre una pestaña incógnita y prueba la página.
+10. NO ejecutes SQL.

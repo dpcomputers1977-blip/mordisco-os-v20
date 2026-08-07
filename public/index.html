@@ -103,6 +103,69 @@
   }
 }
 </style>
+
+<style id="mordiscoMobileAccessFix">
+@media(max-width:900px){
+  .mordisco-mobile-extra-link{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:100%!important;
+    min-height:46px!important;
+    padding:12px 16px!important;
+    margin:4px 0!important;
+    border-radius:12px!important;
+    text-decoration:none!important;
+    font-weight:900!important;
+  }
+  .mordisco-mobile-club{
+    background:linear-gradient(135deg,#ffd21f,#ff9f00)!important;
+    color:#17130f!important;
+  }
+  .mordisco-mobile-staff{
+    border:1px solid rgba(255,255,255,.24)!important;
+    color:#fff!important;
+    background:rgba(255,255,255,.07)!important;
+  }
+}
+</style>
+<script id="mordiscoMobileAccessFixScript">
+document.addEventListener('DOMContentLoaded', function(){
+  const candidates = [
+    document.querySelector('.main-nav'),
+    document.querySelector('nav'),
+    document.querySelector('.nav-links')
+  ].filter(Boolean);
+  const nav = candidates[0];
+  if(!nav) return;
+
+  // Remove duplicate injected links if cache mixes versions.
+  nav.querySelectorAll('.mordisco-mobile-extra-link').forEach(el=>el.remove());
+
+  const links = Array.from(nav.querySelectorAll('a'));
+  const menuLink = links.find(a => (a.textContent||'').trim().toLowerCase().includes('menú') || (a.textContent||'').trim().toLowerCase().includes('menu'));
+  const promoLink = links.find(a => (a.textContent||'').trim().toLowerCase().includes('promoc'));
+
+  const club = document.createElement('a');
+  club.href='/recompensas';
+  club.className='mordisco-mobile-extra-link mordisco-mobile-club';
+  club.textContent='🎁 Club Mordisco';
+
+  if(menuLink) menuLink.insertAdjacentElement('afterend', club);
+  else nav.prepend(club);
+
+  const staff = document.createElement('a');
+  staff.href='/staff';
+  staff.className='mordisco-mobile-extra-link mordisco-mobile-staff';
+  staff.textContent='👥 Empleados';
+
+  // Place staff near the end, before Administration when possible.
+  const adminLink = Array.from(nav.querySelectorAll('a')).find(a => (a.textContent||'').trim().toLowerCase().includes('admin'));
+  if(adminLink) adminLink.insertAdjacentElement('beforebegin', staff);
+  else nav.appendChild(staff);
+});
+</script>
+
 </head>
 <body>
   <div class="promo-bar">
