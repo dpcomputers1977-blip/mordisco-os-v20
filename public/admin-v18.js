@@ -4108,3 +4108,139 @@ document.querySelector('#exitPosFocusBtn')?.addEventListener('click',event=>{
   const dashboardButton=document.querySelector('.sidebar [data-tab="dashboard"]');
   if(dashboardButton)dashboardButton.click();
 },true);
+
+
+/* ============================================================
+   CAMBIO MÍNIMO — VENTANAS CON SALIDA SEGURA
+   No modifica lógica de Caja, pagos, pedidos ni Supabase.
+   ============================================================ */
+(function(){
+  const returnButton=document.querySelector('#safeReturnAdminBtn');
+
+  function isFocusMode(){
+    return document.body.classList.contains('posFocusMode')
+      || document.body.classList.contains('moduleFocusV21')
+      || document.body.classList.contains('customersFocusMode');
+  }
+
+  function syncReturnButton(){
+    if(!returnButton)return;
+    returnButton.classList.toggle('hidden',!isFocusMode());
+  }
+
+  function closeModal(modal){
+    if(!modal)return;
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden','true');
+    document.body.classList.remove('modal-open','no-scroll');
+  }
+
+  function visibleModals(){
+    return [...document.querySelectorAll('.modal:not(.hidden)')]
+      .filter(modal=>getComputedStyle(modal).display!=='none');
+  }
+
+  function installSafeCloseButtons(){
+    document.querySelectorAll('.modal .modalCard').forEach(card=>{
+      const modal=card.closest('.modal');
+      if(!modal||modal.id==='loginModal')return;
+
+      let close=card.querySelector(
+        ':scope > .close, :scope > [data-safe-window-close]'
+      );
+
+      if(!close){
+        close=document.createElement('button');
+        close.type='button';
+        close.textContent='×';
+        close.setAttribute('aria-label','Cerrar ventana');
+        close.dataset.safeWindowClose='1';
+        card.prepend(close);
+      }
+
+      close.classList.add('safeWindowClose');
+      close.setAttribute('aria-label','Cerrar ventana');
+    });
+  }
+
+  returnButton?.addEventListener('click',event=>{
+    event.preventDefault();
+    event.stopPropagation();
+
+    document.body.classList.remove(
+      'posFocusMode',
+      'moduleFocusV21',
+      'customersFocusMode'
+    );
+    document.documentElement.classList.remove(
+      'posFocusModeRoot',
+      'customersFocusModeRoot'
+    );
+    document.body.dataset.focusTab='';
+
+    const dashboard=document.querySelector(
+      '.sidebar [data-tab="dashboard"]'
+    );
+    if(dashboard)dashboard.click();
+
+    syncReturnButton();
+    window.scrollTo({top:0,left:0,behavior:'auto'});
+  });
+
+  document.addEventListener('click',event=>{
+    const closeButton=event.target.closest(
+      '.safeWindowClose,[data-safe-window-close]'
+    );
+
+    if(closeButton){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      closeModal(closeButton.closest('.modal'));
+      return;
+    }
+
+    const modal=event.target.classList?.contains('modal')
+      ?event.target
+      :null;
+
+    if(modal&&modal.id!=='loginModal'){
+      closeModal(modal);
+    }
+
+    setTimeout(syncReturnButton,0);
+  },true);
+
+  document.addEventListener('keydown',event=>{
+    if(event.key!=='Escape')return;
+
+    const modals=visibleModals();
+    const topModal=modals.at(-1);
+
+    if(topModal&&topModal.id!=='loginModal'){
+      event.preventDefault();
+      closeModal(topModal);
+      return;
+    }
+
+    if(isFocusMode()){
+      event.preventDefault();
+      returnButton?.click();
+    }
+  });
+
+  document.querySelectorAll(
+    '.sidebar [data-tab],#toggleModuleFocus,#exitPosFocusBtn'
+  ).forEach(node=>{
+    node.addEventListener('click',()=>setTimeout(syncReturnButton,0));
+  });
+
+  window.addEventListener('load',()=>{
+    installSafeCloseButtons();
+    syncReturnButton();
+  });
+
+  window.addEventListener('pageshow',()=>{
+    installSafeCloseButtons();
+    syncReturnButton();
+  });
+})();

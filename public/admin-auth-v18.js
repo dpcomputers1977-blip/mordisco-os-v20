@@ -1,193 +1,67 @@
-(() => {
-  'use strict';
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#11100e">
+  <title>Promociones | Mordisco Fast Food</title>
+  <link rel="stylesheet" href="/public-site.css?v=19.1.0">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header class="siteHeader">
+  <a class="siteBrand" href="/"><img src="/mordisco-logo.png" alt="Mordisco"><span>MORDISCO <small>FAST FOOD</small></span></a>
+  <nav><a href="/">Inicio</a><a href="/#menu">Menú</a><a href="/promociones">Promociones</a><a href="/#contacto">Contacto</a></nav>
+  <a class="orderHeader" href="/pedir.html">Pedir ahora</a>
+</header>
 
-  const SUPABASE_URL = 'https://nmmjthqflxwucpmmmrks.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0';
-  const DEFAULT_EMAIL = 'dpcomputers1977+admin@gmail.com';
+<main>
+  <section class="publicSection promoSection publicPromotionsPage">
+    <div class="sectionTitle">
+      <div><span>PROMOCIONES</span><h1>Ofertas que merecen un Mordisco</h1></div>
+      <a href="/pedir.html">Hacer pedido →</a>
+    </div>
+    <div id="publicPromotions" class="promoGrid"><p class="loading">Cargando promociones…</p></div>
+  </section>
+</main>
 
-  const client = window.mordiscoSupabaseClient ||
-    window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
+<footer class="siteFooter">
+  <div><img src="/mordisco-logo.png"><span>© 2026 Mordisco Fast Food</span></div>
+</footer>
 
-  if (client) window.mordiscoSupabaseClient = client;
+<script>
+const db=supabase.createClient(
+  "https://nmmjthqflxwucpmmmrks.supabase.co",
+  "sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0"
+);
+const money=n=>new Intl.NumberFormat("es-EC",{style:"currency",currency:"USD"}).format(Number(n||0));
+const esc=s=>String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 
-  const $ = (selector) => document.querySelector(selector);
+async function loadPromotions(){
+  const now=new Date().toISOString().slice(0,10);
+  const {data,error}=await db.from("promotions").select("*").order("sort_order");
 
-  function showMessage(text, type = 'info') {
-    let box = $('#loginDirectMessage');
-    if (!box) {
-      box = document.createElement('div');
-      box.id = 'loginDirectMessage';
-      box.setAttribute('role', 'status');
-      $('#loginForm')?.appendChild(box);
-    }
-    const palette = {
-      info: ['#fff4c7', '#654d00'],
-      success: ['#def7e7', '#11652d'],
-      error: ['#ffe1dd', '#8b1f17']
-    };
-    const [background, color] = palette[type] || palette.info;
-    Object.assign(box.style, {
-      marginTop: '12px',
-      padding: '12px 14px',
-      borderRadius: '10px',
-      background,
-      color,
-      font: '700 13px system-ui, sans-serif',
-      lineHeight: '1.4'
-    });
-    box.textContent = text;
+  const node=document.querySelector("#publicPromotions");
+  if(error){
+    node.innerHTML=`<p class="catalogStatus">No se pudieron cargar las promociones: ${esc(error.message)}</p>`;
+    return;
   }
 
-  async function isAdmin(userId) {
-    const { data, error } = await client
-      .from('admin_users')
-      .select('user_id,active')
-      .eq('user_id', userId)
-      .eq('active', true)
-      .maybeSingle();
-
-    if (error) throw new Error('No se pudo comprobar el permiso de administrador.');
-    return Boolean(data);
-  }
-
-  async function enterAdmin(session) {
-    if (!session?.user?.id) throw new Error('No se pudo crear la sesión.');
-    const allowed = await isAdmin(session.user.id);
-    if (!allowed) {
-      await client.auth.signOut();
-      throw new Error('Este usuario no está autorizado como administrador.');
-    }
-    sessionStorage.setItem('mordisco_admin_verified', '1');
-    window.location.replace('/admin?session=ok');
-  }
-
-  async function signIn(email, password) {
-    const { data, error } = await client.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    await enterAdmin(data.session);
-  }
-
-  async function sendMagicLink(email) {
-    const { error } = await client.auth.signInWithOtp({
-      email,
-      options: {
-        shouldCreateUser: false,
-        emailRedirectTo: `${window.location.origin}/admin`
-      }
-    });
-    if (error) throw error;
-  }
-
-  async function sendReset(email) {
-    const { error } = await client.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`
-    });
-    if (error) throw error;
-  }
-
-  function addRecoveryActions(form) {
-    if ($('#adminRecoveryActions')) return;
-    const wrapper = document.createElement('div');
-    wrapper.id = 'adminRecoveryActions';
-    wrapper.innerHTML = `
-      <button type="button" id="magicLinkButton">Entrar con enlace por correo</button>
-      <button type="button" id="resetPasswordButton">Restablecer contraseña</button>
-    `;
-    Object.assign(wrapper.style, {
-      display: 'grid',
-      gap: '8px',
-      marginTop: '10px'
-    });
-    wrapper.querySelectorAll('button').forEach(button => Object.assign(button.style, {
-      width: '100%',
-      border: '1px solid #dec99f',
-      background: '#fff',
-      color: '#4a3917',
-      borderRadius: '10px',
-      padding: '11px 12px',
-      fontWeight: '800',
-      cursor: 'pointer'
-    }));
-    form.appendChild(wrapper);
-
-    $('#magicLinkButton').addEventListener('click', async () => {
-      const email = $('#loginEmail')?.value.trim();
-      if (!email) return showMessage('Escribe primero el correo.', 'error');
-      try {
-        showMessage('Enviando enlace de acceso…');
-        await sendMagicLink(email);
-        showMessage('Revisa tu correo. Te enviamos un enlace para entrar sin contraseña.', 'success');
-      } catch (error) {
-        showMessage(error?.message || 'No se pudo enviar el enlace.', 'error');
-      }
-    });
-
-    $('#resetPasswordButton').addEventListener('click', async () => {
-      const email = $('#loginEmail')?.value.trim();
-      if (!email) return showMessage('Escribe primero el correo.', 'error');
-      try {
-        showMessage('Enviando recuperación…');
-        await sendReset(email);
-        showMessage('Revisa tu correo. Te enviamos un enlace para crear una contraseña nueva.', 'success');
-      } catch (error) {
-        showMessage(error?.message || 'No se pudo enviar la recuperación.', 'error');
-      }
-    });
-  }
-
-  async function initialize() {
-    const form = $('#loginForm');
-    if (!form || !client) return;
-
-    const emailInput = $('#loginEmail');
-    if (emailInput && !emailInput.value) emailInput.value = DEFAULT_EMAIL;
-    addRecoveryActions(form);
-
-    const { data } = await client.auth.getSession();
-    if (data?.session) {
-      try {
-        await enterAdmin(data.session);
-        return;
-      } catch (error) {
-        showMessage(error.message, 'error');
-      }
-    }
-
-    form.addEventListener('submit', async event => {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-
-      const email = emailInput?.value.trim() || '';
-      const password = $('#loginPassword')?.value || '';
-      const button = form.querySelector('button[type="submit"]');
-
-      if (!email || !password) return showMessage('Escribe el correo y la contraseña.', 'error');
-
-      if (button) {
-        button.disabled = true;
-        button.textContent = 'Ingresando…';
-      }
-      showMessage('Verificando acceso…');
-
-      try {
-        await signIn(email, password);
-      } catch (error) {
-        const raw = String(error?.message || 'No se pudo iniciar sesión.');
-        const friendly = /invalid login credentials/i.test(raw)
-          ? 'La contraseña no coincide. Usa “Entrar con enlace por correo” o “Restablecer contraseña”.'
-          : raw;
-        showMessage(friendly, 'error');
-        if (button) {
-          button.disabled = false;
-          button.textContent = 'Ingresar';
-        }
-      }
-    }, true);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initialize, { once: true });
-  } else {
-    initialize();
-  }
-})();
+  const current=(data||[]).filter(p=>p.active&&(!p.starts_on||p.starts_on<=now)&&(!p.ends_on||p.ends_on>=now));
+  const active=(data||[]).filter(p=>p.active);
+  const list=current.length?current:active;
+  node.innerHTML=list.map(p=>`<article class="promoCard">
+    ${p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(p.title)}">`:""}
+    <div class="promoCardBody">
+      ${p.badge?`<span>${esc(p.badge)}</span>`:""}
+      <h3>${esc(p.title)}</h3>
+      <p>${esc(p.description)}</p>
+      ${p.promo_price!=null?`<b>${money(p.promo_price)}</b>`:""}
+      <a class="yellowButton" href="${esc(p.link_url||'/pedir')}">Pedir promoción</a>
+    </div>
+  </article>`).join("")||'<div class="catalogStatus"><h3>No hay promociones publicadas todavía</h3><p>Créala desde Administración → Promociones y marca la opción Activa.</p><a class="yellowButton" href="/pedir.html">Ver menú y pedir</a></div>';
+}
+loadPromotions();
+</script>
+</body>
+</html>

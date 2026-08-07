@@ -1,0 +1,33 @@
+MORDISCO — ARREGLO MÍNIMO DE VENTANAS
+
+ÚNICOS CAMBIOS
+- Todas las ventanas internas tienen una X visible.
+- La tecla Esc cierra la ventana abierta.
+- Clic fuera de una ventana la cierra.
+- En pantalla completa aparece Volver al administrador.
+- Se evita el botón duplicado anterior de Caja.
+
+NO CAMBIA
+- Caja ni cobros.
+- Turnos.
+- Cocina.
+- Mesas.
+- Contabilidad.
+- Supabase.
+- Página web pública.
+- Base de datos.
+
+INSTALACIÓN
+1. Extrae este ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Elige Reemplazar archivos en el destino.
+4. En GitHub Desktop escribe:
+   Arreglar salida de ventanas sin tocar funciones
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Prueba:
+   https://mordiscofastfood.com/admin?session=ok&v=safe-windows-1
+
+NO EJECUTES SQL.

@@ -8,6 +8,67 @@
 <link rel="stylesheet" href="/admin-v18.css?v=v21-single-exit">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
+
+<style id="safeWindowsPatchStyles">
+  .safeReturnAdminBtn{
+    position:fixed;
+    top:12px;
+    right:14px;
+    z-index:15000;
+    min-height:42px;
+    padding:8px 13px;
+    border:1px solid #d5c5ad;
+    border-radius:10px;
+    background:#fff;
+    color:#17130f;
+    box-shadow:0 8px 24px rgba(0,0,0,.18);
+    font-weight:900;
+    cursor:pointer;
+  }
+  .safeReturnAdminBtn:hover{background:#17130f;color:#fff}
+  .modal .modalCard{position:relative}
+  .safeWindowClose{
+    position:absolute!important;
+    top:10px!important;
+    right:12px!important;
+    z-index:60!important;
+    width:40px!important;
+    height:40px!important;
+    min-width:40px!important;
+    padding:0!important;
+    display:grid!important;
+    place-items:center!important;
+    border:1px solid #d5c5ad!important;
+    border-radius:10px!important;
+    background:#fff!important;
+    color:#17130f!important;
+    box-shadow:0 5px 16px rgba(0,0,0,.13)!important;
+    font-size:25px!important;
+    line-height:1!important;
+    font-weight:900!important;
+  }
+  .safeWindowClose:hover{background:#17130f!important;color:#fff!important}
+  body.posFocusMode #exitPosFocusBtn,
+  body.posFocusMode #exitPosToAdminV21{display:none!important}
+  @media(max-width:650px){
+    .safeReturnAdminBtn{
+      top:7px;
+      right:7px;
+      min-height:38px;
+      padding:6px 9px;
+      font-size:.76rem;
+    }
+    .safeWindowClose{
+      top:7px!important;
+      right:7px!important;
+      width:36px!important;
+      height:36px!important;
+      min-width:36px!important;
+      font-size:22px!important;
+    }
+  }
+</style>
+
 </head>
 <body>
 <header class="topbar hidden">
@@ -48,6 +109,9 @@
 </main>
 
 <section id="adminView" class="hidden adminShell">
+  <button id="safeReturnAdminBtn" class="safeReturnAdminBtn hidden" type="button">
+    ← Volver al administrador
+  </button>
  <aside class="sidebar"><img src="media/logo.png" alt="Mordisco"><button data-tab="dashboard"><span>▦</span> Resumen</button><button data-tab="products" class="active"><span>🍔</span> Productos</button><button data-tab="categories"><span>▤</span> Categorías</button><button data-tab="orders"><span>🌐</span> Pedidos web</button><button data-tab="kitchen"><span>♨</span> Cocina</button><button data-tab="pos"><span>▣</span> POS / Caja</button><button data-tab="inventory"><span>◇</span> Inventario</button><button data-tab="tables"><span>🍽</span> Mesas</button><button data-tab="shifts"><span>🕒</span> Turnos</button><button data-tab="finance"><span>💰</span> Contabilidad</button><button data-tab="customers"><span>👤</span> Clientes</button><button data-tab="promotions"><span>🎁</span> Promociones</button><button data-tab="pages"><span>📄</span> Páginas</button><button data-tab="staff"><span>👥</span> Personal</button><button data-tab="extras">➕ Extras y empaques</button>
 <button data-tab="settings"><span>⚙</span> Negocio</button><button id="logoutBtn"><span>↪</span> Cerrar sesión</button><button id="backToStore"><span>↗</span> Ver página</button></aside>
  <div class="adminContent">
@@ -1154,7 +1218,7 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=v21-single-exit"></script>
+<script src="/admin-v18.js?v=safe-windows-1"></script>
 
 
 
