@@ -4108,30 +4108,3 @@ document.querySelector('#exitPosFocusBtn')?.addEventListener('click',event=>{
   const dashboardButton=document.querySelector('.sidebar [data-tab="dashboard"]');
   if(dashboardButton)dashboardButton.click();
 },true);
-
-
-/* MORDISCO OS V22 — NAVEGACIÓN PROFESIONAL UNIFICADA */
-const mordiscoV22Navigation={history:[],current:'dashboard',navigating:false};
-function getVisibleModuleV22(){const t=document.querySelector('#adminView .tab:not(.hidden)');return t?.id?.replace(/^tab-/,'')||mordiscoV22Navigation.current||'dashboard'}
-function moduleLabelV22(m){return({dashboard:'Resumen',products:'Productos',categories:'Categorías',orders:'Pedidos web',kitchen:'Cocina',pos:'POS / Caja',inventory:'Inventario',tables:'Mesas',shifts:'Turnos',finance:'Contabilidad',customers:'Clientes',promotions:'Promociones',pages:'Páginas',staff:'Personal',extras:'Extras y empaques',settings:'Negocio'})[m]||'Mordisco OS'}
-function updateNavigationV22(){const c=getVisibleModuleV22();mordiscoV22Navigation.current=c;const b=document.querySelector('#v22BackBtn');if(b)b.disabled=c==='dashboard'&&!mordiscoV22Navigation.history.length;const f=document.querySelector('#v22FocusTitle');if(f&&f.textContent!==moduleLabelV22(c))f.textContent=moduleLabelV22(c)}
-function closeTopModalV22(){const a=[...document.querySelectorAll('.modal:not(.hidden)')].filter(m=>getComputedStyle(m).display!=='none');const m=a.at(-1);if(!m)return false;m.classList.add('hidden');m.setAttribute('aria-hidden','true');document.body.classList.remove('modal-open','no-scroll');return true}
-function closeAllModalsV22(){document.querySelectorAll('.modal:not(.hidden)').forEach(m=>{m.classList.add('hidden');m.setAttribute('aria-hidden','true')});document.body.classList.remove('modal-open','no-scroll')}
-function exitFocusModesV22(){document.body.classList.remove('posFocusMode','moduleFocusV21','customersFocusMode');document.documentElement.classList.remove('posFocusModeRoot','customersFocusModeRoot');document.body.dataset.focusTab='';const b=document.querySelector('#toggleModuleFocus');if(b)b.textContent='Pantalla amplia'}
-function navigateToModuleV22(m,{record=false}={}){const b=document.querySelector(`.sidebar [data-tab="${m}"]`);if(!b)return false;const p=getVisibleModuleV22();if(record&&p!==m){mordiscoV22Navigation.history.push(p);if(mordiscoV22Navigation.history.length>20)mordiscoV22Navigation.history.shift()}mordiscoV22Navigation.navigating=true;b.click();mordiscoV22Navigation.navigating=false;requestAnimationFrame(updateNavigationV22);return true}
-function goBackV22(){if(closeTopModalV22())return;exitFocusModesV22();let d=null;while(mordiscoV22Navigation.history.length&&!d){const c=mordiscoV22Navigation.history.pop();if(c&&c!==getVisibleModuleV22())d=c}navigateToModuleV22(d||'dashboard')}
-function goHomeV22(){closeAllModalsV22();exitFocusModesV22();mordiscoV22Navigation.history=[];navigateToModuleV22('dashboard')}
-function closeFocusV22(){if(closeTopModalV22())return;exitFocusModesV22();requestAnimationFrame(updateNavigationV22)}
-function enhanceModalV22(modal){if(!modal||modal.dataset.v22Navigation==='1')return;const card=modal.querySelector('.modalCard');if(!card)return;modal.dataset.v22Navigation='1';const bar=document.createElement('div');bar.className='v22ModalNavigation';bar.innerHTML='<button type="button" data-v22-modal-back>← Volver</button><strong>Mordisco OS</strong><div><button type="button" data-v22-modal-home>⌂ Inicio</button><button type="button" data-v22-modal-close>✕ Cerrar</button></div>';card.prepend(bar);bar.querySelector('[data-v22-modal-back]').onclick=e=>{e.preventDefault();modal.classList.add('hidden')};bar.querySelector('[data-v22-modal-home]').onclick=e=>{e.preventDefault();goHomeV22()};bar.querySelector('[data-v22-modal-close]').onclick=e=>{e.preventDefault();modal.classList.add('hidden')}}
-function enhanceAllModalsV22(){document.querySelectorAll('#adminView .modal').forEach(enhanceModalV22)}
-document.querySelectorAll('.sidebar [data-tab]').forEach(button=>button.addEventListener('click',()=>{if(mordiscoV22Navigation.navigating)return;const d=button.dataset.tab,p=getVisibleModuleV22();if(p&&p!==d){mordiscoV22Navigation.history.push(p);if(mordiscoV22Navigation.history.length>20)mordiscoV22Navigation.history.shift()}requestAnimationFrame(updateNavigationV22)},true));
-document.querySelector('#v22BackBtn')?.addEventListener('click',goBackV22);document.querySelector('#v22HomeBtn')?.addEventListener('click',goHomeV22);document.querySelector('#v22FocusBackBtn')?.addEventListener('click',goBackV22);document.querySelector('#v22FocusHomeBtn')?.addEventListener('click',goHomeV22);document.querySelector('#v22FocusExitBtn')?.addEventListener('click',closeFocusV22);
-document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(closeTopModalV22()){e.preventDefault();return}if(document.body.classList.contains('posFocusMode')||document.body.classList.contains('moduleFocusV21')){e.preventDefault();closeFocusV22()}});
-// V22.1: navegación sin MutationObserver para evitar ciclos infinitos.
-function initializeNavigationV221(){
-  mordiscoV22Navigation.current=getVisibleModuleV22();
-  enhanceAllModalsV22();
-  updateNavigationV22();
-}
-window.addEventListener('load',initializeNavigationV221,{once:true});
-window.addEventListener('pageshow',initializeNavigationV221);
