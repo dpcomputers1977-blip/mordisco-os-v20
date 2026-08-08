@@ -1,0 +1,27 @@
+MORDISCO GAMES — PUNTOS REALES CON SUPABASE
+
+Ya están conectados en el código:
+- Mordisco Rush: Stage 1 y Stage 2
+- Mordisco Maze: niveles 1–6
+- Kitchen Rush: niveles 1–3
+- Memory Battle: niveles 1–5
+- Burger Tower: niveles 1–5
+- Mordisco Catch: niveles 1–5
+
+Mordisco Party NO entrega puntos todavía porque sigue siendo la versión con jugadores demo.
+
+ANTES DE PUBLICAR
+1. Abre Supabase > SQL Editor.
+2. Ejecuta TODO el archivo ACTIVAR_PUNTOS_JUEGOS.sql.
+3. Después publica el proyecto en Vercel.
+4. En /juegos, toca “Vincular Club”, usa un teléfono que ya exista en Club Mordisco y prueba un nivel.
+5. Verifica el nuevo saldo en /recompensas.
+
+PROTECCIONES
+- +1 solo mediante una función de Supabase (RPC).
+- Un mismo juego+nivel solo premia una vez por cliente por día.
+- Máximo 5 puntos de juegos por cliente por día.
+- Solo se premian teléfonos que ya existen en public.customers.
+
+NOTA DE SEGURIDAD
+Los juegos son HTML/JavaScript en el navegador. Sin login individual ni servidor que valide cada jugada, ningún sistema de juego web puede ser totalmente anti-trampa. Esta versión limita el abuso desde Supabase y es adecuada para una primera publicación controlada. Para máxima seguridad futura se recomienda autenticar clientes y validar sesiones de juego en backend.

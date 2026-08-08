@@ -35,6 +35,10 @@
     {
       "source": "/recompensas",
       "destination": "/recompensas.html"
+    },
+    {
+      "source": "/juegos",
+      "destination": "/juegos/index.html"
     }
   ],
   "headers": [
