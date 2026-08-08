@@ -492,26 +492,31 @@ function renderPosPendingOrders(){
   if($('#posPendingCount'))$('#posPendingCount').textContent=pending.length;
 
   $('#posPendingOrders').innerHTML=pending.length?pending.map(o=>`
-    <article class="posPendingCard">
-      <div class="posPendingMain">
-        <div class="posPendingNumber">
-          <small>PEDIDO</small>
-          <strong>#${o.order_number}</strong>
-        </div>
-        <div class="posPendingInfo">
-          <h4>${esc(o.customer_name||'Consumidor final')}</h4>
-          <p>${o.order_items?.map(i=>`${i.quantity}× ${esc(i.product_name)}`).join(', ')||'Sin detalle'}</p>
-          <small>
-            ${o.restaurant_tables?.name?`🍽️ ${esc(o.restaurant_tables.name)} · `:''}
-            ${orderTypeLabel(o.order_type)} ·
-            ${new Date(o.created_at).toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'})}
-          </small>
-        </div>
+    <article class="posPendingCard posPendingCardPro">
+      <div class="posPendingNumber">
+        <small>PEDIDO</small>
+        <strong>#${o.order_number}</strong>
       </div>
-      <div class="posPendingPayment">
+
+      <div class="posPendingInfo">
+        <h4>${esc(o.customer_name||'Consumidor final')}</h4>
+        <p>${o.order_items?.map(i=>`${i.quantity}× ${esc(i.product_name)}`).join(', ')||'Sin detalle'}</p>
+        <small>
+          ${o.restaurant_tables?.name?`🍽️ ${esc(o.restaurant_tables.name)} · `:''}
+          ${orderTypeLabel(o.order_type)} ·
+          ${new Date(o.created_at).toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'})}
+        </small>
+      </div>
+
+      <div class="posPendingTotal">
         <span>Pendiente</span>
         <strong>${money(o.total)}</strong>
-        <button class="primary posPayNowBtn" data-pos-pay="${o.id}">Cobrar ahora</button>
+      </div>
+
+      <div class="posPendingActionsPro">
+        <button type="button" class="pendingEditBtn" data-pending-edit="${o.id}">✏ Editar</button>
+        <button type="button" class="primary pendingChargeBtn" data-pos-pay="${o.id}">💵 Cobrar</button>
+        <button type="button" class="danger pendingCancelBtn" data-pending-cancel="${o.id}">✕</button>
       </div>
     </article>
   `).join(''):`<div class="posPendingEmpty">
@@ -522,6 +527,118 @@ function renderPosPendingOrders(){
   $$('[data-pos-pay]').forEach(button=>{
     button.onclick=()=>openChargeOrder(button.dataset.posPay);
   });
+
+  $$('[data-pending-edit]').forEach(button=>{
+    button.onclick=()=>openPendingOrderEditor(button.dataset.pendingEdit);
+  });
+
+  $$('[data-pending-cancel]').forEach(button=>{
+    button.onclick=()=>cancelPendingOrder(button.dataset.pendingCancel);
+  });
+}
+
+let pendingOrderEditId=null;
+
+function openPendingOrderEditor(id){
+  const order=orders.find(item=>String(item.id)===String(id));
+  if(!order)return toast('Pedido no encontrado');
+
+  pendingOrderEditId=order.id;
+  $('#pendingEditTitle').textContent=`Editar pedido #${order.order_number}`;
+  $('#pendingEditCustomer').value=order.customer_name||'';
+  $('#pendingEditPhone').value=order.customer_phone||'';
+  $('#pendingEditNotes').value=order.notes||'';
+
+  $('#pendingEditItems').innerHTML=(order.order_items||[]).map(item=>`
+    <div class="pendingEditItem" data-edit-item="${item.id}">
+      <div>
+        <b>${esc(item.product_name||'Producto')}</b>
+        <small>${money(item.unit_price||0)} c/u</small>
+      </div>
+      <div class="pendingEditQty">
+        <button type="button" data-edit-minus="${item.id}">−</button>
+        <input type="number" min="1" step="1" value="${Number(item.quantity||1)}"
+               data-edit-qty="${item.id}" data-unit-price="${Number(item.unit_price||0)}">
+        <button type="button" data-edit-plus="${item.id}">+</button>
+      </div>
+    </div>
+  `).join('')||'<div class="notice">Este pedido no tiene productos editables.</div>';
+
+  $$('[data-edit-minus]').forEach(button=>button.onclick=()=>{
+    const input=$(`[data-edit-qty="${button.dataset.editMinus}"]`);
+    input.value=Math.max(1,Number(input.value||1)-1);
+  });
+  $$('[data-edit-plus]').forEach(button=>button.onclick=()=>{
+    const input=$(`[data-edit-qty="${button.dataset.editPlus}"]`);
+    input.value=Number(input.value||1)+1;
+  });
+
+  $('#pendingOrderEditModal').classList.remove('hidden');
+}
+
+async function savePendingOrderEditor(){
+  const order=orders.find(item=>String(item.id)===String(pendingOrderEditId));
+  if(!order)return toast('Pedido no encontrado');
+
+  const customer_name=$('#pendingEditCustomer').value.trim()||'Consumidor final';
+  const customer_phone=$('#pendingEditPhone').value.trim();
+  const notes=$('#pendingEditNotes').value.trim();
+
+  const itemChanges=$$('[data-edit-qty]').map(input=>({
+    id:input.dataset.editQty,
+    quantity:Math.max(1,Number(input.value||1)),
+    unit_price:Number(input.dataset.unitPrice||0)
+  }));
+
+  const total=itemChanges.reduce((sum,item)=>sum+(item.quantity*item.unit_price),0);
+
+  const saveButton=$('#savePendingOrderEdit');
+  saveButton.disabled=true;
+  saveButton.textContent='Guardando...';
+
+  const {error:orderError}=await db.from('orders').update({
+    customer_name,
+    customer_phone,
+    notes,
+    subtotal:total,
+    total
+  }).eq('id',order.id);
+
+  if(orderError){
+    saveButton.disabled=false;
+    saveButton.textContent='Guardar cambios';
+    return toast('No se pudo editar: '+orderError.message);
+  }
+
+  for(const item of itemChanges){
+    const {error}=await db.from('order_items').update({
+      quantity:item.quantity,
+      subtotal:item.quantity*item.unit_price
+    }).eq('id',item.id);
+    if(error){
+      saveButton.disabled=false;
+      saveButton.textContent='Guardar cambios';
+      return toast('Pedido actualizado parcialmente: '+error.message);
+    }
+  }
+
+  saveButton.disabled=false;
+  saveButton.textContent='Guardar cambios';
+  $('#pendingOrderEditModal').classList.add('hidden');
+  toast('Pedido corregido');
+  await loadOrders();
+}
+
+async function cancelPendingOrder(id){
+  const order=orders.find(item=>String(item.id)===String(id));
+  if(!order)return;
+  if(!confirm(`¿Cancelar el pedido #${order.order_number}?`))return;
+
+  const {error}=await db.from('orders').update({status:'cancelled'}).eq('id',id);
+  if(error)return toast('No se pudo cancelar: '+error.message);
+
+  toast('Pedido cancelado');
+  await loadOrders();
 }
 
 if($('#refreshPosPending'))if(document.querySelector('#refreshPosPending'))document.querySelector('#refreshPosPending').onclick=async()=>{
@@ -814,6 +931,7 @@ function renderOrders(){
     if(error)toast(error.message);
     else{toast('Estado actualizado');await loadOrders()}
   });
+
   $$('[data-delete-order]').forEach(b=>b.onclick=()=>deleteSale(b.dataset.deleteOrder));
 }
 function elapsedLabel(createdAt){
@@ -1013,12 +1131,9 @@ function getPosProducts(){
 function renderPosProducts(){
   if(!$('#posProducts'))return;
   const list=getPosProducts();
-  $('#posProducts').innerHTML=list.length?list.map(p=>`<button class="posProduct posProductTextOnly" data-pos-add="${p.id}">
-    <span class="posProductInfo">
-      <small>${esc(p.categories?.name||'Sin categoría')}</small>
-      <b>${esc(p.name)}</b>
-      <strong>${money(p.price)}</strong>
-    </span>
+  $('#posProducts').innerHTML=list.length?list.map(p=>`<button class="posProduct" data-pos-add="${p.id}">
+    ${p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(p.name)}">`:'<div class="posProductNoImage">Sin imagen</div>'}
+    <span class="posProductInfo"><small>${esc(p.categories?.name||'Sin categoría')}</small><b>${esc(p.name)}</b><strong>${money(p.price)}</strong></span>
   </button>`).join(''):'<div class="notice">No hay productos disponibles.</div>';
   $$('[data-pos-add]').forEach(b=>b.onclick=()=>addPosItem(b.dataset.posAdd));
 }
@@ -1209,50 +1324,7 @@ $$('[data-pos-discount]').forEach(button=>button.onclick=()=>{
   renderPosCart();
 });
 
-
-function renderPosReview(){
-  const totals=posTotals();
-  const items=posCart.map(item=>{
-    const product=products.find(p=>String(p.id)===String(item.id));
-    if(!product)return '';
-    return `<div class="posReviewItem">
-      <div><b>${esc(product.name)}</b><small>${money(product.price)} c/u</small></div>
-      <span>${item.qty} ×</span>
-      <strong>${money(Number(product.price)*item.qty)}</strong>
-    </div>`;
-  }).join('');
-
-  $('#posReviewItems').innerHTML=items||'<div class="notice">No hay productos.</div>';
-  $('#posReviewCustomer').textContent=$('#posCustomer').value.trim()||'Consumidor final';
-  $('#posReviewPhone').textContent=$('#posPhone').value.trim()||'Sin teléfono';
-  $('#posReviewNotes').textContent=$('#posNotes').value.trim()||'Sin notas';
-  $('#posReviewTotal').textContent=money(totals.total);
-}
-
-function openPosReview(){
-  if(!posCart.length)return toast('Agrega al menos un producto');
-  renderPosReview();
-  $('#posReviewModal')?.classList.remove('hidden');
-}
-
-if(document.querySelector('#posCharge'))document.querySelector('#posCharge').onclick=openPosReview;
-$('#posReviewBack')?.addEventListener('click',()=>$('#posReviewModal')?.classList.add('hidden'));
-$('#posReviewClose')?.addEventListener('click',()=>$('#posReviewModal')?.classList.add('hidden'));
-$('#posReviewConfirm')?.addEventListener('click',async()=>{
-  const button=$('#posReviewConfirm');
-  if(!button||button.disabled)return;
-  button.disabled=true;
-  const original=button.textContent;
-  button.textContent='Enviando...';
-  try{
-    await completePosSale();
-    $('#posReviewModal')?.classList.add('hidden');
-  }finally{
-    button.disabled=false;
-    button.textContent=original;
-  }
-});
-
+if(document.querySelector('#posCharge'))document.querySelector('#posCharge').onclick=completePosSale;
 if(document.querySelector('#printReceipt'))document.querySelector('#printReceipt').onclick=()=>window.print();
 
 
@@ -1838,12 +1910,9 @@ function getTableProducts(){
 }
 function renderTableProducts(){
   const list=getTableProducts();
-  $('#tableProducts').innerHTML=list.map(p=>`<button class="posProduct posProductTextOnly" data-table-add="${p.id}">
-    <span class="posProductInfo">
-      <small>${esc(p.categories?.name||'')}</small>
-      <b>${esc(p.name)}</b>
-      <strong>${money(p.price)}</strong>
-    </span>
+  $('#tableProducts').innerHTML=list.map(p=>`<button class="posProduct" data-table-add="${p.id}">
+    ${p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(p.name)}">`:'<div class="posProductNoImage">Sin imagen</div>'}
+    <span class="posProductInfo"><small>${esc(p.categories?.name||'')}</small><b>${esc(p.name)}</b><strong>${money(p.price)}</strong></span>
   </button>`).join('');
   $$('[data-table-add]').forEach(b=>b.onclick=()=>{const r=tableCart.find(x=>String(x.id)===String(b.dataset.tableAdd));if(r)r.qty++;else tableCart.push({id:b.dataset.tableAdd,qty:1});renderTableCart()});
 }
@@ -4087,3 +4156,257 @@ document.addEventListener('click',event=>{
     showChargeOperationStatus('', 'info');
   }
 },true);
+
+
+/* ============================================================
+   V21 — SALIDA SEGURA DE POS / CAJA
+   ============================================================ */
+function exitPosToAdministratorV21(){
+  // Exit only the visual POS focus mode.
+  document.body.classList.remove(
+    'posFocusMode',
+    'moduleFocusV21'
+  );
+
+  document.documentElement.classList.remove(
+    'posFocusModeRoot'
+  );
+
+  document.body.dataset.focusTab='';
+
+  const moduleButton=document.querySelector('#toggleModuleFocus');
+  if(moduleButton)moduleButton.textContent='Pantalla amplia';
+
+  // Return to dashboard without closing register or employee shift.
+  const dashboardButton=document.querySelector(
+    '.sidebar [data-tab="dashboard"]'
+  );
+
+  if(dashboardButton){
+    dashboardButton.click();
+  }else{
+    document.querySelectorAll('#adminView .tab').forEach(tab=>{
+      tab.classList.add('hidden');
+    });
+    document.querySelector('#tab-dashboard')?.classList.remove('hidden');
+
+    const title=document.querySelector('#adminTitle');
+    if(title)title.textContent='Resumen';
+  }
+
+  window.scrollTo({top:0,left:0,behavior:'auto'});
+}
+
+document.querySelector('#exitPosToAdminV21')
+  ?.addEventListener('click',event=>{
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    exitPosToAdministratorV21();
+  });
+
+
+/* ============================================================
+   V21 — ÚNICO BOTÓN DE SALIDA DE CAJA
+   ============================================================ */
+document.querySelector('#exitPosFocusBtn')?.addEventListener('click',event=>{
+  event.preventDefault();
+  event.stopImmediatePropagation();
+
+  if(typeof exitPosToAdministratorV21==='function'){
+    exitPosToAdministratorV21();
+    return;
+  }
+
+  document.body.classList.remove('posFocusMode','moduleFocusV21');
+  document.documentElement.classList.remove('posFocusModeRoot');
+
+  const dashboardButton=document.querySelector('.sidebar [data-tab="dashboard"]');
+  if(dashboardButton)dashboardButton.click();
+},true);
+
+
+/* ============================================================
+   CAMBIO MÍNIMO — VENTANAS CON SALIDA SEGURA
+   No modifica lógica de Caja, pagos, pedidos ni Supabase.
+   ============================================================ */
+(function(){
+  const returnButton=document.querySelector('#safeReturnAdminBtn');
+
+  function isFocusMode(){
+    return document.body.classList.contains('posFocusMode')
+      || document.body.classList.contains('moduleFocusV21')
+      || document.body.classList.contains('customersFocusMode');
+  }
+
+  function syncReturnButton(){
+    if(!returnButton)return;
+    returnButton.classList.toggle('hidden',!isFocusMode());
+  }
+
+  function closeModal(modal){
+    if(!modal)return;
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden','true');
+    document.body.classList.remove('modal-open','no-scroll');
+  }
+
+  function visibleModals(){
+    return [...document.querySelectorAll('.modal:not(.hidden)')]
+      .filter(modal=>getComputedStyle(modal).display!=='none');
+  }
+
+  function installSafeCloseButtons(){
+    document.querySelectorAll('.modal .modalCard').forEach(card=>{
+      const modal=card.closest('.modal');
+      if(!modal||modal.id==='loginModal')return;
+
+      let close=card.querySelector(
+        ':scope > .close, :scope > [data-safe-window-close]'
+      );
+
+      if(!close){
+        close=document.createElement('button');
+        close.type='button';
+        close.textContent='×';
+        close.setAttribute('aria-label','Cerrar ventana');
+        close.dataset.safeWindowClose='1';
+        card.prepend(close);
+      }
+
+      close.classList.add('safeWindowClose');
+      close.setAttribute('aria-label','Cerrar ventana');
+    });
+  }
+
+  returnButton?.addEventListener('click',event=>{
+    event.preventDefault();
+    event.stopPropagation();
+
+    document.body.classList.remove(
+      'posFocusMode',
+      'moduleFocusV21',
+      'customersFocusMode'
+    );
+    document.documentElement.classList.remove(
+      'posFocusModeRoot',
+      'customersFocusModeRoot'
+    );
+    document.body.dataset.focusTab='';
+
+    const dashboard=document.querySelector(
+      '.sidebar [data-tab="dashboard"]'
+    );
+    if(dashboard)dashboard.click();
+
+    syncReturnButton();
+    window.scrollTo({top:0,left:0,behavior:'auto'});
+  });
+
+  document.addEventListener('click',event=>{
+    const closeButton=event.target.closest(
+      '.safeWindowClose,[data-safe-window-close]'
+    );
+
+    if(closeButton){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      closeModal(closeButton.closest('.modal'));
+      return;
+    }
+
+    const modal=event.target.classList?.contains('modal')
+      ?event.target
+      :null;
+
+    if(modal&&modal.id!=='loginModal'){
+      closeModal(modal);
+    }
+
+    setTimeout(syncReturnButton,0);
+  },true);
+
+  document.addEventListener('keydown',event=>{
+    if(event.key!=='Escape')return;
+
+    const modals=visibleModals();
+    const topModal=modals.at(-1);
+
+    if(topModal&&topModal.id!=='loginModal'){
+      event.preventDefault();
+      closeModal(topModal);
+      return;
+    }
+
+    if(isFocusMode()){
+      event.preventDefault();
+      returnButton?.click();
+    }
+  });
+
+  document.querySelectorAll(
+    '.sidebar [data-tab],#toggleModuleFocus,#exitPosFocusBtn'
+  ).forEach(node=>{
+    node.addEventListener('click',()=>setTimeout(syncReturnButton,0));
+  });
+
+  window.addEventListener('load',()=>{
+    installSafeCloseButtons();
+    syncReturnButton();
+  });
+
+  window.addEventListener('pageshow',()=>{
+    installSafeCloseButtons();
+    syncReturnButton();
+  });
+})();
+
+/* ===== PEDIDOS PENDIENTES: EDICIÓN SEGURA ===== */
+if(document.querySelector('#savePendingOrderEdit')){
+  document.querySelector('#savePendingOrderEdit').onclick=savePendingOrderEditor;
+}
+if(document.querySelector('#closePendingOrderEdit')){
+  document.querySelector('#closePendingOrderEdit').onclick=()=>{
+    document.querySelector('#pendingOrderEditModal').classList.add('hidden');
+  };
+}
+if(document.querySelector('#cancelPendingOrderEdit')){
+  document.querySelector('#cancelPendingOrderEdit').onclick=()=>{
+    document.querySelector('#pendingOrderEditModal').classList.add('hidden');
+  };
+}
+
+/* ===== CONTABILIDAD POR ACCESOS ===== */
+function setFinanceWorkspace(view){
+  const movementForm=document.querySelector('#financeForm');
+  const accountsForm=document.querySelector('#financeAccountForm');
+  const movements=document.querySelector('#financeMovementsPanel');
+  const accounts=document.querySelector('#financeAccountsPanel');
+
+  [movementForm,accountsForm,movements,accounts].forEach(node=>node?.classList.add('financeSectionHidden'));
+
+  if(view==='income'||view==='expense'){
+    movementForm?.classList.remove('financeSectionHidden');
+    const type=document.querySelector('#financeType');
+    if(type)type.value=view;
+    movementForm?.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  if(view==='movements'){
+    movements?.classList.remove('financeSectionHidden');
+    loadFinance();
+  }
+  if(view==='accounts'){
+    accountsForm?.classList.remove('financeSectionHidden');
+    accounts?.classList.remove('financeSectionHidden');
+    if(typeof loadFinanceAccounts==='function')loadFinanceAccounts();
+  }
+}
+
+document.querySelectorAll('[data-finance-view]').forEach(button=>{
+  button.addEventListener('click',()=>setFinanceWorkspace(button.dataset.financeView));
+});
+document.querySelectorAll('[data-finance-close]').forEach(button=>{
+  button.addEventListener('click',()=>{
+    button.closest('#financeForm,#financeAccountForm,#financeMovementsPanel,#financeAccountsPanel')
+      ?.classList.add('financeSectionHidden');
+  });
+});

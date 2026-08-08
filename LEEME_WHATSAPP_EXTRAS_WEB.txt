@@ -1,0 +1,43 @@
+MORDISCO — CORRECCIÓN URGENTE WHATSAPP + EXTRAS WEB
+
+CORRIGE
+- Botón flotante de WhatsApp de la portada:
+  antes: 593999999999
+  ahora: 593959005534
+
+- Pedidos web en teléfono y computadora:
+  carga extras y empaques activos desde extra_options.
+- Muestra extras aplicables según la categoría de los productos del carrito.
+- Permite aumentar y disminuir cantidades.
+- Suma los extras al total.
+- Envía los extras en p_extras al crear el pedido.
+- Incluye los extras en el mensaje de confirmación de WhatsApp.
+- Limpia los extras después de un pedido exitoso.
+
+NO TOCA
+- Caja
+- POS
+- Contabilidad
+- Administrador
+- Cocina
+- Turnos
+- Supabase / SQL
+- Club Mordisco
+
+INSTALACIÓN
+1. Extrae el ZIP.
+2. Copia todo dentro de:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Corregir WhatsApp y extras en pedidos web
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Cierra TODAS las pestañas de Mordisco en teléfono y PC.
+9. Prueba primero:
+   https://mordiscofastfood.com/?v=whatsapp-oficial-1
+10. Luego:
+   https://mordiscofastfood.com/pedir?v=whatsapp-extras-web-1
+
+NO EJECUTES SQL.

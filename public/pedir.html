@@ -97,6 +97,108 @@ body.storeClosed [data-add]{
 }
 </style>
 
+
+<style id="onlineExtrasWebStyles">
+.onlineExtrasSection{
+  margin:16px 0;
+  padding:14px;
+  border:1px solid #e1d7c8;
+  border-radius:16px;
+  background:#fffaf2;
+}
+.onlineExtrasHead{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+.onlineExtrasHead span{
+  display:block;
+  color:#b97d00;
+  font-size:.66rem;
+  font-weight:950;
+  letter-spacing:1.1px;
+}
+.onlineExtrasHead h3{
+  margin:3px 0 0;
+  font-size:1.02rem;
+}
+.onlineExtrasHead>small{
+  padding:5px 8px;
+  border-radius:999px;
+  background:#f2eadf;
+  color:#766b5e;
+  font-weight:800;
+}
+.onlineExtrasList{
+  display:grid;
+  gap:8px;
+}
+.onlineExtraRow{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:10px;
+  padding:10px 11px;
+  border:1px solid #e6dccd;
+  border-radius:12px;
+  background:#fff;
+}
+.onlineExtraInfo{
+  min-width:0;
+}
+.onlineExtraInfo b{
+  display:block;
+  font-size:.9rem;
+}
+.onlineExtraInfo small{
+  display:block;
+  margin-top:2px;
+  color:#756a5e;
+  font-size:.72rem;
+}
+.onlineExtraInfo strong{
+  display:block;
+  margin-top:4px;
+  color:#17130f;
+}
+.onlineExtraQty{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+.onlineExtraQty button{
+  width:34px;
+  height:34px;
+  padding:0;
+  border:1px solid #d9cdbb;
+  border-radius:9px;
+  background:#f7f1e8;
+  color:#17130f;
+  font-weight:950;
+  font-size:1rem;
+}
+.onlineExtraQty b{
+  min-width:20px;
+  text-align:center;
+}
+.onlineExtrasEmpty{
+  margin:0;
+  padding:10px;
+  color:#786f64;
+  font-size:.8rem;
+}
+@media(max-width:600px){
+  .onlineExtraRow{
+    grid-template-columns:1fr;
+  }
+  .onlineExtraQty{
+    justify-content:flex-end;
+  }
+}
+</style>
+
 </head>
 <body>
 <header class="orderTopbar">
@@ -141,6 +243,20 @@ body.storeClosed [data-add]{
         </select>
       </label>
       <label id="onlineAddressWrap" class="hidden">Dirección<input id="onlineAddress"></label>
+      
+      <section class="onlineExtrasSection" id="onlineExtrasSection">
+        <div class="onlineExtrasHead">
+          <div>
+            <span>➕ PERSONALIZA TU PEDIDO</span>
+            <h3>Extras y empaques</h3>
+          </div>
+          <small>Opcional</small>
+        </div>
+        <div id="onlineExtrasList" class="onlineExtrasList">
+          <p class="onlineExtrasEmpty">Cargando extras disponibles…</p>
+        </div>
+      </section>
+
       <label>Método de pago
         <select id="onlinePaymentMethod" required>
           <option value="cash">Efectivo al recibir</option>
@@ -177,6 +293,6 @@ body.storeClosed [data-add]{
 </div>
 
 <div id="onlineToast" class="onlineToast"></div>
-<script src="/online-v18.js?v=hours-payments-cart-1"></script>
+<script src="/online-v18.js?v=whatsapp-extras-web-1"></script>
 </body>
 </html>

@@ -5,151 +5,303 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=pos-clean-review-1">
+<link rel="stylesheet" href="/admin-v18.css?v=v21-single-exit">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 
-<style id="mordiscoPosCleanReviewStyles">
-/* Solo administrador/POS: la web pública conserva sus imágenes */
-#posProducts,
-#tableProducts{
-  grid-template-columns:repeat(auto-fill,minmax(145px,1fr))!important;
-  gap:8px!important;
-}
-#posProducts .posProductTextOnly,
-#tableProducts .posProductTextOnly{
-  min-height:82px!important;
-  height:auto!important;
-  padding:12px!important;
-  display:flex!important;
-  align-items:stretch!important;
-  text-align:left!important;
-  border:1px solid #e0d4c2!important;
-  border-radius:12px!important;
-  background:#fff!important;
-  box-shadow:none!important;
-}
-#posProducts .posProductTextOnly .posProductInfo,
-#tableProducts .posProductTextOnly .posProductInfo{
-  width:100%!important;
-  display:flex!important;
-  flex-direction:column!important;
-  gap:4px!important;
-  justify-content:center!important;
-  padding:0!important;
-}
-#posProducts .posProductTextOnly small,
-#tableProducts .posProductTextOnly small{
-  color:#8a7d6b!important;
-  font-size:.65rem!important;
-}
-#posProducts .posProductTextOnly b,
-#tableProducts .posProductTextOnly b{
-  font-size:.82rem!important;
-  line-height:1.12!important;
-}
-#posProducts .posProductTextOnly strong,
-#tableProducts .posProductTextOnly strong{
-  margin-top:auto!important;
-  font-size:1rem!important;
-  color:#17130f!important;
-}
+<style id="safeWindowsPatchStyles">
+  .safeReturnAdminBtn{
+    position:fixed;
+    top:12px;
+    right:14px;
+    z-index:15000;
+    min-height:34px;
+    padding:5px 9px;
+    border:1px solid #d5c5ad;
+    border-radius:10px;
+    background:#fff;
+    color:#17130f;
+    box-shadow:0 8px 24px rgba(0,0,0,.18);
+    font-size:.76rem;
+    font-weight:900;
+    cursor:pointer;
+  }
+  .safeReturnAdminBtn:hover{background:#17130f;color:#fff}
+  .modal .modalCard{position:relative}
+  .safeWindowClose{
+    position:absolute!important;
+    top:10px!important;
+    right:12px!important;
+    z-index:60!important;
+    width:40px!important;
+    height:40px!important;
+    min-width:40px!important;
+    padding:0!important;
+    display:grid!important;
+    place-items:center!important;
+    border:1px solid #d5c5ad!important;
+    border-radius:10px!important;
+    background:#fff!important;
+    color:#17130f!important;
+    box-shadow:0 5px 16px rgba(0,0,0,.13)!important;
+    font-size:25px!important;
+    line-height:1!important;
+    font-weight:900!important;
+  }
+  .safeWindowClose:hover{background:#17130f!important;color:#fff!important}
+  body.posFocusMode #exitPosFocusBtn,
+  body.posFocusMode #exitPosToAdminV21{display:none!important}
+  @media(max-width:650px){
+    .safeReturnAdminBtn{
+      top:6px;
+      right:6px;
+      min-height:32px;
+      padding:4px 7px;
+      font-size:.7rem;
+    }
+    .safeWindowClose{
+      top:7px!important;
+      right:7px!important;
+      width:36px!important;
+      height:36px!important;
+      min-width:36px!important;
+      font-size:22px!important;
+    }
+  }
+</style>
 
-/* Revisión antes de Cocina */
-.posReviewCard{max-width:650px!important}
-.posReviewHelp{margin:-4px 0 16px;color:#70665a}
-.posReviewItems{
-  display:grid;gap:7px;max-height:280px;overflow:auto;
-  border-top:1px solid #e5d9c8;border-bottom:1px solid #e5d9c8;
-  padding:10px 0
-}
-.posReviewItem{
-  display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;
-  align-items:center;padding:8px 4px
-}
-.posReviewItem div{display:flex;flex-direction:column;gap:2px}
-.posReviewItem small{color:#817668}
-.posReviewMeta{
-  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0
-}
-.posReviewMeta>div{
-  padding:10px;border-radius:10px;background:#f5f0e7;
-  display:flex;flex-direction:column;gap:3px
-}
-.posReviewMeta .wide{grid-column:1/-1}
-.posReviewMeta span{font-size:.68rem;color:#756a5d}
-.posReviewGrand{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:13px 15px;border-radius:12px;background:#17130f;color:#fff
-}
-.posReviewGrand strong{font-size:1.65rem;color:#ffc400}
-.posReviewActions{display:grid;grid-template-columns:1fr 1.2fr;gap:8px;margin-top:12px}
-.posReviewActions button{min-height:48px!important;border-radius:11px!important}
 
-/* Cobro: misma lógica, diseño más simple */
-#chargeOrderModal .chargeOrderCard{
-  width:min(94vw,520px)!important;
-  max-width:520px!important;
-  padding:24px!important;
-  border-radius:22px!important;
+<style id="mobileAdminCompleteMenuStyles">
+.mobileAdminMenuBtn,
+.mobileAdminBackdrop{display:none}
+
+@media(max-width:900px){
+  .mobileAdminMenuBtn{
+    position:fixed!important;
+    top:10px!important;
+    left:10px!important;
+    z-index:20000!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-height:42px!important;
+    padding:8px 12px!important;
+    border:1px solid #e1cda8!important;
+    border-radius:11px!important;
+    background:#17130f!important;
+    color:#fff!important;
+    box-shadow:0 8px 24px rgba(0,0,0,.24)!important;
+    font-size:.8rem!important;
+    font-weight:950!important;
+    cursor:pointer!important;
+  }
+
+  .mobileAdminBackdrop{
+    position:fixed!important;
+    inset:0!important;
+    z-index:19980!important;
+    display:block!important;
+    background:rgba(0,0,0,.55)!important;
+    backdrop-filter:blur(2px)!important;
+  }
+  .mobileAdminBackdrop.hidden{display:none!important}
+
+  #adminView .sidebar{
+    position:fixed!important;
+    top:0!important;
+    left:0!important;
+    bottom:0!important;
+    z-index:19990!important;
+    width:min(86vw,320px)!important;
+    max-width:320px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    overflow-y:auto!important;
+    padding:18px 14px 28px!important;
+    transform:translateX(-105%)!important;
+    transition:transform .22s ease!important;
+    box-shadow:18px 0 45px rgba(0,0,0,.35)!important;
+  }
+
+  #adminView.mobileMenuOpen .sidebar{
+    transform:translateX(0)!important;
+  }
+
+  #adminView .sidebar img{
+    display:block!important;
+    max-width:105px!important;
+    height:auto!important;
+    margin:5px auto 18px!important;
+  }
+
+  #adminView .sidebar button,
+  #adminView .sidebar a{
+    display:flex!important;
+    width:100%!important;
+    min-height:46px!important;
+    align-items:center!important;
+    gap:10px!important;
+    flex:0 0 auto!important;
+  }
+
+  #adminView .adminContent{
+    width:100%!important;
+    margin-left:0!important;
+    padding-top:58px!important;
+  }
+
+  body.mobileAdminMenuLocked{
+    overflow:hidden!important;
+  }
 }
-#chargeOrderModal .chargeSummary{
+</style>
+
+
+<style id="mordiscoAdminMobileFullFix">
+@media(max-width:900px){
+  #adminView .sidebar{
+    top:0!important;
+    bottom:0!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    overscroll-behavior:contain!important;
+    -webkit-overflow-scrolling:touch!important;
+    padding:78px 14px 42px!important;
+    box-sizing:border-box!important;
+  }
+  #adminView .sidebar nav,
+  #adminView .sidebar .nav,
+  #adminView .sidebar .sidebar-nav{
+    display:flex!important;
+    flex-direction:column!important;
+    width:100%!important;
+    height:auto!important;
+    max-height:none!important;
+    overflow:visible!important;
+    flex:0 0 auto!important;
+  }
+  #adminView .sidebar button,
+  #adminView .sidebar a{
+    display:flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+    position:relative!important;
+    transform:none!important;
+    flex:0 0 auto!important;
+  }
+  #mobileAdminMenuBtn{
+    z-index:20010!important;
+  }
+}
+</style>
+<script id="mordiscoAdminMobileFullFixScript">
+document.addEventListener('DOMContentLoaded', function(){
+  const sidebar=document.querySelector('#adminView .sidebar');
+  if(!sidebar) return;
+
+  // Undo accidental mobile hiding on every actual navigation item.
+  sidebar.querySelectorAll('a,button').forEach(function(el){
+    if(el.id==='mobileAdminMenuBtn') return;
+    el.style.removeProperty('display');
+    el.style.removeProperty('visibility');
+    el.style.removeProperty('opacity');
+  });
+
+  // Keep menu at top whenever opened.
+  const btn=document.querySelector('#mobileAdminMenuBtn');
+  if(btn){
+    btn.addEventListener('click', function(){
+      setTimeout(function(){
+        if(document.querySelector('#adminView')?.classList.contains('mobileMenuOpen')){
+          sidebar.scrollTop=0;
+        }
+      },30);
+    });
+  }
+});
+</script>
+
+
+<style id="mordiscoProfessionalOperationsPatch">
+/* Pedidos pendientes compactos */
+#posPendingOrders{display:grid!important;gap:10px!important}
+.posPendingCardPro{
   display:grid!important;
-  grid-template-columns:1fr 1fr!important;
-  gap:8px!important;
-  margin:14px 0!important;
-}
-#chargeOrderModal .chargeSummary>div{
-  padding:10px 12px!important;
-  border-radius:11px!important;
-  background:#f5f0e7!important;
-}
-#chargeOrderModal .chargeOrderTotal{
-  grid-column:1/-1!important;
-  background:#17130f!important;
-  color:#fff!important;
-  display:flex!important;
+  grid-template-columns:74px minmax(0,1fr) auto auto!important;
   align-items:center!important;
-  justify-content:space-between!important;
-}
-#chargeOrderModal .chargeOrderTotal strong{
-  color:#ffc400!important;
-  font-size:2rem!important;
-}
-#chargeOrderModal .discountControls{
-  display:grid!important;
-  grid-template-columns:1fr 1fr!important;
-  gap:8px!important;
-}
-#chargeOrderModal label{
-  font-size:.78rem!important;
-  font-weight:850!important;
-}
-#chargeOrderModal select,
-#chargeOrderModal input{
-  min-height:44px!important;
-  border-radius:10px!important;
-  border:1px solid #d7c8b3!important;
-  background:#fff!important;
-}
-#chargeOrderModal #confirmChargeOrder{
-  min-height:52px!important;
-  margin-top:12px!important;
-  border-radius:12px!important;
-  font-size:1rem!important;
-  background:#ffc400!important;
-  color:#17130f!important;
-}
-#chargeOrderModal .chargeChange{
+  gap:12px!important;
+  min-height:auto!important;
   padding:10px 12px!important;
-  border-radius:10px!important;
-  background:#eef8ef!important;
+  border-radius:14px!important;
 }
-@media(max-width:620px){
-  .posReviewMeta{grid-template-columns:1fr}
-  .posReviewMeta .wide{grid-column:auto}
-  .posReviewActions{grid-template-columns:1fr}
-  #chargeOrderModal .discountControls{grid-template-columns:1fr}
+.posPendingCardPro .posPendingNumber{
+  width:64px!important;height:58px!important;min-width:64px!important;
+  border-radius:12px!important;
+}
+.posPendingCardPro .posPendingInfo h4{margin:0 0 2px!important;font-size:.94rem!important}
+.posPendingCardPro .posPendingInfo p{
+  margin:0!important;white-space:nowrap!important;overflow:hidden!important;
+  text-overflow:ellipsis!important;max-width:100%!important;font-size:.78rem!important
+}
+.posPendingTotal{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.posPendingTotal span{font-size:.68rem;padding:4px 7px;border-radius:999px;background:#fff3c8;font-weight:900}
+.posPendingTotal strong{font-size:1.05rem}
+.posPendingActionsPro{display:flex;align-items:center;gap:6px}
+.posPendingActionsPro button{
+  min-height:38px!important;padding:7px 10px!important;border-radius:10px!important;
+  font-size:.76rem!important;font-weight:900!important
+}
+.pendingEditBtn{background:#fff!important;color:#17130f!important;border:1px solid #d9cab5!important}
+.pendingCancelBtn{width:38px!important;padding:0!important}
+
+/* Editor */
+.pendingOrderEditCard{max-width:680px!important}
+.pendingEditFields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+.pendingEditFields label{display:flex;flex-direction:column;gap:5px;font-weight:800}
+.pendingEditFields .wide{grid-column:1/-1}
+.pendingEditFields input,.pendingEditFields textarea{padding:10px;border:1px solid #d8cbb9;border-radius:10px}
+.pendingEditItems{display:grid;gap:8px;max-height:300px;overflow:auto}
+.pendingEditItem{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:10px 12px;border:1px solid #e5d8c5;border-radius:12px;background:#faf7f1
+}
+.pendingEditItem small{display:block;color:#766d61}
+.pendingEditQty{display:flex;align-items:center;gap:6px}
+.pendingEditQty button{width:34px;height:34px;border-radius:9px;border:1px solid #d7c8b1;background:#fff;font-weight:900}
+.pendingEditQty input{width:54px;text-align:center;padding:7px;border:1px solid #d7c8b1;border-radius:9px}
+.pendingEditFooter{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+
+/* Contabilidad limpia */
+.financeQuickActions{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0
+}
+.financeQuickActions button{
+  min-height:92px;border:1px solid #ded1bd;border-radius:16px;background:#fff;
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
+  gap:7px;padding:16px;box-shadow:0 8px 24px rgba(38,27,10,.06);cursor:pointer
+}
+.financeQuickActions button span{
+  display:grid;place-items:center;width:38px;height:38px;border-radius:11px;
+  background:#ffc400;color:#17130f;font-size:1.35rem;font-weight:950
+}
+.financeQuickActions button b{font-size:.9rem}
+.financeSectionHidden{display:none!important}
+#financeForm,#financeAccountForm,#financeMovementsPanel,#financeAccountsPanel{position:relative}
+.financeCloseBtn{
+  position:absolute;right:12px;top:12px;width:34px;height:34px;padding:0!important;
+  border-radius:9px!important;background:#17130f!important;color:#fff!important;z-index:5
+}
+.v21FinanceMain,.v21AccountsMain{grid-template-columns:1fr!important}
+#financeMovementsPanel .tableWrap,#financeAccountsPanel .tableWrap{max-height:480px;overflow:auto}
+
+@media(max-width:760px){
+  .posPendingCardPro{grid-template-columns:58px minmax(0,1fr)!important}
+  .posPendingTotal{align-items:flex-start!important}
+  .posPendingActionsPro{grid-column:1/-1;display:grid!important;grid-template-columns:1fr 1fr 38px}
+  .financeQuickActions{grid-template-columns:1fr 1fr}
+  .pendingEditFields{grid-template-columns:1fr}
 }
 </style>
 
@@ -192,7 +344,12 @@
 </footer>
 </main>
 
-<section id="adminView" class="hidden adminShell">
+<section id="adminView" class="adminShell hidden">
+  <button id="mobileAdminMenuBtn" class="mobileAdminMenuBtn" type="button" aria-label="Abrir menú administrador">☰ Menú</button>
+  <div id="mobileAdminBackdrop" class="mobileAdminBackdrop hidden"></div>
+  <button id="safeReturnAdminBtn" class="safeReturnAdminBtn hidden" type="button" title="Volver al administrador" aria-label="Volver al administrador">
+    ← Volver
+  </button>
  <aside class="sidebar"><img src="media/logo.png" alt="Mordisco"><button data-tab="dashboard"><span>▦</span> Resumen</button><button data-tab="products" class="active"><span>🍔</span> Productos</button><button data-tab="categories"><span>▤</span> Categorías</button><button data-tab="orders"><span>🌐</span> Pedidos web</button><button data-tab="kitchen"><span>♨</span> Cocina</button><button data-tab="pos"><span>▣</span> POS / Caja</button><button data-tab="inventory"><span>◇</span> Inventario</button><button data-tab="tables"><span>🍽</span> Mesas</button><button data-tab="shifts"><span>🕒</span> Turnos</button><button data-tab="finance"><span>💰</span> Contabilidad</button><button data-tab="customers"><span>👤</span> Clientes</button><button data-tab="promotions"><span>🎁</span> Promociones</button><button data-tab="pages"><span>📄</span> Páginas</button><button data-tab="staff"><span>👥</span> Personal</button><button data-tab="extras">➕ Extras y empaques</button>
 <button data-tab="settings"><span>⚙</span> Negocio</button><button id="logoutBtn"><span>↪</span> Cerrar sesión</button><button id="backToStore"><span>↗</span> Ver página</button></aside>
  <div class="adminContent">
@@ -341,8 +498,7 @@
 
 
    <section id="tab-pos" class="tab hidden">
-
-      <section id="adminCashControl" class="panel adminCashControl">
+<section id="adminCashControl" class="panel adminCashControl">
         <div>
           <span class="eyebrow">CONTROL ADMINISTRATIVO</span>
           <h3>Estado de la caja</h3>
@@ -372,7 +528,7 @@
           <strong id="posHeaderTotal">$0.00</strong>
           </div>
           <button id="exitPosFocusBtn" class="posExitBtn" type="button">
-            <span>←</span> Volver al panel
+            <span>←</span> Volver al administrador
           </button>
         </div>
       </div>
@@ -702,8 +858,15 @@
       <div><span>Resultado</span><strong id="financeBalance">$0.00</strong></div>
     </div>
   </div>
-  <div class="dashboardGrid financeGrid v21FinanceMain">
-    <form id="financeForm" class="panel formGrid">
+  
+<div class="financeQuickActions">
+  <button type="button" data-finance-view="income"><span>＋</span><b>Nuevo ingreso</b></button>
+  <button type="button" data-finance-view="expense"><span>−</span><b>Nuevo egreso</b></button>
+  <button type="button" data-finance-view="movements"><span>⇄</span><b>Movimientos</b></button>
+  <button type="button" data-finance-view="accounts"><span>▣</span><b>Cuentas</b></button>
+</div>
+<div class="dashboardGrid financeGrid v21FinanceMain">
+    <form id="financeForm" class="panel formGrid financeSectionHidden"><button type="button" class="financeCloseBtn" data-finance-close>×</button>
       <input type="hidden" id="financeId">
       <h3 class="wide">Nuevo movimiento</h3>
       <label>Tipo<select id="financeType"><option value="income">Ingreso</option><option value="expense">Egreso</option></select></label>
@@ -719,7 +882,7 @@
       <label class="wide">Descripción<textarea id="financeDescription" required></textarea></label>
       <div class="wide"><button class="primary">Guardar movimiento</button><button type="button" class="dark" id="clearFinance">Limpiar</button></div>
     </form>
-    <section class="panel">
+    <section class="panel financeSectionHidden" id="financeMovementsPanel"><button type="button" class="financeCloseBtn" data-finance-close>×</button>
       <div class="panelTitle"><h3>Movimientos</h3><div><input id="financeMonth" type="month"><button class="dark" id="refreshFinance">Actualizar</button></div></div>
       <div class="tableWrap"><table class="dataTable">
         <thead><tr><th>Fecha</th><th>Tipo</th><th>Categoría</th><th>Descripción</th><th>Método</th><th>Monto</th><th></th></tr></thead>
@@ -737,7 +900,7 @@
   </div>
 
   <div class="dashboardGrid accountsGrid v21AccountsMain">
-    <form id="financeAccountForm" class="panel formGrid">
+    <form id="financeAccountForm" class="panel formGrid financeSectionHidden"><button type="button" class="financeCloseBtn" data-finance-close>×</button>
       <input type="hidden" id="financeAccountId">
       <h3 class="wide">Nueva cuenta</h3>
       <label>Tipo
@@ -1098,34 +1261,6 @@
 <div id="cartDrawer" class="drawer"><div class="drawerHead"><h2>Tu pedido</h2><button id="closeCart">×</button></div><div id="cartItems"></div><div class="totals"><p><span>Subtotal</span><b id="subtotal">$0.00</b></p><p><span>Delivery</span><b id="deliveryTotal">$0.00</b></p><p class="grand"><span>Total</span><b id="grandTotal">$0.00</b></p></div><form id="orderForm"><input id="customerName" placeholder="Nombre" required><input id="customerPhone" placeholder="Teléfono" required><select id="orderType"><option value="delivery">Delivery</option><option value="pickup">Retiro</option><option value="local">En el local</option></select><input id="customerAddress" placeholder="Dirección de entrega"><select id="paymentMethod"><option value="cash">Efectivo</option><option value="transfer">Transferencia</option><option value="card">Tarjeta</option></select><textarea id="orderNotes" placeholder="Notas del pedido"></textarea><button class="primary">Confirmar pedido</button></form></div>
 
 
-
-<div id="posReviewModal" class="modal hidden">
-  <div class="modalCard posReviewCard">
-    <button class="close" id="posReviewClose" type="button">×</button>
-    <span class="eyebrow">REVISAR PEDIDO</span>
-    <h2>Confirma antes de enviar a cocina</h2>
-    <p class="posReviewHelp">Si algo está mal, vuelve a la orden y corrígelo antes de enviarlo.</p>
-
-    <div id="posReviewItems" class="posReviewItems"></div>
-
-    <div class="posReviewMeta">
-      <div><span>Cliente</span><b id="posReviewCustomer">Consumidor final</b></div>
-      <div><span>Teléfono</span><b id="posReviewPhone">Sin teléfono</b></div>
-      <div class="wide"><span>Notas</span><b id="posReviewNotes">Sin notas</b></div>
-    </div>
-
-    <div class="posReviewGrand">
-      <span>Total</span>
-      <strong id="posReviewTotal">$0,00</strong>
-    </div>
-
-    <div class="posReviewActions">
-      <button class="dark" id="posReviewBack" type="button">← Volver y corregir</button>
-      <button class="primary" id="posReviewConfirm" type="button">Enviar a cocina</button>
-    </div>
-  </div>
-</div>
-
 <div id="chargeOrderModal" class="modal hidden">
   <div class="modalCard chargeOrderCard">
     <button class="close" data-close="chargeOrderModal">×</button>
@@ -1328,9 +1463,82 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=pos-clean-review-1"></script>
+<script src="/admin-v18.js?v=operations-pro-1"></script>
 
 
 
 <div id="v18VersionMarker">Mordisco OS V20</div>
+
+<script id="mobileAdminCompleteMenuScript">
+(function(){
+  const adminView=document.querySelector('#adminView');
+  const button=document.querySelector('#mobileAdminMenuBtn');
+  const backdrop=document.querySelector('#mobileAdminBackdrop');
+  const sidebar=adminView?.querySelector('.sidebar');
+
+  if(!adminView||!button||!backdrop||!sidebar)return;
+
+  function openMenu(){
+    adminView.classList.add('mobileMenuOpen');
+    backdrop.classList.remove('hidden');
+    document.body.classList.add('mobileAdminMenuLocked');
+    button.textContent='✕ Cerrar';
+    button.setAttribute('aria-label','Cerrar menú administrador');
+  }
+
+  function closeMenu(){
+    adminView.classList.remove('mobileMenuOpen');
+    backdrop.classList.add('hidden');
+    document.body.classList.remove('mobileAdminMenuLocked');
+    button.textContent='☰ Menú';
+    button.setAttribute('aria-label','Abrir menú administrador');
+  }
+
+  button.addEventListener('click',()=>{
+    adminView.classList.contains('mobileMenuOpen')?closeMenu():openMenu();
+  });
+
+  backdrop.addEventListener('click',closeMenu);
+
+  sidebar.querySelectorAll('button,a').forEach(item=>{
+    item.addEventListener('click',()=>{
+      if(window.innerWidth<=900)setTimeout(closeMenu,40);
+    });
+  });
+
+  document.addEventListener('keydown',event=>{
+    if(event.key==='Escape'&&adminView.classList.contains('mobileMenuOpen')){
+      closeMenu();
+    }
+  });
+
+  window.addEventListener('resize',()=>{
+    if(window.innerWidth>900)closeMenu();
+  });
+})();
+</script>
+
+
+<div id="pendingOrderEditModal" class="modal hidden" aria-hidden="true">
+  <div class="modalCard pendingOrderEditCard">
+    <button type="button" class="safeWindowClose" id="closePendingOrderEdit" aria-label="Cerrar">×</button>
+    <span class="eyebrow">CORREGIR ANTES DE COBRAR</span>
+    <h2 id="pendingEditTitle">Editar pedido</h2>
+
+    <div class="pendingEditFields">
+      <label>Cliente<input id="pendingEditCustomer"></label>
+      <label>Teléfono<input id="pendingEditPhone" type="tel"></label>
+      <label class="wide">Notas<textarea id="pendingEditNotes"></textarea></label>
+    </div>
+
+    <h3>Productos y cantidades</h3>
+    <div id="pendingEditItems" class="pendingEditItems"></div>
+
+    <div class="pendingEditFooter">
+      <button type="button" class="dark" id="cancelPendingOrderEdit">Cancelar</button>
+      <button type="button" class="primary" id="savePendingOrderEdit">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
 </body></html>

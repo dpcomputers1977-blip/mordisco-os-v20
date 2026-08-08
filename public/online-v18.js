@@ -2,7 +2,7 @@ const SUPABASE_URL="https://nmmjthqflxwucpmmmrks.supabase.co";
 const SUPABASE_KEY="sb_publishable_izCztp4wZ0MzKOHjT2KGYA_ot_3pgb0";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let products=[],categories=[],cart=[],category="Todos",search="";
+let products=[],categories=[],cart=[],category="Todos",search="",extraOptions=[],selectedExtras=[];
 let storeIsOpen=true;
 let businessHours=[];
 
@@ -120,17 +120,112 @@ function toast(message){
   setTimeout(()=>node.classList.remove("show"),3500);
 }
 
+
+function getAvailableExtras(){
+  const cartProductCategoryIds=new Set(
+    cart.map(item=>{
+      const product=products.find(p=>String(p.id)===String(item.id));
+      return product?.category_id!=null?String(product.category_id):null;
+    }).filter(Boolean)
+  );
+
+  return extraOptions.filter(option=>{
+    if(option.active===false)return false;
+    if(!option.category_id)return true;
+    return cartProductCategoryIds.has(String(option.category_id));
+  });
+}
+
+function normalizeSelectedExtras(){
+  const availableIds=new Set(getAvailableExtras().map(option=>String(option.id)));
+  selectedExtras=selectedExtras.filter(item=>
+    availableIds.has(String(item.id)) && Number(item.qty)>0
+  );
+}
+
+function extrasTotal(){
+  normalizeSelectedExtras();
+  return selectedExtras.reduce((sum,item)=>{
+    const option=extraOptions.find(extra=>String(extra.id)===String(item.id));
+    return sum+(option?Number(option.price||0)*Number(item.qty||0):0);
+  },0);
+}
+
+function renderExtras(){
+  const node=document.querySelector("#onlineExtrasList");
+  if(!node)return;
+
+  normalizeSelectedExtras();
+  const available=getAvailableExtras();
+
+  if(!cart.length){
+    node.innerHTML='<p class="onlineExtrasEmpty">Agrega un producto para ver los extras disponibles.</p>';
+    return;
+  }
+
+  if(!available.length){
+    node.innerHTML='<p class="onlineExtrasEmpty">No hay extras disponibles para los productos seleccionados.</p>';
+    return;
+  }
+
+  node.innerHTML=available.map(option=>{
+    const selected=selectedExtras.find(item=>String(item.id)===String(option.id));
+    const qty=Number(selected?.qty||0);
+    const label=option.option_type==="packaging"?"Empaque":"Extra";
+
+    return `<div class="onlineExtraRow">
+      <div class="onlineExtraInfo">
+        <b>${esc(option.name)}</b>
+        <small>${label}${option.description?` · ${esc(option.description)}`:""}</small>
+        <strong>+ ${money(option.price)}</strong>
+      </div>
+      <div class="onlineExtraQty">
+        <button type="button" data-extra-minus="${option.id}" aria-label="Quitar ${esc(option.name)}">−</button>
+        <b>${qty}</b>
+        <button type="button" data-extra-plus="${option.id}" aria-label="Agregar ${esc(option.name)}">+</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  node.querySelectorAll("[data-extra-plus]").forEach(button=>{
+    button.onclick=()=>{
+      const id=button.dataset.extraPlus;
+      const row=selectedExtras.find(item=>String(item.id)===String(id));
+      if(row)row.qty++;
+      else selectedExtras.push({id,qty:1});
+      renderExtras();
+      renderCart();
+    };
+  });
+
+  node.querySelectorAll("[data-extra-minus]").forEach(button=>{
+    button.onclick=()=>{
+      const id=button.dataset.extraMinus;
+      const row=selectedExtras.find(item=>String(item.id)===String(id));
+      if(!row)return;
+      row.qty--;
+      selectedExtras=selectedExtras.filter(item=>Number(item.qty)>0);
+      renderExtras();
+      renderCart();
+    };
+  });
+}
+
 async function load(){
-  const [productsResult,categoriesResult]=await Promise.all([
+  const [productsResult,categoriesResult,extrasResult]=await Promise.all([
     db.from("products").select("*,categories(name)").eq("active",true).order("sort_order"),
     db.from("categories").select("*").eq("active",true).order("sort_order"),
+    db.from("extra_options").select("*").eq("active",true).order("sort_order").order("name"),
     loadBusinessHoursForOrdering()
   ]);
   if(productsResult.error)return toast(productsResult.error.message);
   products=productsResult.data||[];
   categories=categoriesResult.data||[];
+  extraOptions=extrasResult?.error?[]:(extrasResult?.data||[]);
+  if(extrasResult?.error)console.warn("Extras web:",extrasResult.error.message);
   renderCategories();
   renderProducts();
+  renderExtras();
   renderCart();
 }
 
@@ -162,6 +257,7 @@ function renderProducts(){
     const id=button.dataset.add;
     const row=cart.find(item=>String(item.id)===String(id));
     if(row)row.qty++;else cart.push({id,qty:1});
+    renderExtras();
     renderCart();
     toast("Producto agregado");
   });
@@ -191,6 +287,7 @@ function renderCart(){
     const row=cart.find(item=>String(item.id)===String(button.dataset.minus));
     row.qty--;
     cart=cart.filter(item=>item.qty>0);
+    renderExtras();
     renderCart();
   });
   document.querySelectorAll("[data-plus]").forEach(button=>button.onclick=()=>{
@@ -198,10 +295,11 @@ function renderCart(){
     renderCart();
   });
 
-  const total=cart.reduce((sum,item)=>{
+  const productsTotal=cart.reduce((sum,item)=>{
     const p=products.find(product=>String(product.id)===String(item.id));
-    return sum+Number(p.price)*item.qty;
+    return sum+(p?Number(p.price)*item.qty:0);
   },0);
+  const total=productsTotal+extrasTotal();
   document.querySelector("#onlineTotal").textContent=money(total);
   const itemCount=cart.reduce((sum,item)=>sum+Number(item.qty||0),0);
   const floatingSummary=document.querySelector("#floatingCartSummary");
@@ -274,7 +372,25 @@ document.querySelector("#onlineOrderForm").onsubmit=async event=>{
     };
   });
 
-  const total=selectedItems.reduce((sum,item)=>sum+item.subtotal,0);
+  normalizeSelectedExtras();
+  const selectedExtraRows=selectedExtras.map(item=>{
+    const option=extraOptions.find(extra=>String(extra.id)===String(item.id));
+    return {
+      id:item.id,
+      extra_id:item.id,
+      option_id:item.id,
+      quantity:Number(item.qty||1),
+      qty:Number(item.qty||1),
+      name:option?.name||"Extra",
+      price:Number(option?.price||0),
+      subtotal:Number(option?.price||0)*Number(item.qty||1),
+      option_type:option?.option_type||"extra"
+    };
+  });
+
+  const productsTotal=selectedItems.reduce((sum,item)=>sum+item.subtotal,0);
+  const selectedExtrasTotal=selectedExtraRows.reduce((sum,item)=>sum+item.subtotal,0);
+  const total=productsTotal+selectedExtrasTotal;
 
   // Abrir una pestaña desde el mismo toque para evitar el bloqueo de WhatsApp
   // en Chrome, Android y navegadores integrados.
@@ -308,7 +424,7 @@ document.querySelector("#onlineOrderForm").onsubmit=async event=>{
         quantity:item.quantity
       })),
       p_payment_method:paymentMethod,
-      p_extras:[]
+      p_extras:selectedExtraRows
     });
 
     if(error)throw error;
@@ -325,6 +441,10 @@ document.querySelector("#onlineOrderForm").onsubmit=async event=>{
       .map(item=>`${item.quantity} x ${item.name} - ${money(item.subtotal)}`)
       .join("\n");
 
+    const extraLines=selectedExtraRows
+      .map(item=>`${item.quantity} x ${item.name} - ${money(item.subtotal)}`)
+      .join("\n");
+
     const whatsappMessage=[
       "🍔 *CONFIRMACIÓN DE PEDIDO - MORDISCO*",
       "",
@@ -336,6 +456,9 @@ document.querySelector("#onlineOrderForm").onsubmit=async event=>{
       "",
       "*Productos:*",
       itemLines,
+      extraLines?"":"",
+      extraLines?"*Extras y empaques:*":"",
+      extraLines||"",
       "",
       `*Total: ${money(total)}*`,
       `Método de pago: ${PAYMENT_LABELS[paymentMethod]||paymentMethod}`,
@@ -350,6 +473,8 @@ document.querySelector("#onlineOrderForm").onsubmit=async event=>{
 
     // Solo vaciar el carrito después de que Supabase confirmó el pedido.
     cart=[];
+    selectedExtras=[];
+    renderExtras();
     renderCart();
     form.reset();
     document.querySelector("#onlineAddressWrap").classList.add("hidden");
