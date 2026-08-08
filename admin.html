@@ -305,6 +305,105 @@ document.addEventListener('DOMContentLoaded', function(){
 }
 </style>
 
+
+<style id="mordiscoCajaMesasUrgentFix">
+/* Caja: pedidos de mesas y caja siempre visibles y cobrables */
+#posPendingOrders{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:10px!important;
+  width:100%!important;
+  overflow:visible!important;
+}
+.posPendingPanel{
+  overflow:visible!important;
+}
+.posPendingPayCard{
+  width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+  display:grid!important;
+  grid-template-columns:72px minmax(180px,1fr) 105px minmax(270px,auto)!important;
+  align-items:center!important;
+  gap:10px!important;
+  padding:10px!important;
+  overflow:visible!important;
+  cursor:pointer;
+}
+.posPendingPayCard .posPendingInfo{
+  min-width:0!important;
+}
+.posPendingPayCard .posPendingInfo p{
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  line-height:1.25!important;
+}
+.posPendingPayCard .pendingCustomer{
+  display:block!important;
+  margin-bottom:2px!important;
+}
+.posPendingPayCard .posPendingActionsPro{
+  display:grid!important;
+  grid-template-columns:auto minmax(150px,1fr) 38px!important;
+  gap:6px!important;
+  min-width:270px!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+.posPendingPayCard .pendingChargeBtn{
+  display:block!important;
+  min-width:150px!important;
+  min-height:42px!important;
+  background:#ffc400!important;
+  color:#111!important;
+  border:1px solid #dca900!important;
+  font-weight:950!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+.posPendingPayCard .pendingEditBtn,
+.posPendingPayCard .pendingCancelBtn{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+#posCharge{
+  min-height:48px!important;
+  font-weight:950!important;
+}
+@media(max-width:1050px){
+  .posPendingPayCard{
+    grid-template-columns:64px minmax(0,1fr) 100px!important;
+  }
+  .posPendingPayCard .posPendingActionsPro{
+    grid-column:1/-1!important;
+    width:100%!important;
+    min-width:0!important;
+    grid-template-columns:1fr 2fr 42px!important;
+  }
+}
+@media(max-width:650px){
+  .posPendingPayCard{
+    grid-template-columns:58px minmax(0,1fr)!important;
+  }
+  .posPendingPayCard .posPendingTotal{
+    grid-column:1/-1!important;
+    flex-direction:row!important;
+    justify-content:space-between!important;
+    align-items:center!important;
+  }
+  .posPendingPayCard .posPendingActionsPro{
+    grid-template-columns:1fr!important;
+  }
+  .posPendingPayCard .pendingChargeBtn,
+  .posPendingPayCard .pendingEditBtn,
+  .posPendingPayCard .pendingCancelBtn{
+    width:100%!important;
+  }
+}
+</style>
+
 </head>
 <body>
 <header class="topbar hidden">
@@ -1463,7 +1562,7 @@ document.addEventListener('DOMContentLoaded', function(){
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=operations-pro-1"></script>
+<script src="/admin-v18.js?v=caja-mesas-fix-1"></script>
 
 
 

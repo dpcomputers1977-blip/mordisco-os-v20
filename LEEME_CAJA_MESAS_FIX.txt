@@ -1,0 +1,32 @@
+MORDISCO OS — CORRECCIÓN CAJA + MESAS
+
+SE CORRIGIÓ:
+- Los pedidos enviados desde Mesas aparecen en Caja como POR COBRAR.
+- La tarjeta muestra pedido, mesa/cliente, productos y total.
+- Botón COBRAR AHORA siempre visible.
+- También se puede pulsar la tarjeta para abrir el cobro.
+- Se mantiene Editar antes de cobrar.
+- Los pedidos creados directamente desde Caja siguen usando el flujo seguro:
+  Crear pedido y enviar a cocina -> aparece abajo -> Cobrar ahora.
+- Al enviar una mesa a Cocina se actualiza la lista de Caja inmediatamente.
+
+NO SE TOCÓ:
+- Contabilidad
+- Web pública
+- Pedidos web
+- WhatsApp
+- Club Mordisco
+- Supabase / SQL
+- Lógica interna del cobro ya existente
+
+INSTALACIÓN:
+1. Copia/reemplaza estos archivos sobre tu proyecto actual.
+2. GitHub Desktop:
+   Summary: Corregir cobro de mesas y pedidos desde caja
+3. Commit to main.
+4. Push origin.
+5. Espera Vercel Ready.
+6. En PC abre /admin?v=caja-mesas-fix-1
+7. Ctrl + Shift + R.
+
+NO EJECUTES SQL.
