@@ -1,0 +1,44 @@
+MORDISCO — APERTURA NATIVA DE WHATSAPP EN ANDROID
+
+CAMBIO
+- El botón Confirmar mi pedido ya no usa una redirección JavaScript.
+- Ahora es un enlace nativo disparado directamente por el toque del cliente.
+- Android usa intent:// con package=com.whatsapp.
+- iPhone usa whatsapp://.
+- PC usa WhatsApp Web.
+- Número: 593959005534
+
+IMPORTANTE
+- En Android puede aparecer un aviso del sistema "Abrir WhatsApp".
+  Ese aviso lo controla Android/Chrome y una web no puede eliminarlo.
+- Esta versión NO usa api.whatsapp.com como ruta principal.
+- Si un navegador integrado (por ejemplo dentro de Facebook/Instagram)
+  bloquea enlaces intent://, abre mordiscofastfood.com directamente en Chrome.
+
+FLUJO
+1. Cliente arma pedido.
+2. Confirma.
+3. Toca "Confirmar mi pedido".
+4. Android intenta abrir la app WhatsApp directamente.
+5. Envía el mensaje.
+6. Regresa a Mordisco.
+7. Pulsa "Ya confirmé por WhatsApp — Registrar pedido".
+8. Pedido queda esperando confirmación.
+9. Administrador verifica WhatsApp.
+10. Pulsa "Confirmado — Enviar a cocina".
+
+NO CAMBIA
+Caja, Mesas, Cobros, Contabilidad, Cocina, Supabase ni SQL.
+
+INSTALACIÓN
+1. Reemplaza estos archivos sobre tu proyecto.
+2. GitHub Desktop:
+   Abrir WhatsApp nativo en Android
+3. Commit to main.
+4. Push origin.
+5. Espera Vercel Ready.
+6. En el teléfono CIERRA todas las pestañas de Mordisco.
+7. Abre directamente en Chrome:
+   https://mordiscofastfood.com/pedir?v=whatsapp-native-android-2
+
+NO EJECUTES SQL.

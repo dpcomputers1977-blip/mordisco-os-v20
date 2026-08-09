@@ -234,7 +234,7 @@ body.storeClosed [data-add]{
   width:100%;min-height:54px;border:0;border-radius:14px;font-weight:950;
   display:flex;align-items:center;justify-content:center;gap:8px
 }
-.webWhatsAppButton{background:#25d366;color:#092d16}
+.webWhatsAppButton{background:#25d366;color:#092d16;text-decoration:none}
 .webRegisterButton{background:#ffc400;color:#17130f}
 .webRegisterButton:disabled{opacity:.42;cursor:not-allowed}
 .webConfirmFoot{
@@ -363,10 +363,10 @@ body.storeClosed [data-add]{
         <small>Se abrirá WhatsApp con tu pedido listo. Pulsa Enviar.</small>
       </div>
     </div>
-    <button type="button" id="webOpenWhatsApp" class="webWhatsAppButton">
+    <a id="webOpenWhatsApp" class="webWhatsAppButton" href="#" rel="external">
       <span>WhatsApp</span>
       <b>Confirmar mi pedido</b>
-    </button>
+    </a>
 
     <div class="webConfirmStep">
       <span>2</span>
@@ -386,6 +386,6 @@ body.storeClosed [data-add]{
 </div>
 
 <div id="onlineToast" class="onlineToast"></div>
-<script src="/online-v18.js?v=confirm-before-kitchen-1"></script>
+<script src="/online-v18.js?v=whatsapp-native-android-2"></script>
 </body>
 </html>

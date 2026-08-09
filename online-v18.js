@@ -407,24 +407,39 @@ function webConfirmationMessage(data){
   ].filter(Boolean).join("\n");
 }
 
-function openWhatsAppFromCustomerGesture(data){
+function buildNativeWhatsAppHref(data){
   const message=webConfirmationMessage(data);
   const encoded=encodeURIComponent(message);
-  const direct=`whatsapp://send?phone=593959005534&text=${encoded}`;
-  const fallback=`https://wa.me/593959005534?text=${encoded}`;
+  const ua=navigator.userAgent||"";
 
+  if(/Android/i.test(ua)){
+    // Native Android intent. No web fallback here: the goal is to open the app.
+    return `intent://send?phone=593959005534&text=${encoded}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
+  }
+
+  if(/iPhone|iPad|iPod/i.test(ua)){
+    return `whatsapp://send?phone=593959005534&text=${encoded}`;
+  }
+
+  return `https://web.whatsapp.com/send?phone=593959005534&text=${encoded}`;
+}
+
+function prepareNativeWhatsAppLink(data){
+  const link=document.querySelector("#webOpenWhatsApp");
+  if(!link)return;
+
+  link.href=buildNativeWhatsAppHref(data);
+  link.target="";
+  link.dataset.ready="1";
+}
+
+function markWhatsAppConfirmationOpened(){
   whatsappConfirmationOpened=true;
   const register=document.querySelector("#webRegisterAfterWhatsApp");
-  register.disabled=false;
-  register.textContent="Ya confirmé por WhatsApp — Registrar pedido";
-
-  window.location.href=direct;
-
-  setTimeout(()=>{
-    if(document.visibilityState==="visible"){
-      window.location.href=fallback;
-    }
-  },1800);
+  if(register){
+    register.disabled=false;
+    register.textContent="Ya confirmé por WhatsApp — Registrar pedido";
+  }
 }
 
 function openWebConfirmationModal(data){
@@ -445,6 +460,7 @@ function openWebConfirmationModal(data){
     <p><b>Código:</b> ${data.confirmationCode}</p>
     <strong>Total: ${money(data.total)}</strong>
   `;
+  prepareNativeWhatsAppLink(data);
   document.querySelector("#webConfirmModal").classList.remove("hidden");
   document.querySelector("#webConfirmModal").setAttribute("aria-hidden","false");
 }
@@ -464,9 +480,14 @@ document.querySelector("#onlineOrderForm").onsubmit=event=>{
   }
 };
 
-document.querySelector("#webOpenWhatsApp")?.addEventListener("click",()=>{
-  if(!pendingWebConfirmation)return;
-  openWhatsAppFromCustomerGesture(pendingWebConfirmation);
+document.querySelector("#webOpenWhatsApp")?.addEventListener("click",event=>{
+  if(!pendingWebConfirmation){
+    event.preventDefault();
+    return;
+  }
+
+  // IMPORTANT: do not preventDefault. The <a> navigation itself is the native gesture.
+  markWhatsAppConfirmationOpened();
 });
 
 document.querySelector("#webConfirmClose")?.addEventListener("click",()=>{
