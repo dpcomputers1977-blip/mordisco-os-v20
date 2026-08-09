@@ -39,6 +39,34 @@
     {
       "source": "/juegos",
       "destination": "/juegos/index.html"
+    },
+    {
+      "source": "/juegos/mordisco-rush",
+      "destination": "/juegos/mordisco-rush.html"
+    },
+    {
+      "source": "/juegos/mordisco-party",
+      "destination": "/juegos/mordisco-party.html"
+    },
+    {
+      "source": "/juegos/mordisco-maze",
+      "destination": "/juegos/mordisco-maze.html"
+    },
+    {
+      "source": "/juegos/mordisco-kitchen-rush",
+      "destination": "/juegos/mordisco-kitchen-rush.html"
+    },
+    {
+      "source": "/juegos/mordisco-memory-battle",
+      "destination": "/juegos/mordisco-memory-battle.html"
+    },
+    {
+      "source": "/juegos/mordisco-burger-tower",
+      "destination": "/juegos/mordisco-burger-tower.html"
+    },
+    {
+      "source": "/juegos/mordisco-catch",
+      "destination": "/juegos/mordisco-catch.html"
     }
   ],
   "headers": [

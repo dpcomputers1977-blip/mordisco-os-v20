@@ -1,27 +1,13 @@
-MORDISCO — SOLO DISEÑO DE BOTONES
+MORDISCO GAMES - FIX DE RUTAS VERCEL
 
-ESTE PAQUETE SOLO MODIFICA CSS.
-NO INCLUYE JavaScript, HTML, SQL NI CAMBIOS DE SUPABASE.
+Reemplazar en el repositorio:
+1) vercel.json
+2) public/juegos/index.html
 
-MEJORA VISUALMENTE:
-- Cobrar
-- Confirmar cobro
-- Actualizar
-- Guardar
-- Cerrar
-- Métodos de pago
-- Botones de tablas y acciones
-
-INSTALACIÓN
-1. Extrae el ZIP.
-2. Copia únicamente los archivos incluidos dentro de:
-   C:\Users\USER\Documents\GitHub\mordisco-os-v20
-3. Reemplaza admin-v18.css y public\admin-v18.css.
-4. GitHub Desktop:
-   Summary: Mejorar visibilidad de botones
-5. Commit to main.
-6. Push origin.
-7. Espera Vercel Ready.
-8. Presiona Ctrl + Shift + R.
-
-NO EJECUTES SQL.
+Luego:
+- Abrir GitHub Desktop.
+- Revisar que aparezcan solo estos cambios.
+- Commit.
+- Push origin.
+- Esperar el despliegue de Vercel.
+- Probar https://www.mordiscofastfood.com/juegos/mordisco-maze
