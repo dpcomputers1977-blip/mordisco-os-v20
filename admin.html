@@ -317,6 +317,74 @@ document.addEventListener('DOMContentLoaded', function(){
 }
 </style>
 
+
+<style id="mordiscoReportsFinalStyles">
+.reportHeaderActions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.reportFilters{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(150px,1fr)) auto;
+  gap:10px!important;
+  align-items:end!important;
+  margin-bottom:14px!important
+}
+.reportFilters label{display:flex;flex-direction:column;gap:5px;font-weight:850}
+.reportFilters input,.reportFilters select{min-height:42px;border:1px solid #d8cbb9;border-radius:10px;padding:8px 10px;background:#fff}
+.reportMetrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}
+.reportMetrics article{padding:15px;border:1px solid #ded2c0;border-radius:15px;background:#fff;display:flex;flex-direction:column;gap:4px}
+.reportMetrics article span{font-size:.72rem;color:#746a5d;font-weight:850;text-transform:uppercase;letter-spacing:.4px}
+.reportMetrics article b{font-size:1.55rem}
+.reportMetrics article small{color:#82786d}
+.reportSection{margin-top:12px!important}
+.paymentReportGrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.paymentReportGrid>div{padding:12px;border-radius:12px;background:#f5f0e7;display:flex;flex-direction:column;gap:4px}
+.paymentReportGrid span{font-size:.7rem;color:#766b5f;font-weight:850}
+.paymentReportGrid strong{font-size:1.05rem}
+.reportTable th{white-space:nowrap}
+.reportTable td{vertical-align:top}
+.reportDifferencePositive{color:#1f7a38!important;font-weight:900}
+.reportDifferenceNegative{color:#b52d25!important;font-weight:900}
+.reportDifferenceZero{color:#5e5549!important;font-weight:900}
+.reportPrintHeader{display:none}
+.mordiscoReportsTab .positiveAmount{color:#1f7a38;font-weight:900}
+.mordiscoReportsTab .negativeAmount{color:#b52d25;font-weight:900}
+
+@media(max-width:1000px){
+  .reportMetrics{grid-template-columns:1fr 1fr}
+  .paymentReportGrid{grid-template-columns:repeat(3,1fr)}
+  .reportFilters{grid-template-columns:1fr 1fr}
+}
+@media(max-width:620px){
+  .reportMetrics,.paymentReportGrid,.reportFilters{grid-template-columns:1fr}
+  .reportHeaderActions{width:100%}
+  .reportHeaderActions button{flex:1}
+}
+
+@media print{
+  @page{size:A4 landscape;margin:10mm}
+  body *{visibility:hidden!important}
+  #tab-reports,#tab-reports *{visibility:visible!important}
+  #tab-reports{
+    display:block!important;
+    position:absolute!important;
+    left:0!important;top:0!important;width:100%!important;
+    background:#fff!important;color:#000!important
+  }
+  #tab-reports .noPrint,
+  #tab-reports .reportHeaderActions,
+  #tab-reports button{display:none!important}
+  #tab-reports .reportPrintHeader{display:block!important;text-align:center;margin-bottom:12px}
+  #tab-reports .reportPrintHeader h1{margin:0;font-size:22px}
+  #tab-reports .reportPrintHeader p{margin:3px 0}
+  #tab-reports .reportMetrics{grid-template-columns:repeat(4,1fr)!important}
+  #tab-reports .reportMetrics article,
+  #tab-reports .panel{box-shadow:none!important;border:1px solid #bbb!important;break-inside:avoid}
+  #tab-reports .paymentReportGrid{grid-template-columns:repeat(6,1fr)!important}
+  #tab-reports .tableWrap{overflow:visible!important}
+  #tab-reports table{font-size:9px!important;width:100%!important}
+  #tab-reports th,#tab-reports td{padding:5px!important}
+}
+</style>
+
 </head>
 <body>
 <header class="topbar hidden">
@@ -362,7 +430,7 @@ document.addEventListener('DOMContentLoaded', function(){
   <button id="safeReturnAdminBtn" class="safeReturnAdminBtn hidden" type="button" title="Volver al administrador" aria-label="Volver al administrador">
     ← Volver
   </button>
- <aside class="sidebar"><img src="media/logo.png" alt="Mordisco"><button data-tab="dashboard"><span>▦</span> Resumen</button><button data-tab="products" class="active"><span>🍔</span> Productos</button><button data-tab="categories"><span>▤</span> Categorías</button><button data-tab="orders"><span>🌐</span> Pedidos web</button><button data-tab="kitchen"><span>♨</span> Cocina</button><button data-tab="pos"><span>▣</span> POS / Caja</button><button data-tab="inventory"><span>◇</span> Inventario</button><button data-tab="tables"><span>🍽</span> Mesas</button><button data-tab="shifts"><span>🕒</span> Turnos</button><button data-tab="finance"><span>💰</span> Contabilidad</button><button data-tab="customers"><span>👤</span> Clientes</button><button data-tab="promotions"><span>🎁</span> Promociones</button><button data-tab="pages"><span>📄</span> Páginas</button><button data-tab="staff"><span>👥</span> Personal</button><button data-tab="extras">➕ Extras y empaques</button>
+ <aside class="sidebar"><img src="media/logo.png" alt="Mordisco"><button data-tab="dashboard"><span>▦</span> Resumen</button><button data-tab="products" class="active"><span>🍔</span> Productos</button><button data-tab="categories"><span>▤</span> Categorías</button><button data-tab="orders"><span>🌐</span> Pedidos web</button><button data-tab="kitchen"><span>♨</span> Cocina</button><button data-tab="pos"><span>▣</span> POS / Caja</button><button data-tab="inventory"><span>◇</span> Inventario</button><button data-tab="tables"><span>🍽</span> Mesas</button><button data-tab="shifts"><span>🕒</span> Turnos</button><button data-tab="reports"><span>📊</span> Informes</button><button data-tab="finance"><span>💰</span> Contabilidad</button><button data-tab="customers"><span>👤</span> Clientes</button><button data-tab="promotions"><span>🎁</span> Promociones</button><button data-tab="pages"><span>📄</span> Páginas</button><button data-tab="staff"><span>👥</span> Personal</button><button data-tab="extras">➕ Extras y empaques</button>
 <button data-tab="settings"><span>⚙</span> Negocio</button><button id="logoutBtn"><span>↪</span> Cerrar sesión</button><button id="backToStore"><span>↗</span> Ver página</button></aside>
  <div class="adminContent">
    <div class="adminTop">
@@ -861,6 +929,184 @@ document.addEventListener('DOMContentLoaded', function(){
    </section>
 
    
+
+<section id="tab-reports" class="tab hidden mordiscoReportsTab">
+  <div class="tablesHeader">
+    <div>
+      <span class="eyebrow">CONTROL ADMINISTRATIVO</span>
+      <h2>Informes y cierre de caja</h2>
+      <p>Ventas por cajero, detalle de caja, ingresos, egresos y resultado del período.</p>
+    </div>
+    <div class="reportHeaderActions">
+      <button type="button" class="dark" id="refreshReportsBtn">↻ Actualizar</button>
+      <button type="button" class="primary" id="printReportsBtn">🖨 Imprimir / Guardar PDF</button>
+    </div>
+  </div>
+
+  <section class="panel reportFilters noPrint">
+    <label>Desde
+      <input id="reportDateFrom" type="date">
+    </label>
+    <label>Hasta
+      <input id="reportDateTo" type="date">
+    </label>
+    <label>Cajero
+      <select id="reportCashierFilter">
+        <option value="all">Todos los cajeros</option>
+      </select>
+    </label>
+    <button type="button" class="primary" id="applyReportFilters">Generar informe</button>
+  </section>
+
+  <div id="reportPrintHeader" class="reportPrintHeader">
+    <h1>MORDISCO FAST FOOD</h1>
+    <p>Informe administrativo de caja</p>
+    <small id="reportPeriodLabel"></small>
+  </div>
+
+  <div class="reportMetrics">
+    <article>
+      <span>Ventas cobradas</span>
+      <b id="reportSalesTotal">$0.00</b>
+      <small id="reportSalesCount">0 ventas</small>
+    </article>
+    <article>
+      <span>Otros ingresos</span>
+      <b id="reportOtherIncome">$0.00</b>
+      <small>Sin contar ventas</small>
+    </article>
+    <article>
+      <span>Egresos</span>
+      <b id="reportExpenses">$0.00</b>
+      <small>Gastos registrados</small>
+    </article>
+    <article>
+      <span>Resultado</span>
+      <b id="reportNetResult">$0.00</b>
+      <small>Ventas + ingresos − egresos</small>
+    </article>
+  </div>
+
+  <section class="panel reportSection">
+    <div class="panelTitle">
+      <div>
+        <h3>Detalle por forma de pago</h3>
+        <small>Solo ventas cobradas del período seleccionado.</small>
+      </div>
+    </div>
+    <div class="paymentReportGrid">
+      <div><span>Efectivo</span><strong id="reportPayCash">$0.00</strong></div>
+      <div><span>Deuna</span><strong id="reportPayDeuna">$0.00</strong></div>
+      <div><span>Ahorita</span><strong id="reportPayAhorita">$0.00</strong></div>
+      <div><span>Transferencia</span><strong id="reportPayTransfer">$0.00</strong></div>
+      <div><span>Tarjeta</span><strong id="reportPayCard">$0.00</strong></div>
+      <div><span>Otros</span><strong id="reportPayOther">$0.00</strong></div>
+    </div>
+  </section>
+
+  <section class="panel reportSection">
+    <div class="panelTitle">
+      <div>
+        <h3>Ventas por cajero</h3>
+        <small>Cuánto cobró cada cajero y por qué método.</small>
+      </div>
+    </div>
+    <div class="tableWrap">
+      <table class="dataTable reportTable">
+        <thead>
+          <tr>
+            <th>Cajero</th>
+            <th>Ventas</th>
+            <th>Efectivo</th>
+            <th>Deuna</th>
+            <th>Ahorita</th>
+            <th>Transfer.</th>
+            <th>Tarjeta</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="reportCashierBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel reportSection">
+    <div class="panelTitle">
+      <div>
+        <h3>Registro y cierre de caja por turno</h3>
+        <small>Fondo inicial, ventas en efectivo, efectivo esperado, contado y diferencia.</small>
+      </div>
+    </div>
+    <div class="tableWrap">
+      <table class="dataTable reportTable">
+        <thead>
+          <tr>
+            <th>Cajero</th>
+            <th>Apertura</th>
+            <th>Cierre</th>
+            <th>Inicial</th>
+            <th>Ventas efectivo</th>
+            <th>Efectivo esperado</th>
+            <th>Contado</th>
+            <th>Diferencia</th>
+            <th>Total ventas</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody id="reportShiftBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel reportSection">
+    <div class="panelTitle">
+      <div>
+        <h3>Ingresos y egresos</h3>
+        <small>Movimientos de Contabilidad del período. Las ventas se identifican por separado.</small>
+      </div>
+    </div>
+    <div class="tableWrap">
+      <table class="dataTable reportTable">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Categoría</th>
+            <th>Descripción</th>
+            <th>Método</th>
+            <th>Responsable</th>
+            <th>Monto</th>
+          </tr>
+        </thead>
+        <tbody id="reportFinanceBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel reportSection">
+    <div class="panelTitle">
+      <div>
+        <h3>Detalle de ventas</h3>
+        <small>Pedidos pagados incluidos en este informe.</small>
+      </div>
+    </div>
+    <div class="tableWrap">
+      <table class="dataTable reportTable">
+        <thead>
+          <tr>
+            <th>Pedido</th>
+            <th>Fecha / hora</th>
+            <th>Cajero</th>
+            <th>Método</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="reportSalesBody"></tbody>
+      </table>
+    </div>
+  </section>
+</section>
+
 <section id="tab-finance" class="tab hidden v21Workspace">
   <div class="tablesHeader">
     <div><h2>Contabilidad</h2><p>Ingresos, egresos y resultado del negocio.</p></div>
@@ -1475,7 +1721,7 @@ document.addEventListener('DOMContentLoaded', function(){
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=confirm-before-kitchen-1"></script>
+<script src="/admin-v18.js?v=reports-final-1"></script>
 
 
 

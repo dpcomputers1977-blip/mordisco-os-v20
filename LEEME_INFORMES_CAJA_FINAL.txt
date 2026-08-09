@@ -1,0 +1,52 @@
+MORDISCO OS — INFORMES Y CIERRE DE CAJA
+
+ESTA ACTUALIZACIÓN SOLO AGREGA UN MÓDULO DE LECTURA/REPORTES.
+NO CAMBIA EL COBRO NI LOS PEDIDOS.
+
+NUEVO MENÚ: INFORMES
+
+INCLUYE:
+- Ventas cobradas por período.
+- Reporte por cajero.
+- Número de ventas por cajero.
+- Total por cajero.
+- Desglose por:
+  Efectivo, Deuna, Ahorita, Transferencia, Tarjeta y otros.
+- Registro de turnos/cierres.
+- Efectivo inicial.
+- Ventas en efectivo durante el turno.
+- Efectivo esperado.
+- Efectivo contado (si la tabla work_shifts lo almacena).
+- Diferencia de caja.
+- Total vendido durante el turno.
+- Ingresos.
+- Egresos.
+- Resultado del período.
+- Detalle de movimientos contables.
+- Detalle de ventas.
+- Filtro por fecha y cajero.
+- Imprimir / Guardar como PDF usando el diálogo de impresión del navegador.
+
+IMPORTANTE:
+- El módulo es de SOLO LECTURA.
+- No inserta, actualiza ni elimina datos.
+- No requiere SQL.
+- No toca Caja, Pedidos web, Cocina, Mesas, WhatsApp, Club Mordisco ni Contabilidad.
+- Para guardar PDF: pulsa Imprimir / Guardar PDF y en Windows/Chrome elige
+  "Guardar como PDF".
+
+INSTALACIÓN:
+1. Extrae el ZIP.
+2. Copia todo sobre:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+3. Reemplaza archivos.
+4. GitHub Desktop:
+   Summary: Agregar informes finales de caja
+5. Commit to main.
+6. Push origin.
+7. Espera Vercel Ready.
+8. Abre:
+   https://mordiscofastfood.com/admin?v=reports-final-1
+9. Ctrl + Shift + R.
+
+NO EJECUTES SQL.

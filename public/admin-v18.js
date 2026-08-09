@@ -4446,3 +4446,390 @@ document.querySelectorAll('[data-finance-close]').forEach(button=>{
       ?.classList.add('financeSectionHidden');
   });
 });
+
+
+
+/* ============================================================
+   INFORMES FINALES — CAJA, CAJEROS, INGRESOS Y EGRESOS
+   Solo lectura. No modifica pedidos, cobros ni contabilidad.
+   ============================================================ */
+let mordiscoReportOrders=[];
+let mordiscoReportMovements=[];
+let mordiscoReportShifts=[];
+let mordiscoReportStaffMap={};
+
+function reportLocalDate(value){
+  if(!value)return '';
+  try{
+    return new Date(value).toLocaleString('es-EC',{
+      timeZone:'America/Guayaquil',
+      year:'numeric',month:'2-digit',day:'2-digit',
+      hour:'2-digit',minute:'2-digit'
+    });
+  }catch{return String(value)}
+}
+
+function reportDateInputToday(){
+  const parts=new Intl.DateTimeFormat('en-CA',{
+    timeZone:'America/Guayaquil',
+    year:'numeric',month:'2-digit',day:'2-digit'
+  }).formatToParts(new Date());
+  const map=Object.fromEntries(parts.map(x=>[x.type,x.value]));
+  return `${map.year}-${map.month}-${map.day}`;
+}
+
+function reportMethodKey(value){
+  const method=String(value||'other').toLowerCase();
+  if(method==='cash'||method==='efectivo')return 'cash';
+  if(method==='deuna'||method==='de una')return 'deuna';
+  if(method==='ahorita')return 'ahorita';
+  if(method==='transfer'||method==='transferencia')return 'transfer';
+  if(method==='card'||method==='tarjeta')return 'card';
+  return 'other';
+}
+
+function reportMethodName(value){
+  const key=reportMethodKey(value);
+  return {
+    cash:'Efectivo',
+    deuna:'Deuna',
+    ahorita:'Ahorita',
+    transfer:'Transferencia',
+    card:'Tarjeta',
+    other:'Otro'
+  }[key]||'Otro';
+}
+
+function reportStaffName(id){
+  if(!id)return 'Administrador / sin asignar';
+  return mordiscoReportStaffMap[String(id)]?.name||'Empleado';
+}
+
+function reportSelectedCashier(){
+  return document.querySelector('#reportCashierFilter')?.value||'all';
+}
+
+function reportFilteredOrders(){
+  const cashier=reportSelectedCashier();
+  return mordiscoReportOrders.filter(order=>
+    cashier==='all'||String(order.cashier_id||'')===String(cashier)
+  );
+}
+
+function reportFilteredShifts(){
+  const cashier=reportSelectedCashier();
+  return mordiscoReportShifts.filter(shift=>
+    cashier==='all'||String(shift.staff_id||'')===String(cashier)
+  );
+}
+
+function reportFilteredMovements(){
+  const cashier=reportSelectedCashier();
+  if(cashier==='all')return mordiscoReportMovements;
+  return mordiscoReportMovements.filter(movement=>
+    !movement.staff_id||String(movement.staff_id)===String(cashier)
+  );
+}
+
+async function fillReportCashiers(){
+  const select=document.querySelector('#reportCashierFilter');
+  if(!select)return;
+
+  const {data,error}=await db
+    .from('staff')
+    .select('id,name,role,active')
+    .eq('active',true)
+    .order('name');
+
+  if(error){
+    console.warn('No se pudieron cargar cajeros para informes:',error);
+    return;
+  }
+
+  const staff=data||[];
+  staff.forEach(member=>mordiscoReportStaffMap[String(member.id)]=member);
+
+  const eligible=staff.filter(member=>['cashier','admin','administrator'].includes(String(member.role||'').toLowerCase()));
+  const current=select.value||'all';
+
+  select.innerHTML='<option value="all">Todos los cajeros</option>'+
+    eligible.map(member=>`<option value="${member.id}">${esc(member.name)}</option>`).join('');
+
+  if([...select.options].some(option=>option.value===current))select.value=current;
+}
+
+async function loadMordiscoReports(){
+  const from=document.querySelector('#reportDateFrom')?.value||reportDateInputToday();
+  const to=document.querySelector('#reportDateTo')?.value||from;
+
+  const startIso=`${from}T00:00:00-05:00`;
+  const endDate=new Date(`${to}T00:00:00-05:00`);
+  endDate.setDate(endDate.getDate()+1);
+  const endIso=endDate.toISOString();
+
+  const [ordersResult,movementsResult,shiftsResult,staffResult]=await Promise.all([
+    db.from('orders')
+      .select('id,order_number,total,subtotal,discount_amount,payment_status,payment_method,cashier_id,created_at')
+      .eq('payment_status','paid')
+      .gte('created_at',startIso)
+      .lt('created_at',endIso)
+      .order('created_at',{ascending:true}),
+
+    db.from('financial_movements')
+      .select('id,type,category,amount,payment_method,movement_date,reference,description,staff_id,created_at')
+      .gte('movement_date',from)
+      .lte('movement_date',to)
+      .order('movement_date',{ascending:true})
+      .order('created_at',{ascending:true}),
+
+    db.from('work_shifts')
+      .select('*,staff(name,role)')
+      .gte('started_at',startIso)
+      .lt('started_at',endIso)
+      .order('started_at',{ascending:true}),
+
+    db.from('staff')
+      .select('id,name,role,active')
+  ]);
+
+  const error=ordersResult.error||movementsResult.error||shiftsResult.error||staffResult.error;
+  if(error){
+    console.error('Informes:',error);
+    toast('No se pudo generar el informe: '+error.message);
+    return;
+  }
+
+  mordiscoReportOrders=ordersResult.data||[];
+  mordiscoReportMovements=movementsResult.data||[];
+  mordiscoReportShifts=shiftsResult.data||[];
+
+  mordiscoReportStaffMap={};
+  (staffResult.data||[]).forEach(member=>{
+    mordiscoReportStaffMap[String(member.id)]=member;
+  });
+
+  renderMordiscoReports();
+
+  const label=document.querySelector('#reportPeriodLabel');
+  if(label){
+    label.textContent=from===to
+      ?`Fecha: ${from}`
+      :`Período: ${from} al ${to}`;
+  }
+}
+
+function renderMordiscoReports(){
+  const orders=reportFilteredOrders();
+  const movements=reportFilteredMovements();
+  const shifts=reportFilteredShifts();
+
+  const salesTotal=orders.reduce((sum,order)=>sum+Number(order.total||0),0);
+  const salesCount=orders.length;
+
+  const salesMovement=movement=>{
+    const category=String(movement.category||'').toLowerCase();
+    const reference=String(movement.reference||'').toLowerCase();
+    const description=String(movement.description||'').toLowerCase();
+    return category==='ventas'||reference.startsWith('venta #')||description.startsWith('pago del pedido #');
+  };
+
+  const otherIncome=movements
+    .filter(m=>m.type==='income'&&!salesMovement(m))
+    .reduce((sum,m)=>sum+Number(m.amount||0),0);
+
+  const expenses=movements
+    .filter(m=>m.type==='expense')
+    .reduce((sum,m)=>sum+Number(m.amount||0),0);
+
+  const result=salesTotal+otherIncome-expenses;
+
+  $('#reportSalesTotal').textContent=money(salesTotal);
+  $('#reportSalesCount').textContent=`${salesCount} venta${salesCount===1?'':'s'}`;
+  $('#reportOtherIncome').textContent=money(otherIncome);
+  $('#reportExpenses').textContent=money(expenses);
+  $('#reportNetResult').textContent=money(result);
+
+  const methodTotals={cash:0,deuna:0,ahorita:0,transfer:0,card:0,other:0};
+  orders.forEach(order=>{
+    methodTotals[reportMethodKey(order.payment_method)]+=Number(order.total||0);
+  });
+
+  $('#reportPayCash').textContent=money(methodTotals.cash);
+  $('#reportPayDeuna').textContent=money(methodTotals.deuna);
+  $('#reportPayAhorita').textContent=money(methodTotals.ahorita);
+  $('#reportPayTransfer').textContent=money(methodTotals.transfer);
+  $('#reportPayCard').textContent=money(methodTotals.card);
+  $('#reportPayOther').textContent=money(methodTotals.other);
+
+  renderReportCashiers(orders);
+  renderReportShifts(shifts,orders);
+  renderReportFinance(movements);
+  renderReportSales(orders);
+}
+
+function renderReportCashiers(orders){
+  const body=$('#reportCashierBody');
+  if(!body)return;
+
+  const groups=new Map();
+
+  orders.forEach(order=>{
+    const id=String(order.cashier_id||'unassigned');
+    if(!groups.has(id)){
+      groups.set(id,{
+        id,
+        name:reportStaffName(order.cashier_id),
+        count:0,total:0,
+        cash:0,deuna:0,ahorita:0,transfer:0,card:0,other:0
+      });
+    }
+
+    const group=groups.get(id);
+    const amount=Number(order.total||0);
+    const key=reportMethodKey(order.payment_method);
+    group.count++;
+    group.total+=amount;
+    group[key]+=amount;
+  });
+
+  const rows=[...groups.values()].sort((a,b)=>b.total-a.total);
+
+  body.innerHTML=rows.length?rows.map(row=>`<tr>
+    <td><b>${esc(row.name)}</b></td>
+    <td>${row.count}</td>
+    <td>${money(row.cash)}</td>
+    <td>${money(row.deuna)}</td>
+    <td>${money(row.ahorita)}</td>
+    <td>${money(row.transfer)}</td>
+    <td>${money(row.card)}</td>
+    <td><b>${money(row.total)}</b></td>
+  </tr>`).join(''):'<tr><td colspan="8">No hay ventas cobradas en este período.</td></tr>';
+}
+
+function shiftCountedCash(shift){
+  const candidates=[
+    shift.closing_cash,
+    shift.counted_cash,
+    shift.cash_counted,
+    shift.final_cash,
+    shift.closed_cash
+  ];
+  const found=candidates.find(value=>value!==null&&value!==undefined&&value!=='');
+  return found===undefined?null:Number(found||0);
+}
+
+function renderReportShifts(shifts,orders){
+  const body=$('#reportShiftBody');
+  if(!body)return;
+
+  body.innerHTML=shifts.length?shifts.map(shift=>{
+    const started=new Date(shift.started_at).getTime();
+    const ended=shift.ended_at?new Date(shift.ended_at).getTime():Date.now();
+
+    const shiftOrders=orders.filter(order=>{
+      if(String(order.cashier_id||'')!==String(shift.staff_id||''))return false;
+      const created=new Date(order.created_at).getTime();
+      return created>=started&&created<=ended;
+    });
+
+    const cashSales=shiftOrders
+      .filter(order=>reportMethodKey(order.payment_method)==='cash')
+      .reduce((sum,order)=>sum+Number(order.total||0),0);
+
+    const totalSales=shiftOrders.reduce((sum,order)=>sum+Number(order.total||0),0);
+    const opening=Number(shift.opening_cash||0);
+    const expected=opening+cashSales;
+    const counted=shiftCountedCash(shift);
+    const difference=counted===null?null:counted-expected;
+
+    const diffClass=difference===null?'':difference>0.005
+      ?'reportDifferencePositive'
+      :difference<-0.005
+        ?'reportDifferenceNegative'
+        :'reportDifferenceZero';
+
+    return `<tr>
+      <td><b>${esc(shift.staff?.name||reportStaffName(shift.staff_id))}</b></td>
+      <td>${reportLocalDate(shift.started_at)}</td>
+      <td>${shift.ended_at?reportLocalDate(shift.ended_at):'—'}</td>
+      <td>${money(opening)}</td>
+      <td>${money(cashSales)}</td>
+      <td><b>${money(expected)}</b></td>
+      <td>${counted===null?'—':money(counted)}</td>
+      <td class="${diffClass}">${difference===null?'—':money(difference)}</td>
+      <td><b>${money(totalSales)}</b></td>
+      <td>${shift.status==='open'?'ABIERTO':'CERRADO'}</td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="10">No hay turnos registrados en este período.</td></tr>';
+}
+
+function renderReportFinance(movements){
+  const body=$('#reportFinanceBody');
+  if(!body)return;
+
+  body.innerHTML=movements.length?movements.map(movement=>`<tr>
+    <td>${esc(movement.movement_date||'')}</td>
+    <td>${movement.type==='income'?'Ingreso':'Egreso'}</td>
+    <td>${esc(movement.category||'')}</td>
+    <td>${esc(movement.description||'')}${movement.reference?`<small> · ${esc(movement.reference)}</small>`:''}</td>
+    <td>${reportMethodName(movement.payment_method)}</td>
+    <td>${esc(reportStaffName(movement.staff_id))}</td>
+    <td class="${movement.type==='income'?'positiveAmount':'negativeAmount'}">
+      ${movement.type==='income'?'+':'−'}${money(movement.amount)}
+    </td>
+  </tr>`).join(''):'<tr><td colspan="7">No hay ingresos ni egresos en este período.</td></tr>';
+}
+
+function renderReportSales(orders){
+  const body=$('#reportSalesBody');
+  if(!body)return;
+
+  body.innerHTML=orders.length?orders.map(order=>`<tr>
+    <td>#${esc(String(order.order_number||''))}</td>
+    <td>${reportLocalDate(order.created_at)}</td>
+    <td>${esc(reportStaffName(order.cashier_id))}</td>
+    <td>${reportMethodName(order.payment_method)}</td>
+    <td><b>${money(order.total)}</b></td>
+  </tr>`).join(''):'<tr><td colspan="5">No hay ventas cobradas en este período.</td></tr>';
+}
+
+function initMordiscoReports(){
+  const from=$('#reportDateFrom');
+  const to=$('#reportDateTo');
+  if(!from||!to)return;
+
+  const today=reportDateInputToday();
+  if(!from.value)from.value=today;
+  if(!to.value)to.value=today;
+
+  fillReportCashiers();
+}
+
+$('#applyReportFilters')?.addEventListener('click',loadMordiscoReports);
+$('#refreshReportsBtn')?.addEventListener('click',loadMordiscoReports);
+$('#reportCashierFilter')?.addEventListener('change',renderMordiscoReports);
+$('#printReportsBtn')?.addEventListener('click',()=>{
+  const cashier=$('#reportCashierFilter')?.selectedOptions?.[0]?.textContent||'Todos los cajeros';
+  const period=$('#reportPeriodLabel')?.textContent||'';
+  const header=$('#reportPrintHeader p');
+  if(header)header.textContent=`Informe administrativo de caja · ${cashier}`;
+  window.print();
+});
+
+// This explicit navigation handler only covers the new module and does not
+// interfere with the existing tab system.
+document.querySelector('[data-tab="reports"]')?.addEventListener('click',event=>{
+  document.querySelectorAll('#adminView .tab').forEach(tab=>tab.classList.add('hidden'));
+  document.querySelector('#tab-reports')?.classList.remove('hidden');
+
+  document.querySelectorAll('.sidebar [data-tab]').forEach(button=>button.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  const title=document.querySelector('#adminTitle');
+  if(title)title.textContent='Informes';
+
+  initMordiscoReports();
+  loadMordiscoReports();
+});
+
+document.addEventListener('DOMContentLoaded',initMordiscoReports);
