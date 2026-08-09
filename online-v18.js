@@ -325,41 +325,12 @@ document.querySelector("#onlineType").onchange=event=>{
 };
 
 
-function openWhatsAppDirect(phone,message){
-  const cleanPhone=String(phone||"").replace(/\D/g,"");
-  const encoded=encodeURIComponent(message);
-  const fallback=`https://wa.me/${cleanPhone}?text=${encoded}`;
-  const ua=navigator.userAgent||"";
+let pendingWebConfirmation=null;
+let whatsappConfirmationOpened=false;
 
-  if(/Android/i.test(ua)){
-    const intent=
-      `intent://send?phone=${cleanPhone}&text=${encoded}`+
-      `#Intent;scheme=whatsapp;package=com.whatsapp;S.browser_fallback_url=${encodeURIComponent(fallback)};end`;
-    window.location.href=intent;
-    return;
-  }
+function buildWebConfirmationData(){
+  if(!cart.length)throw new Error("Agrega productos al pedido");
 
-  if(/iPhone|iPad|iPod/i.test(ua)){
-    window.location.href=`whatsapp://send?phone=${cleanPhone}&text=${encoded}`;
-    setTimeout(()=>{
-      if(document.visibilityState==="visible")window.location.href=fallback;
-    },1600);
-    return;
-  }
-
-  window.location.href=fallback;
-}
-
-document.querySelector("#onlineOrderForm").onsubmit=async event=>{
-  event.preventDefault();
-
-  if(!cart.length){
-    toast("Agrega productos al pedido");
-    document.querySelector("#onlineProducts")?.scrollIntoView({behavior:"smooth"});
-    return;
-  }
-
-  const form=event.currentTarget;
   const name=document.querySelector("#onlineName").value.trim();
   const rawPhone=document.querySelector("#onlinePhone").value.trim();
   const phone=rawPhone.replace(/\D/g,"");
@@ -367,25 +338,10 @@ document.querySelector("#onlineOrderForm").onsubmit=async event=>{
   const address=document.querySelector("#onlineAddress").value.trim();
   const notes=document.querySelector("#onlineNotes").value.trim();
   const paymentMethod=document.querySelector("#onlinePaymentMethod").value||"cash";
-  const button=document.querySelector("#sendOnlineOrder");
 
-  if(name.length<2){
-    toast("Escribe tu nombre");
-    document.querySelector("#onlineName").focus();
-    return;
-  }
-
-  if(phone.length<9||phone.length>15){
-    toast("Escribe un número de WhatsApp válido");
-    document.querySelector("#onlinePhone").focus();
-    return;
-  }
-
-  if(type==="delivery"&&!address){
-    toast("Escribe la dirección de entrega");
-    document.querySelector("#onlineAddress").focus();
-    return;
-  }
+  if(name.length<2)throw new Error("Escribe tu nombre");
+  if(phone.length<9||phone.length>15)throw new Error("Escribe un número de WhatsApp válido");
+  if(type==="delivery"&&!address)throw new Error("Escribe la dirección de entrega");
 
   const selectedItems=cart.map(item=>{
     const product=products.find(p=>String(p.id)===String(item.id));
@@ -402,126 +358,184 @@ document.querySelector("#onlineOrderForm").onsubmit=async event=>{
   const selectedExtraRows=selectedExtras.map(item=>{
     const option=extraOptions.find(extra=>String(extra.id)===String(item.id));
     return {
-      id:item.id,
-      extra_id:item.id,
-      option_id:item.id,
-      quantity:Number(item.qty||1),
-      qty:Number(item.qty||1),
-      name:option?.name||"Extra",
-      price:Number(option?.price||0),
+      id:item.id,extra_id:item.id,option_id:item.id,
+      quantity:Number(item.qty||1),qty:Number(item.qty||1),
+      name:option?.name||"Extra",price:Number(option?.price||0),
       subtotal:Number(option?.price||0)*Number(item.qty||1),
       option_type:option?.option_type||"extra"
     };
   });
 
-  const productsTotal=selectedItems.reduce((sum,item)=>sum+item.subtotal,0);
-  const selectedExtrasTotal=selectedExtraRows.reduce((sum,item)=>sum+item.subtotal,0);
-  const total=productsTotal+selectedExtrasTotal;
+  const total=
+    selectedItems.reduce((sum,item)=>sum+item.subtotal,0)+
+    selectedExtraRows.reduce((sum,item)=>sum+item.subtotal,0);
 
-  // Abrir una pestaña desde el mismo toque para evitar el bloqueo de WhatsApp
-  // en Chrome, Android y navegadores integrados.
-  let whatsappWindow=null;
-  try{
-    whatsappWindow=window.open("about:blank","_blank");
-    if(whatsappWindow){
-      whatsappWindow.document.write(
-        "<title>Confirmando pedido...</title>"+
-        "<body style='font-family:Arial;padding:30px;text-align:center'>"+
-        "<h2>Registrando tu pedido...</h2>"+
-        "<p>En unos segundos abriremos WhatsApp.</p></body>"
-      );
+  const confirmationCode="M"+Date.now().toString().slice(-7);
+
+  return {
+    name,rawPhone,type,address,notes,paymentMethod,
+    selectedItems,selectedExtraRows,total,confirmationCode
+  };
+}
+
+function webConfirmationMessage(data){
+  const typeLabel=data.type==="delivery"?"Delivery":"Retiro en el local";
+  const items=data.selectedItems.map(item=>`${item.quantity} x ${item.name} - ${money(item.subtotal)}`).join("\n");
+  const extras=data.selectedExtraRows.map(item=>`${item.quantity} x ${item.name} - ${money(item.subtotal)}`).join("\n");
+
+  return [
+    "🍔 *CONFIRMACIÓN DE PEDIDO - MORDISCO*",
+    "",
+    `Código: *${data.confirmationCode}*`,
+    `Cliente: ${data.name}`,
+    `Teléfono: ${data.rawPhone}`,
+    `Tipo: ${typeLabel}`,
+    data.address?`Dirección: ${data.address}`:"",
+    "",
+    "*Productos:*",
+    items,
+    extras?"":"",
+    extras?"*Extras y empaques:*":"",
+    extras||"",
+    "",
+    `*Total: ${money(data.total)}*`,
+    `Método de pago: ${PAYMENT_LABELS[data.paymentMethod]||data.paymentMethod}`,
+    data.notes?`Notas: ${data.notes}`:"",
+    "",
+    "✅ *CONFIRMO QUE DESEO REALIZAR ESTE PEDIDO.*",
+    `Código de confirmación: ${data.confirmationCode}`
+  ].filter(Boolean).join("\n");
+}
+
+function openWhatsAppFromCustomerGesture(data){
+  const message=webConfirmationMessage(data);
+  const encoded=encodeURIComponent(message);
+  const direct=`whatsapp://send?phone=593959005534&text=${encoded}`;
+  const fallback=`https://wa.me/593959005534?text=${encoded}`;
+
+  whatsappConfirmationOpened=true;
+  const register=document.querySelector("#webRegisterAfterWhatsApp");
+  register.disabled=false;
+  register.textContent="Ya confirmé por WhatsApp — Registrar pedido";
+
+  window.location.href=direct;
+
+  setTimeout(()=>{
+    if(document.visibilityState==="visible"){
+      window.location.href=fallback;
     }
-  }catch(error){
-    whatsappWindow=null;
+  },1800);
+}
+
+function openWebConfirmationModal(data){
+  pendingWebConfirmation=data;
+  whatsappConfirmationOpened=false;
+  const register=document.querySelector("#webRegisterAfterWhatsApp");
+  register.disabled=true;
+  register.textContent="Primero confirma por WhatsApp";
+
+  const extras=data.selectedExtraRows.length
+    ?`<p><b>Extras:</b> ${data.selectedExtraRows.map(x=>`${x.quantity}× ${esc(x.name)}`).join(", ")}</p>`
+    :"";
+
+  document.querySelector("#webConfirmSummary").innerHTML=`
+    <p><b>Cliente:</b> ${esc(data.name)}</p>
+    <p><b>Productos:</b> ${data.selectedItems.map(x=>`${x.quantity}× ${esc(x.name)}`).join(", ")}</p>
+    ${extras}
+    <p><b>Código:</b> ${data.confirmationCode}</p>
+    <strong>Total: ${money(data.total)}</strong>
+  `;
+  document.querySelector("#webConfirmModal").classList.remove("hidden");
+  document.querySelector("#webConfirmModal").setAttribute("aria-hidden","false");
+}
+
+document.querySelector("#onlineOrderForm").onsubmit=event=>{
+  event.preventDefault();
+
+  if(!storeIsOpen){
+    toast("El restaurante está cerrado en este momento");
+    return;
   }
 
+  try{
+    openWebConfirmationModal(buildWebConfirmationData());
+  }catch(error){
+    toast(error.message||"Revisa los datos del pedido");
+  }
+};
+
+document.querySelector("#webOpenWhatsApp")?.addEventListener("click",()=>{
+  if(!pendingWebConfirmation)return;
+  openWhatsAppFromCustomerGesture(pendingWebConfirmation);
+});
+
+document.querySelector("#webConfirmClose")?.addEventListener("click",()=>{
+  document.querySelector("#webConfirmModal")?.classList.add("hidden");
+});
+
+document.querySelector("#webRegisterAfterWhatsApp")?.addEventListener("click",async()=>{
+  if(!pendingWebConfirmation||!whatsappConfirmationOpened){
+    return toast("Primero confirma el pedido por WhatsApp");
+  }
+
+  const data=pendingWebConfirmation;
+  const button=document.querySelector("#webRegisterAfterWhatsApp");
   button.disabled=true;
-  button.textContent="Registrando pedido...";
+  button.textContent="Registrando solicitud...";
 
   try{
-    const {data,error}=await db.rpc("create_web_order",{
-      p_customer_name:name,
-      p_customer_phone:rawPhone,
-      p_customer_address:address,
-      p_order_type:type,
-      p_notes:notes,
-      p_items:selectedItems.map(item=>({
+    const notesWithConfirmation=
+      `[WEB_ESPERANDO_WHATSAPP] Código ${data.confirmationCode}. `+(data.notes||"");
+
+    const {data:rpcData,error}=await db.rpc("create_web_order",{
+      p_customer_name:data.name,
+      p_customer_phone:data.rawPhone,
+      p_customer_address:data.address,
+      p_order_type:data.type,
+      p_notes:notesWithConfirmation,
+      p_items:data.selectedItems.map(item=>({
         product_id:item.product_id,
         quantity:item.quantity
       })),
-      p_payment_method:paymentMethod,
-      p_extras:selectedExtraRows
+      p_payment_method:data.paymentMethod,
+      p_extras:data.selectedExtraRows
     });
 
     if(error)throw error;
 
-    const result=Array.isArray(data)?data[0]:data;
+    const result=Array.isArray(rpcData)?rpcData[0]:rpcData;
     const orderNumber=
       result?.order_number ??
       result?.number ??
-      (typeof data==="number"||typeof data==="string"?data:null);
-    const orderLabel=orderNumber||"pendiente";
-    const typeLabel=type==="delivery"?"Delivery":"Retiro en el local";
+      (typeof rpcData==="number"||typeof rpcData==="string"?rpcData:null);
 
-    const itemLines=selectedItems
-      .map(item=>`${item.quantity} x ${item.name} - ${money(item.subtotal)}`)
-      .join("\n");
+    if(orderNumber){
+      const {error:updateError}=await db
+        .from("orders")
+        .update({status:"awaiting_confirmation"})
+        .eq("order_number",orderNumber);
+      if(updateError)console.warn("Estado de confirmación:",updateError);
+    }
 
-    const extraLines=selectedExtraRows
-      .map(item=>`${item.quantity} x ${item.name} - ${money(item.subtotal)}`)
-      .join("\n");
-
-    const whatsappMessage=[
-      "🍔 *CONFIRMACIÓN DE PEDIDO - MORDISCO*",
-      "",
-      `Pedido: #${orderLabel}`,
-      `Cliente: ${name}`,
-      `Teléfono registrado: ${rawPhone}`,
-      `Tipo: ${typeLabel}`,
-      address?`Dirección: ${address}`:"",
-      "",
-      "*Productos:*",
-      itemLines,
-      extraLines?"":"",
-      extraLines?"*Extras y empaques:*":"",
-      extraLines||"",
-      "",
-      `*Total: ${money(total)}*`,
-      `Método de pago: ${PAYMENT_LABELS[paymentMethod]||paymentMethod}`,
-      notes?`Notas: ${notes}`:"",
-      "",
-      "Confirmo que deseo realizar este pedido.",
-      "Por favor, respóndanme por este WhatsApp para coordinarlo."
-    ].filter(Boolean).join("\n");
-
-    const whatsappUrl=
-      `https://wa.me/593959005534?text=${encodeURIComponent(whatsappMessage)}`;
-
-    // Solo vaciar el carrito después de que Supabase confirmó el pedido.
     cart=[];
     selectedExtras=[];
     renderExtras();
     renderCart();
-    form.reset();
+    document.querySelector("#onlineOrderForm").reset();
     document.querySelector("#onlineAddressWrap").classList.add("hidden");
+    document.querySelector("#webConfirmModal").classList.add("hidden");
 
-    toast(`Pedido #${orderLabel} registrado. Abriendo WhatsApp...`);
+    pendingWebConfirmation=null;
+    whatsappConfirmationOpened=false;
 
-    if(whatsappWindow&&!whatsappWindow.closed){try{whatsappWindow.close()}catch(error){}}
-    openWhatsAppDirect("593959005534",whatsappMessage);
+    toast(`Solicitud #${orderNumber||""} recibida. Mordisco verificará tu WhatsApp antes de enviarla a Cocina.`);
   }catch(error){
-    console.error("Error confirmando pedido:",error);
-
-    if(whatsappWindow&&!whatsappWindow.closed){
-      whatsappWindow.close();
-    }
-
-    toast("No se pudo registrar el pedido: "+(error?.message||"Error desconocido"));
-  }finally{
+    console.error("Registro tras WhatsApp:",error);
+    toast("No se pudo registrar: "+(error?.message||"Error desconocido"));
     button.disabled=false;
-    button.textContent="Confirmar pedido por WhatsApp";
+    button.textContent="Ya confirmé por WhatsApp — Registrar pedido";
   }
-};
+});
 
 document.querySelector("#floatingCartButton")?.addEventListener("click",()=>{
   document.querySelector(".onlineCart")?.scrollIntoView({behavior:"smooth",block:"start"});

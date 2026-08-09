@@ -907,7 +907,7 @@ async function loadOrders(){
   renderKitchen();
   renderPosPendingOrders();
 }
-const statusLabels={pending:'Pendiente',confirmed:'Confirmado',preparing:'Preparando',ready:'Listo',delivered:'Entregado',cancelled:'Cancelado'};
+const statusLabels={awaiting_confirmation:'Esperando confirmación',pending:'Pendiente',confirmed:'Confirmado',preparing:'Preparando',ready:'Listo',delivered:'Entregado',cancelled:'Cancelado'};
 function getFilteredOrders(){return orderStatusFilter==='all'?orders:orders.filter(o=>o.status===orderStatusFilter)}
 function renderOrders(){
   const list=getFilteredOrders();
@@ -920,6 +920,12 @@ function renderOrders(){
     <div class="orderPaymentStatus ${o.payment_status==='paid'?'paid':'unpaid'}">${o.payment_status==='paid'?'✓ Pagada':'⏳ Pendiente de pago'}</div>
     <strong>${money(o.total)}</strong>
     <p>${new Date(o.created_at).toLocaleString('es-EC')}</p>
+    ${o.status==='awaiting_confirmation'||String(o.notes||'').includes('[WEB_ESPERANDO_WHATSAPP]')?`
+      <div class="orderAwaitingWhatsApp">
+        <b>📱 Esperando confirmación por WhatsApp</b>
+        <small>Verifica el mensaje del cliente antes de enviarlo a Cocina.</small>
+        <button type="button" class="success" data-confirm-web-order="${o.id}">✓ Confirmado — Enviar a cocina</button>
+      </div>`:''}
     <div class="orderActions">
       <select data-status="${o.id}">${Object.entries(statusLabels).map(([value,label])=>`<option ${value===o.status?'selected':''} value="${value}">${label}</option>`).join('')}</select>
       ${isAdminSession?`<button class="danger deleteSaleBtn" data-delete-order="${o.id}">Eliminar venta</button>`:''}
@@ -933,6 +939,36 @@ function renderOrders(){
   });
 
   $$('[data-delete-order]').forEach(b=>b.onclick=()=>deleteSale(b.dataset.deleteOrder));
+
+  $$('[data-confirm-web-order]').forEach(button=>button.onclick=async()=>{
+    const id=button.dataset.confirmWebOrder;
+    const order=orders.find(item=>String(item.id)===String(id));
+    if(!order)return toast('Pedido no encontrado');
+
+    if(!confirm(`¿Ya comprobaste en WhatsApp la confirmación del pedido #${order.order_number}?`))return;
+
+    button.disabled=true;
+    button.textContent='Enviando a cocina...';
+
+    const cleanedNotes=String(order.notes||'')
+      .replace('[WEB_ESPERANDO_WHATSAPP]','')
+      .replace(/^\s*Código\s+M\d+\.\s*/i,'')
+      .trim();
+
+    const {error}=await db.from('orders').update({
+      status:'confirmed',
+      notes:cleanedNotes
+    }).eq('id',id);
+
+    if(error){
+      button.disabled=false;
+      button.textContent='✓ Confirmado — Enviar a cocina';
+      return toast('No se pudo confirmar: '+error.message);
+    }
+
+    toast(`Pedido #${order.order_number} confirmado y enviado a Cocina`);
+    await loadOrders();
+  });
 }
 function elapsedLabel(createdAt){
   const mins=Math.max(0,Math.floor((Date.now()-new Date(createdAt).getTime())/60000));
@@ -965,7 +1001,7 @@ function kitchenCard(o){
   </article>`;
 }
 function renderKitchen(){
-  const pending=orders.filter(o=>['pending','confirmed'].includes(o.status));
+  const pending=orders.filter(o=>['pending','confirmed'].includes(o.status)&&!String(o.notes||'').includes('[WEB_ESPERANDO_WHATSAPP]'));
   const preparing=orders.filter(o=>o.status==='preparing');
   const ready=orders.filter(o=>o.status==='ready');
   $('#kitchenPendingCount').textContent=pending.length;

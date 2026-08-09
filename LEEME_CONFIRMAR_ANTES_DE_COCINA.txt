@@ -1,0 +1,42 @@
+MORDISCO — CONFIRMAR ANTES DE ENVIAR A COCINA
+
+NUEVO FLUJO
+1. Cliente arma el pedido.
+2. Pulsa Confirmar pedido.
+3. Se abre una ventana de confirmación.
+4. Pulsa Confirmar mi pedido en WhatsApp.
+5. WhatsApp abre con un código único y el pedido completo.
+6. El cliente pulsa Enviar en WhatsApp.
+7. Regresa a la web y pulsa Ya confirmé por WhatsApp — Registrar pedido.
+8. El pedido queda como ESPERANDO CONFIRMACIÓN y NO aparece en Cocina.
+9. En Administrador > Pedidos web verificas que llegó el WhatsApp.
+10. Pulsas Confirmado — Enviar a cocina.
+11. Recién en ese momento Cocina recibe el pedido.
+
+IMPORTANTE
+La web no puede leer automáticamente los mensajes privados de WhatsApp.
+Por eso la comprobación final la hace el restaurante desde Pedidos web.
+Esto evita que un pedido llegue a Cocina sin haber recibido la confirmación.
+
+NO CAMBIA
+- Caja
+- Cobros
+- Contabilidad
+- Mesas
+- Turnos
+- Club Mordisco
+- Supabase / SQL
+
+INSTALACIÓN
+1. Reemplaza los archivos sobre:
+   C:\Users\USER\Documents\GitHub\mordisco-os-v20
+2. GitHub Desktop:
+   Summary: Confirmar WhatsApp antes de enviar a cocina
+3. Commit to main.
+4. Push origin.
+5. Espera Vercel Ready.
+6. Cierra todas las pestañas en teléfono y PC.
+7. Prueba:
+   https://mordiscofastfood.com/pedir?v=confirm-before-kitchen-1
+
+NO EJECUTES SQL.
