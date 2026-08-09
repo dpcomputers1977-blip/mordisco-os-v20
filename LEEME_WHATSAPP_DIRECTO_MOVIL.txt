@@ -1,0 +1,25 @@
+MORDISCO — WHATSAPP DIRECTO EN TELÉFONO
+
+- Android intenta abrir directamente la app de WhatsApp.
+- iPhone/iPad usa whatsapp://.
+- wa.me queda solo como respaldo.
+- Número oficial: 593959005534
+
+NOTA:
+Android o iPhone pueden mostrar una confirmación de seguridad para abrir WhatsApp.
+Eso lo controla el sistema operativo y una web no puede eliminarlo.
+
+NO CAMBIA:
+Caja, Mesas, Contabilidad, Cocina, Supabase, Club Mordisco ni cobros.
+
+INSTALACIÓN:
+1. Reemplaza los archivos sobre tu proyecto actual.
+2. GitHub Desktop: Abrir WhatsApp directo en móvil
+3. Commit to main.
+4. Push origin.
+5. Espera Vercel Ready.
+6. Cierra todas las pestañas de Mordisco del teléfono.
+7. Abre:
+   https://mordiscofastfood.com/pedir?v=whatsapp-direct-mobile-1
+
+NO EJECUTES SQL.

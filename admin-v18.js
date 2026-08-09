@@ -483,8 +483,7 @@ function renderAdminCategories(){$('#adminCategories').innerHTML=categories.map(
 
 
 function renderPosPendingOrders(){
-  const container=$('#posPendingOrders');
-  if(!container)return;
+  if(!$('#posPendingOrders'))return;
 
   const pending=orders
     .filter(o=>(o.payment_status||'unpaid')!=='paid'&&o.status!=='cancelled')
@@ -492,72 +491,49 @@ function renderPosPendingOrders(){
 
   if($('#posPendingCount'))$('#posPendingCount').textContent=pending.length;
 
-  container.innerHTML=pending.length?pending.map(o=>{
-    const tableName=o.restaurant_tables?.name||'';
-    const customer=tableName||o.customer_name||'Consumidor final';
-    const detail=(o.order_items||[])
-      .map(i=>`${Number(i.quantity||1)}× ${esc(i.product_name||'Producto')}`)
-      .join(', ');
-
-    return `<article class="posPendingCard posPendingCardPro posPendingPayCard" data-pending-order="${o.id}">
+  $('#posPendingOrders').innerHTML=pending.length?pending.map(o=>`
+    <article class="posPendingCard posPendingCardPro">
       <div class="posPendingNumber">
         <small>PEDIDO</small>
         <strong>#${o.order_number}</strong>
       </div>
 
       <div class="posPendingInfo">
-        <h4>${tableName?`🍽️ ${esc(tableName)}`:esc(customer)}</h4>
-        ${tableName&&o.customer_name&&o.customer_name!==tableName?`<small class="pendingCustomer">${esc(o.customer_name)}</small>`:''}
-        <p>${detail||'Pedido enviado a cocina'}</p>
-        <small>${orderTypeLabel(o.order_type)} · ${new Date(o.created_at).toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'})}</small>
+        <h4>${esc(o.customer_name||'Consumidor final')}</h4>
+        <p>${o.order_items?.map(i=>`${i.quantity}× ${esc(i.product_name)}`).join(', ')||'Sin detalle'}</p>
+        <small>
+          ${o.restaurant_tables?.name?`🍽️ ${esc(o.restaurant_tables.name)} · `:''}
+          ${orderTypeLabel(o.order_type)} ·
+          ${new Date(o.created_at).toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'})}
+        </small>
       </div>
 
       <div class="posPendingTotal">
-        <span>POR COBRAR</span>
+        <span>Pendiente</span>
         <strong>${money(o.total)}</strong>
       </div>
 
       <div class="posPendingActionsPro">
         <button type="button" class="pendingEditBtn" data-pending-edit="${o.id}">✏ Editar</button>
-        <button type="button" class="primary pendingChargeBtn" data-pos-pay="${o.id}">💵 COBRAR AHORA</button>
-        <button type="button" class="danger pendingCancelBtn" data-pending-cancel="${o.id}" title="Cancelar pedido">✕</button>
+        <button type="button" class="primary pendingChargeBtn" data-pos-pay="${o.id}">💵 Cobrar</button>
+        <button type="button" class="danger pendingCancelBtn" data-pending-cancel="${o.id}">✕</button>
       </div>
-    </article>`;
-  }).join(''):`<div class="posPendingEmpty">
+    </article>
+  `).join(''):`<div class="posPendingEmpty">
     <span>✓</span>
     <div><b>No hay pedidos pendientes</b><p>Las órdenes enviadas a cocina aparecerán aquí para cobrarlas.</p></div>
   </div>`;
 
-  container.querySelectorAll('[data-pos-pay]').forEach(button=>{
-    button.onclick=event=>{
-      event.preventDefault();
-      event.stopPropagation();
-      openChargeOrder(button.dataset.posPay);
-    };
+  $$('[data-pos-pay]').forEach(button=>{
+    button.onclick=()=>openChargeOrder(button.dataset.posPay);
   });
 
-  container.querySelectorAll('[data-pending-edit]').forEach(button=>{
-    button.onclick=event=>{
-      event.preventDefault();
-      event.stopPropagation();
-      openPendingOrderEditor(button.dataset.pendingEdit);
-    };
+  $$('[data-pending-edit]').forEach(button=>{
+    button.onclick=()=>openPendingOrderEditor(button.dataset.pendingEdit);
   });
 
-  container.querySelectorAll('[data-pending-cancel]').forEach(button=>{
-    button.onclick=event=>{
-      event.preventDefault();
-      event.stopPropagation();
-      cancelPendingOrder(button.dataset.pendingCancel);
-    };
-  });
-
-  // Clicking the card itself also opens payment, except when clicking an action.
-  container.querySelectorAll('[data-pending-order]').forEach(card=>{
-    card.onclick=event=>{
-      if(event.target.closest('button'))return;
-      openChargeOrder(card.dataset.pendingOrder);
-    };
+  $$('[data-pending-cancel]').forEach(button=>{
+    button.onclick=()=>cancelPendingOrder(button.dataset.pendingCancel);
   });
 }
 
@@ -1293,12 +1269,12 @@ async function completePosSale(){
 
   const sendBtn=$('#posCharge');
   sendBtn.disabled=true;
-  sendBtn.textContent='Creando pedido...';
+  sendBtn.textContent='Enviando...';
 
   const {data,error}=await db.from('orders').insert(order).select().single();
   if(error){
     sendBtn.disabled=false;
-    sendBtn.textContent='Crear pedido y enviar a cocina';
+    sendBtn.textContent='Enviar a cocina';
     return toast('No se pudo crear la orden: '+error.message);
   }
 
@@ -1316,7 +1292,7 @@ async function completePosSale(){
 
   const {error:itemError}=await db.from('order_items').insert(items);
   sendBtn.disabled=false;
-  sendBtn.textContent='Crear pedido y enviar a cocina';
+  sendBtn.textContent='Enviar a cocina';
 
   if(itemError)return toast('La orden se creó, pero fallaron los detalles: '+itemError.message);
 
@@ -1962,7 +1938,7 @@ if(document.querySelector('#sendTableOrder'))document.querySelector('#sendTableO
   const items=tableCart.map(r=>{const p=products.find(x=>String(x.id)===String(r.id));return{order_id:data.id,product_id:p.id,product_name:p.name,unit_price:p.price,quantity:r.qty,subtotal:Number(p.price)*r.qty}});
   const {error:itemError}=await db.from('order_items').insert(items);if(itemError)return toast(itemError.message);
   await db.from('restaurant_tables').update({status:'preparing',current_order_id:data.id,staff_id:order.waiter_id,updated_at:new Date().toISOString()}).eq('id',currentTable.id);
-  toast(`Comanda #${data.order_number} enviada a cocina y disponible en Caja`);$('#tableOrderModal').classList.add('hidden');await loadTables();await loadOrders();renderPosPendingOrders();
+  toast(`Comanda #${data.order_number} enviada a cocina`);$('#tableOrderModal').classList.add('hidden');await loadTables();await loadOrders();
 };
 if(document.querySelector('#markTablePayment'))document.querySelector('#markTablePayment').onclick=async()=>{if(!currentTable)return;await db.from('restaurant_tables').update({status:'payment',updated_at:new Date().toISOString()}).eq('id',currentTable.id);toast('Mesa pendiente de cobro');$('#tableOrderModal').classList.add('hidden');await loadTables()};
 if(document.querySelector('#freeTable'))document.querySelector('#freeTable').onclick=async()=>{if(!currentTable)return;await db.from('restaurant_tables').update({status:'free',current_order_id:null,staff_id:null,updated_at:new Date().toISOString()}).eq('id',currentTable.id);toast('Mesa liberada');$('#tableOrderModal').classList.add('hidden');await loadTables()};

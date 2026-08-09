@@ -324,6 +324,32 @@ document.querySelector("#onlineType").onchange=event=>{
   document.querySelector("#onlineAddressWrap").classList.toggle("hidden",event.target.value!=="delivery");
 };
 
+
+function openWhatsAppDirect(phone,message){
+  const cleanPhone=String(phone||"").replace(/\D/g,"");
+  const encoded=encodeURIComponent(message);
+  const fallback=`https://wa.me/${cleanPhone}?text=${encoded}`;
+  const ua=navigator.userAgent||"";
+
+  if(/Android/i.test(ua)){
+    const intent=
+      `intent://send?phone=${cleanPhone}&text=${encoded}`+
+      `#Intent;scheme=whatsapp;package=com.whatsapp;S.browser_fallback_url=${encodeURIComponent(fallback)};end`;
+    window.location.href=intent;
+    return;
+  }
+
+  if(/iPhone|iPad|iPod/i.test(ua)){
+    window.location.href=`whatsapp://send?phone=${cleanPhone}&text=${encoded}`;
+    setTimeout(()=>{
+      if(document.visibilityState==="visible")window.location.href=fallback;
+    },1600);
+    return;
+  }
+
+  window.location.href=fallback;
+}
+
 document.querySelector("#onlineOrderForm").onsubmit=async event=>{
   event.preventDefault();
 
@@ -481,11 +507,8 @@ document.querySelector("#onlineOrderForm").onsubmit=async event=>{
 
     toast(`Pedido #${orderLabel} registrado. Abriendo WhatsApp...`);
 
-    if(whatsappWindow&&!whatsappWindow.closed){
-      whatsappWindow.location.replace(whatsappUrl);
-    }else{
-      window.location.href=whatsappUrl;
-    }
+    if(whatsappWindow&&!whatsappWindow.closed){try{whatsappWindow.close()}catch(error){}}
+    openWhatsAppDirect("593959005534",whatsappMessage);
   }catch(error){
     console.error("Error confirmando pedido:",error);
 
