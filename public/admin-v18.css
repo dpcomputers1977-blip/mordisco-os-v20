@@ -4207,10 +4207,42 @@ body.employeeMode[data-employee-role="cashier"] #exitPosFocusBtn{
 }
 
 
-/* ===== V36 RESTAURA PANTALLA AMPLIA ORIGINAL ===== */
-body.moduleFocusV21 #adminView.adminV21 .sidebar,
-body.moduleFocusV21 #adminView.adminV21 .adminTop{
+/* ===== V37 PANTALLA AMPLIA CON REGRESO VISIBLE ===== */
+body.moduleFocusV21 #adminView.adminV21 .sidebar{
   display:none!important;
+}
+body.moduleFocusV21 #adminView.adminV21 .adminTop{
+  display:flex!important;
+  position:sticky!important;
+  top:0!important;
+  z-index:5000!important;
+  min-height:54px!important;
+  margin:0 0 8px!important;
+  padding:8px 10px!important;
+  justify-content:flex-end!important;
+  background:rgba(244,240,232,.97)!important;
+  border-bottom:1px solid #ded6c8!important;
+}
+body.moduleFocusV21 #adminView.adminV21 .adminTopTitle,
+body.moduleFocusV21 #adminView.adminV21 .cloudStatus{
+  display:none!important;
+}
+body.moduleFocusV21 #adminView.adminV21 .adminTopActions{
+  display:flex!important;
+  margin-left:auto!important;
+}
+body.moduleFocusV21 #adminView.adminV21 #toggleModuleFocus{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:38px!important;
+  padding:8px 14px!important;
+  border:1px solid #cfbea3!important;
+  border-radius:10px!important;
+  background:#fff!important;
+  color:#111!important;
+  font-weight:900!important;
+  cursor:pointer!important;
 }
 body.moduleFocusV21 #adminView.adminV21 .adminContent{
   margin-left:0!important;
@@ -4219,5 +4251,5 @@ body.moduleFocusV21 #adminView.adminV21 .adminContent{
   padding:10px!important;
 }
 body.moduleFocusV21 #adminView.adminV21 .tab:not(.hidden){
-  min-height:calc(100vh - 20px)!important;
+  min-height:calc(100vh - 72px)!important;
 }
