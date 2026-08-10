@@ -4173,3 +4173,30 @@ body.posFocusMode #tab-pos .posChargeBtn{min-height:52px!important;height:52px!i
 
 /* V29 PUBLIC - marcador de archivo correcto */
 #v18VersionMarker{z-index:99999!important}
+
+/* ============================================================
+   V30 — CAJERO: POS LIMPIO SIN MENÚ ADMINISTRATIVO
+   No afecta administrador, contabilidad, informes ni datos.
+   ============================================================ */
+body.employeeMode[data-employee-role="cashier"] .sidebar,
+body.employeeMode[data-employee-role="cashier"] .topbar{
+  display:none !important;
+}
+body.employeeMode[data-employee-role="cashier"] .adminShell{
+  display:block !important;
+  grid-template-columns:1fr !important;
+  width:100% !important;
+  max-width:none !important;
+}
+body.employeeMode[data-employee-role="cashier"] .adminMain,
+body.employeeMode[data-employee-role="cashier"] .mainContent,
+body.employeeMode[data-employee-role="cashier"] .dashboardMain,
+body.employeeMode[data-employee-role="cashier"] main{
+  margin-left:0 !important;
+  width:100% !important;
+  max-width:none !important;
+}
+body.employeeMode[data-employee-role="cashier"] #tab-pos{
+  width:100% !important;
+  max-width:none !important;
+}

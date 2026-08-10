@@ -4414,3 +4414,25 @@ confirmChargeOrderV21=async function(){
   };
 })();
 
+
+/* ============================================================
+   V30 — FORZAR MODO POS PARA CAJERO
+   ============================================================ */
+function mordiscoForceCashierPosV30(){
+  const employee=currentEmployee||(()=>{try{return JSON.parse(localStorage.getItem('mordisco_employee')||'null')}catch{return null}})();
+  if(employee?.role!=='cashier')return;
+  document.body.classList.add('employeeMode','posFocusMode');
+  document.body.dataset.employeeRole='cashier';
+  document.documentElement.classList.add('posFocusModeRoot');
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(mordiscoForceCashierPosV30,250);
+  setTimeout(mordiscoForceCashierPosV30,900);
+});
+
+// Refuerza el modo al entrar/cambiar dentro de Caja sin afectar al administrador.
+document.addEventListener('click',event=>{
+  const posButton=event.target.closest?.('.sidebar [data-tab="pos"]');
+  if(posButton)setTimeout(mordiscoForceCashierPosV30,0);
+},true);
