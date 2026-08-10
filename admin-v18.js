@@ -4327,94 +4327,37 @@ confirmChargeOrderV21=async function(){
   };
 })();
 
-/* ===== V28 CONTABILIDAD: UNA SOLA FILA POR NUMERO DE VENTA ===== */
+/* ===== V36 CONTABILIDAD SEGURA: CARGA ORIGINAL + DESDUPLICACION SOLO VISUAL ===== */
 (function(){
-  function normalizeSaleNumberV28(value){
-    const text=String(value||'').trim();
-    const match=text.match(/venta\s*#\s*([0-9a-z_-]+)/i);
+  function saleNumberV36(value){
+    const match=String(value||'').match(/venta\s*#\s*([0-9a-z_-]+)/i);
     return match ? String(match[1]).toLowerCase() : null;
   }
-
-  function saleKeyV28(x){
-    if(!x || x.type!=='income')return null;
-    if(String(x.category||'').trim().toLowerCase()!=='ventas')return null;
-
-    // En Mordisco OS el numero de venta puede venir en description (ej. "Venta #33")
-    // o en reference, dependiendo de la version del RPC/trigger instalada.
-    const number=
-      normalizeSaleNumberV28(x.description)||
-      normalizeSaleNumberV28(x.reference);
-
-    if(number)return 'sale:'+number;
-
-    // Respaldo solo para ingresos de venta antiguos sin numero visible.
-    return [
-      'legacy-sale',
-      String(x.movement_date||''),
-      Number(x.amount||0).toFixed(2),
-      String(x.payment_method||''),
-      String(x.staff_id||x.staff?.id||''),
-      String(x.description||'').trim().toLowerCase(),
-      String(x.reference||'').trim().toLowerCase()
-    ].join('|');
+  function saleKeyV36(row){
+    if(!row || row.type!=='income')return null;
+    if(String(row.category||'').trim().toLowerCase()!=='ventas')return null;
+    const number=saleNumberV36(row.description)||saleNumberV36(row.reference);
+    return number ? 'sale:'+number : null;
   }
-
-  window.dedupeFinanceRowsV28=function(rows){
+  const renderFinanceOriginalV36=renderFinance;
+  renderFinance=function(){
+    const source=Array.isArray(financeMovements)?financeMovements:[];
     const seen=new Set();
     const clean=[];
-    let hidden=0;
-    for(const row of (rows||[])){
-      const key=saleKeyV28(row);
+    for(const row of source){
+      const key=saleKeyV36(row);
       if(key){
-        if(seen.has(key)){hidden++;continue;}
+        if(seen.has(key))continue;
         seen.add(key);
       }
       clean.push(row);
     }
-    window.mordiscoFinanceDuplicatesHidden=hidden;
-    return clean;
-  };
-
-  // Reemplaza la carga de Contabilidad para que los totales y la tabla usen
-  // exactamente una sola fila por numero de venta.
-  loadFinance=async function(){
-    let start,end;
-    if($('#financeStart') && $('#financeEnd')){
-      start=$('#financeStart').value||new Date().toISOString().slice(0,10);
-      const endSelected=$('#financeEnd').value||start;
-      const d=new Date(endSelected+'T00:00:00');
-      d.setDate(d.getDate()+1);
-      end=d.toISOString().slice(0,10);
-    }else{
-      const month=$('#financeMonth')?.value||new Date().toISOString().slice(0,7);
-      start=month+'-01';
-      end=new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),1).toISOString().slice(0,10);
-    }
-
-    const {data,error}=await db.from('financial_movements')
-      .select('*,staff(name)')
-      .gte('movement_date',start)
-      .lt('movement_date',end)
-      .order('movement_date',{ascending:false})
-      .order('created_at',{ascending:false});
-
-    if(error)return toast('Error cargando contabilidad: '+error.message);
-    financeMovements=window.dedupeFinanceRowsV28(data||[]);
-    renderFinance();
-  };
-
-  // Refuerzo extra: incluso si otra funcion vuelve a llenar financeMovements,
-  // renderFinance nunca sumara dos veces el mismo numero de venta.
-  const renderFinanceBaseV28=renderFinance;
-  renderFinance=function(){
     const saved=financeMovements;
-    financeMovements=window.dedupeFinanceRowsV28(saved||[]);
-    try{return renderFinanceBaseV28();}
+    financeMovements=clean;
+    try{return renderFinanceOriginalV36();}
     finally{financeMovements=saved;}
   };
 })();
-
-
 
 /* ===== V35 SALIDA DE CAJA AISLADA ===== */
 (function(){

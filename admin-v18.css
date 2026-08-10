@@ -4205,3 +4205,19 @@ body.employeeMode[data-employee-role="cashier"] #exitPosFocusBtn{
 @media(max-width:760px){
   body.employeeMode[data-employee-role="cashier"] #adminView .adminContent{padding:10px!important;}
 }
+
+
+/* ===== V36 RESTAURA PANTALLA AMPLIA ORIGINAL ===== */
+body.moduleFocusV21 #adminView.adminV21 .sidebar,
+body.moduleFocusV21 #adminView.adminV21 .adminTop{
+  display:none!important;
+}
+body.moduleFocusV21 #adminView.adminV21 .adminContent{
+  margin-left:0!important;
+  width:100%!important;
+  max-width:none!important;
+  padding:10px!important;
+}
+body.moduleFocusV21 #adminView.adminV21 .tab:not(.hidden){
+  min-height:calc(100vh - 20px)!important;
+}
