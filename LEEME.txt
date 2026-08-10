@@ -1,19 +1,15 @@
-BOTON MORDISCO GAMES - WEB + MOVIL
+MORDISCO OS V22 — CAJA VISIBLE
 
-Reemplazar SOLO:
-public/index.html
+Cambios:
+- POS ajustado a la altura real de la pantalla.
+- Pedidos pendientes de cobro visibles dentro del panel derecho.
+- Pedidos enviados desde Mesas aparecen en Caja con botón COBRAR AHORA.
+- Al cobrar un pedido de mesa, la mesa se libera automáticamente.
+- El botón ENVIAR A COCINA queda siempre accesible.
 
-No reemplazar otras carpetas ni archivos.
+Reemplaza estos tres archivos en el proyecto publicado:
+  admin.html
+  admin-v18.js
+  admin-v18.css
 
-El cambio agrega:
-- enlace 🎮 Juegos visible en el menú principal;
-- botón naranja 🎮 Juegos en el header de escritorio;
-- llamada grande "Mordisco Games - Juega mientras esperas tu orden" en el hero;
-- en móvil, el enlace Juegos se convierte en un botón naranja grande dentro del menú.
-
-Después:
-1. GitHub Desktop debe mostrar solo public/index.html modificado.
-2. Commit.
-3. Push origin.
-4. Esperar Vercel.
-5. Abrir https://www.mordiscofastfood.com y revisar escritorio + móvil.
+Después publica y pulsa Ctrl+F5 en el navegador.

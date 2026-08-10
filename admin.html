@@ -5,386 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=caja-fullscreen-mesas-1">
+<link rel="stylesheet" href="/admin-v18.css?v=v22-caja-visible">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
-
-<style id="safeWindowsPatchStyles">
-  .safeReturnAdminBtn{
-    position:fixed;
-    top:12px;
-    right:14px;
-    z-index:15000;
-    min-height:34px;
-    padding:5px 9px;
-    border:1px solid #d5c5ad;
-    border-radius:10px;
-    background:#fff;
-    color:#17130f;
-    box-shadow:0 8px 24px rgba(0,0,0,.18);
-    font-size:.76rem;
-    font-weight:900;
-    cursor:pointer;
-  }
-  .safeReturnAdminBtn:hover{background:#17130f;color:#fff}
-  .modal .modalCard{position:relative}
-  .safeWindowClose{
-    position:absolute!important;
-    top:10px!important;
-    right:12px!important;
-    z-index:60!important;
-    width:40px!important;
-    height:40px!important;
-    min-width:40px!important;
-    padding:0!important;
-    display:grid!important;
-    place-items:center!important;
-    border:1px solid #d5c5ad!important;
-    border-radius:10px!important;
-    background:#fff!important;
-    color:#17130f!important;
-    box-shadow:0 5px 16px rgba(0,0,0,.13)!important;
-    font-size:25px!important;
-    line-height:1!important;
-    font-weight:900!important;
-  }
-  .safeWindowClose:hover{background:#17130f!important;color:#fff!important}
-  body.posFocusMode #exitPosFocusBtn,
-  body.posFocusMode #exitPosToAdminV21{display:none!important}
-  @media(max-width:650px){
-    .safeReturnAdminBtn{
-      top:6px;
-      right:6px;
-      min-height:32px;
-      padding:4px 7px;
-      font-size:.7rem;
-    }
-    .safeWindowClose{
-      top:7px!important;
-      right:7px!important;
-      width:36px!important;
-      height:36px!important;
-      min-width:36px!important;
-      font-size:22px!important;
-    }
-  }
-</style>
-
-
-<style id="mobileAdminCompleteMenuStyles">
-.mobileAdminMenuBtn,
-.mobileAdminBackdrop{display:none}
-
-@media(max-width:900px){
-  .mobileAdminMenuBtn{
-    position:fixed!important;
-    top:10px!important;
-    left:10px!important;
-    z-index:20000!important;
-    display:inline-flex!important;
-    align-items:center!important;
-    justify-content:center!important;
-    min-height:42px!important;
-    padding:8px 12px!important;
-    border:1px solid #e1cda8!important;
-    border-radius:11px!important;
-    background:#17130f!important;
-    color:#fff!important;
-    box-shadow:0 8px 24px rgba(0,0,0,.24)!important;
-    font-size:.8rem!important;
-    font-weight:950!important;
-    cursor:pointer!important;
-  }
-
-  .mobileAdminBackdrop{
-    position:fixed!important;
-    inset:0!important;
-    z-index:19980!important;
-    display:block!important;
-    background:rgba(0,0,0,.55)!important;
-    backdrop-filter:blur(2px)!important;
-  }
-  .mobileAdminBackdrop.hidden{display:none!important}
-
-  #adminView .sidebar{
-    position:fixed!important;
-    top:0!important;
-    left:0!important;
-    bottom:0!important;
-    z-index:19990!important;
-    width:min(86vw,320px)!important;
-    max-width:320px!important;
-    display:flex!important;
-    flex-direction:column!important;
-    overflow-y:auto!important;
-    padding:18px 14px 28px!important;
-    transform:translateX(-105%)!important;
-    transition:transform .22s ease!important;
-    box-shadow:18px 0 45px rgba(0,0,0,.35)!important;
-  }
-
-  #adminView.mobileMenuOpen .sidebar{
-    transform:translateX(0)!important;
-  }
-
-  #adminView .sidebar img{
-    display:block!important;
-    max-width:105px!important;
-    height:auto!important;
-    margin:5px auto 18px!important;
-  }
-
-  #adminView .sidebar button,
-  #adminView .sidebar a{
-    display:flex!important;
-    width:100%!important;
-    min-height:46px!important;
-    align-items:center!important;
-    gap:10px!important;
-    flex:0 0 auto!important;
-  }
-
-  #adminView .adminContent{
-    width:100%!important;
-    margin-left:0!important;
-    padding-top:58px!important;
-  }
-
-  body.mobileAdminMenuLocked{
-    overflow:hidden!important;
-  }
-}
-</style>
-
-
-<style id="mordiscoAdminMobileFullFix">
-@media(max-width:900px){
-  #adminView .sidebar{
-    top:0!important;
-    bottom:0!important;
-    height:100dvh!important;
-    max-height:100dvh!important;
-    overflow-y:auto!important;
-    overflow-x:hidden!important;
-    overscroll-behavior:contain!important;
-    -webkit-overflow-scrolling:touch!important;
-    padding:78px 14px 42px!important;
-    box-sizing:border-box!important;
-  }
-  #adminView .sidebar nav,
-  #adminView .sidebar .nav,
-  #adminView .sidebar .sidebar-nav{
-    display:flex!important;
-    flex-direction:column!important;
-    width:100%!important;
-    height:auto!important;
-    max-height:none!important;
-    overflow:visible!important;
-    flex:0 0 auto!important;
-  }
-  #adminView .sidebar button,
-  #adminView .sidebar a{
-    display:flex!important;
-    visibility:visible!important;
-    opacity:1!important;
-    position:relative!important;
-    transform:none!important;
-    flex:0 0 auto!important;
-  }
-  #mobileAdminMenuBtn{
-    z-index:20010!important;
-  }
-}
-</style>
-<script id="mordiscoAdminMobileFullFixScript">
-document.addEventListener('DOMContentLoaded', function(){
-  const sidebar=document.querySelector('#adminView .sidebar');
-  if(!sidebar) return;
-
-  // Undo accidental mobile hiding on every actual navigation item.
-  sidebar.querySelectorAll('a,button').forEach(function(el){
-    if(el.id==='mobileAdminMenuBtn') return;
-    el.style.removeProperty('display');
-    el.style.removeProperty('visibility');
-    el.style.removeProperty('opacity');
-  });
-
-  // Keep menu at top whenever opened.
-  const btn=document.querySelector('#mobileAdminMenuBtn');
-  if(btn){
-    btn.addEventListener('click', function(){
-      setTimeout(function(){
-        if(document.querySelector('#adminView')?.classList.contains('mobileMenuOpen')){
-          sidebar.scrollTop=0;
-        }
-      },30);
-    });
-  }
-});
-</script>
-
-
-<style id="mordiscoProfessionalOperationsPatch">
-/* Pedidos pendientes compactos */
-#posPendingOrders{display:grid!important;gap:10px!important}
-.posPendingCardPro{
-  display:grid!important;
-  grid-template-columns:74px minmax(0,1fr) auto auto!important;
-  align-items:center!important;
-  gap:12px!important;
-  min-height:auto!important;
-  padding:10px 12px!important;
-  border-radius:14px!important;
-}
-.posPendingCardPro .posPendingNumber{
-  width:64px!important;height:58px!important;min-width:64px!important;
-  border-radius:12px!important;
-}
-.posPendingCardPro .posPendingInfo h4{margin:0 0 2px!important;font-size:.94rem!important}
-.posPendingCardPro .posPendingInfo p{
-  margin:0!important;white-space:nowrap!important;overflow:hidden!important;
-  text-overflow:ellipsis!important;max-width:100%!important;font-size:.78rem!important
-}
-.posPendingTotal{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
-.posPendingTotal span{font-size:.68rem;padding:4px 7px;border-radius:999px;background:#fff3c8;font-weight:900}
-.posPendingTotal strong{font-size:1.05rem}
-.posPendingActionsPro{display:flex;align-items:center;gap:6px}
-.posPendingActionsPro button{
-  min-height:38px!important;padding:7px 10px!important;border-radius:10px!important;
-  font-size:.76rem!important;font-weight:900!important
-}
-.pendingEditBtn{background:#fff!important;color:#17130f!important;border:1px solid #d9cab5!important}
-.pendingCancelBtn{width:38px!important;padding:0!important}
-
-/* Editor */
-.pendingOrderEditCard{max-width:680px!important}
-.pendingEditFields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
-.pendingEditFields label{display:flex;flex-direction:column;gap:5px;font-weight:800}
-.pendingEditFields .wide{grid-column:1/-1}
-.pendingEditFields input,.pendingEditFields textarea{padding:10px;border:1px solid #d8cbb9;border-radius:10px}
-.pendingEditItems{display:grid;gap:8px;max-height:300px;overflow:auto}
-.pendingEditItem{
-  display:flex;justify-content:space-between;align-items:center;gap:12px;
-  padding:10px 12px;border:1px solid #e5d8c5;border-radius:12px;background:#faf7f1
-}
-.pendingEditItem small{display:block;color:#766d61}
-.pendingEditQty{display:flex;align-items:center;gap:6px}
-.pendingEditQty button{width:34px;height:34px;border-radius:9px;border:1px solid #d7c8b1;background:#fff;font-weight:900}
-.pendingEditQty input{width:54px;text-align:center;padding:7px;border:1px solid #d7c8b1;border-radius:9px}
-.pendingEditFooter{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
-
-/* Contabilidad limpia */
-.financeQuickActions{
-  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0
-}
-.financeQuickActions button{
-  min-height:92px;border:1px solid #ded1bd;border-radius:16px;background:#fff;
-  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
-  gap:7px;padding:16px;box-shadow:0 8px 24px rgba(38,27,10,.06);cursor:pointer
-}
-.financeQuickActions button span{
-  display:grid;place-items:center;width:38px;height:38px;border-radius:11px;
-  background:#ffc400;color:#17130f;font-size:1.35rem;font-weight:950
-}
-.financeQuickActions button b{font-size:.9rem}
-.financeSectionHidden{display:none!important}
-#financeForm,#financeAccountForm,#financeMovementsPanel,#financeAccountsPanel{position:relative}
-.financeCloseBtn{
-  position:absolute;right:12px;top:12px;width:34px;height:34px;padding:0!important;
-  border-radius:9px!important;background:#17130f!important;color:#fff!important;z-index:5
-}
-.v21FinanceMain,.v21AccountsMain{grid-template-columns:1fr!important}
-#financeMovementsPanel .tableWrap,#financeAccountsPanel .tableWrap{max-height:480px;overflow:auto}
-
-@media(max-width:760px){
-  .posPendingCardPro{grid-template-columns:58px minmax(0,1fr)!important}
-  .posPendingTotal{align-items:flex-start!important}
-  .posPendingActionsPro{grid-column:1/-1;display:grid!important;grid-template-columns:1fr 1fr 38px}
-  .financeQuickActions{grid-template-columns:1fr 1fr}
-  .pendingEditFields{grid-template-columns:1fr}
-}
-</style>
-
-
-<style id="webOrderConfirmationAdminStyles">
-.orderAwaitingWhatsApp{
-  display:grid;gap:6px;margin:10px 0;padding:11px;border-radius:12px;
-  background:#fff1c9;border:1px solid #efcf70;color:#704d00
-}
-.orderAwaitingWhatsApp small{line-height:1.35}
-.orderAwaitingWhatsApp button{
-  min-height:42px;border-radius:10px;font-weight:950
-}
-</style>
-
-
-<style id="mordiscoReportsFinalStyles">
-.reportHeaderActions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.reportFilters{
-  display:grid!important;
-  grid-template-columns:repeat(3,minmax(150px,1fr)) auto;
-  gap:10px!important;
-  align-items:end!important;
-  margin-bottom:14px!important
-}
-.reportFilters label{display:flex;flex-direction:column;gap:5px;font-weight:850}
-.reportFilters input,.reportFilters select{min-height:42px;border:1px solid #d8cbb9;border-radius:10px;padding:8px 10px;background:#fff}
-.reportMetrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}
-.reportMetrics article{padding:15px;border:1px solid #ded2c0;border-radius:15px;background:#fff;display:flex;flex-direction:column;gap:4px}
-.reportMetrics article span{font-size:.72rem;color:#746a5d;font-weight:850;text-transform:uppercase;letter-spacing:.4px}
-.reportMetrics article b{font-size:1.55rem}
-.reportMetrics article small{color:#82786d}
-.reportSection{margin-top:12px!important}
-.paymentReportGrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
-.paymentReportGrid>div{padding:12px;border-radius:12px;background:#f5f0e7;display:flex;flex-direction:column;gap:4px}
-.paymentReportGrid span{font-size:.7rem;color:#766b5f;font-weight:850}
-.paymentReportGrid strong{font-size:1.05rem}
-.reportTable th{white-space:nowrap}
-.reportTable td{vertical-align:top}
-.reportDifferencePositive{color:#1f7a38!important;font-weight:900}
-.reportDifferenceNegative{color:#b52d25!important;font-weight:900}
-.reportDifferenceZero{color:#5e5549!important;font-weight:900}
-.reportPrintHeader{display:none}
-.mordiscoReportsTab .positiveAmount{color:#1f7a38;font-weight:900}
-.mordiscoReportsTab .negativeAmount{color:#b52d25;font-weight:900}
-
-@media(max-width:1000px){
-  .reportMetrics{grid-template-columns:1fr 1fr}
-  .paymentReportGrid{grid-template-columns:repeat(3,1fr)}
-  .reportFilters{grid-template-columns:1fr 1fr}
-}
-@media(max-width:620px){
-  .reportMetrics,.paymentReportGrid,.reportFilters{grid-template-columns:1fr}
-  .reportHeaderActions{width:100%}
-  .reportHeaderActions button{flex:1}
-}
-
-@media print{
-  @page{size:A4 landscape;margin:10mm}
-  body *{visibility:hidden!important}
-  #tab-reports,#tab-reports *{visibility:visible!important}
-  #tab-reports{
-    display:block!important;
-    position:absolute!important;
-    left:0!important;top:0!important;width:100%!important;
-    background:#fff!important;color:#000!important
-  }
-  #tab-reports .noPrint,
-  #tab-reports .reportHeaderActions,
-  #tab-reports button{display:none!important}
-  #tab-reports .reportPrintHeader{display:block!important;text-align:center;margin-bottom:12px}
-  #tab-reports .reportPrintHeader h1{margin:0;font-size:22px}
-  #tab-reports .reportPrintHeader p{margin:3px 0}
-  #tab-reports .reportMetrics{grid-template-columns:repeat(4,1fr)!important}
-  #tab-reports .reportMetrics article,
-  #tab-reports .panel{box-shadow:none!important;border:1px solid #bbb!important;break-inside:avoid}
-  #tab-reports .paymentReportGrid{grid-template-columns:repeat(6,1fr)!important}
-  #tab-reports .tableWrap{overflow:visible!important}
-  #tab-reports table{font-size:9px!important;width:100%!important}
-  #tab-reports th,#tab-reports td{padding:5px!important}
-}
-</style>
-
 </head>
 <body>
 <header class="topbar hidden">
@@ -424,13 +47,8 @@ document.addEventListener('DOMContentLoaded', function(){
 </footer>
 </main>
 
-<section id="adminView" class="adminShell hidden">
-  <button id="mobileAdminMenuBtn" class="mobileAdminMenuBtn" type="button" aria-label="Abrir menú administrador">☰ Menú</button>
-  <div id="mobileAdminBackdrop" class="mobileAdminBackdrop hidden"></div>
-  <button id="safeReturnAdminBtn" class="safeReturnAdminBtn hidden" type="button" title="Volver al administrador" aria-label="Volver al administrador">
-    ← Volver
-  </button>
- <aside class="sidebar"><img src="media/logo.png" alt="Mordisco"><button data-tab="dashboard"><span>▦</span> Resumen</button><button data-tab="products" class="active"><span>🍔</span> Productos</button><button data-tab="categories"><span>▤</span> Categorías</button><button data-tab="orders"><span>🌐</span> Pedidos web</button><button data-tab="kitchen"><span>♨</span> Cocina</button><button data-tab="pos"><span>▣</span> POS / Caja</button><button data-tab="inventory"><span>◇</span> Inventario</button><button data-tab="tables"><span>🍽</span> Mesas</button><button data-tab="shifts"><span>🕒</span> Turnos</button><button data-tab="reports"><span>📊</span> Informes</button><button data-tab="finance"><span>💰</span> Contabilidad</button><button data-tab="customers"><span>👤</span> Clientes</button><button data-tab="promotions"><span>🎁</span> Promociones</button><button data-tab="pages"><span>📄</span> Páginas</button><button data-tab="staff"><span>👥</span> Personal</button><button data-tab="extras">➕ Extras y empaques</button>
+<section id="adminView" class="hidden adminShell">
+ <aside class="sidebar"><img src="media/logo.png" alt="Mordisco"><button data-tab="dashboard"><span>▦</span> Resumen</button><button data-tab="products" class="active"><span>🍔</span> Productos</button><button data-tab="categories"><span>▤</span> Categorías</button><button data-tab="orders"><span>🌐</span> Pedidos web</button><button data-tab="kitchen"><span>♨</span> Cocina</button><button data-tab="pos"><span>▣</span> POS / Caja</button><button data-tab="inventory"><span>◇</span> Inventario</button><button data-tab="tables"><span>🍽</span> Mesas</button><button data-tab="shifts"><span>🕒</span> Turnos</button><button data-tab="finance"><span>💰</span> Contabilidad</button><button data-tab="customers"><span>👤</span> Clientes</button><button data-tab="promotions"><span>🎁</span> Promociones</button><button data-tab="pages"><span>📄</span> Páginas</button><button data-tab="staff"><span>👥</span> Personal</button><button data-tab="extras">➕ Extras y empaques</button>
 <button data-tab="settings"><span>⚙</span> Negocio</button><button id="logoutBtn"><span>↪</span> Cerrar sesión</button><button id="backToStore"><span>↗</span> Ver página</button></aside>
  <div class="adminContent">
    <div class="adminTop">
@@ -700,28 +318,29 @@ document.addEventListener('DOMContentLoaded', function(){
             <span>Envía a cocina y cobra desde la lista inferior cuando el cliente esté listo.</span>
           </div>
 
-          <div class="posPrimaryActions">
-            <button class="primary posChargeBtn" id="posCharge">Enviar a cocina</button>
-          </div>
-        </aside>
-      </div>
-
-      <section class="panel posPendingPanel">
+          <section class="panel posPendingPanel posPendingInsideTicket">
         <div class="panelTitle posPendingHeader">
           <div>
             <span class="eyebrow">CAJA DEL LOCAL</span>
-            <h3>Pedidos pendientes de cobro</h3>
-            <p>Selecciona una orden cuando el cliente esté listo para pagar.</p>
+            <h3>Pedidos por cobrar</h3>
+            <p>Incluye pedidos de mesas y mostrador.</p>
           </div>
           <div class="posPendingActions">
             <span class="pendingCount"><b id="posPendingCount">0</b> pendientes</span>
-            <button class="dark" id="refreshPosPending">Actualizar</button>
+            <button class="dark" id="refreshPosPending" type="button">Actualizar</button>
           </div>
         </div>
         <div id="posPendingOrders" class="posPendingOrders">
           <div class="notice">Cargando pedidos pendientes...</div>
         </div>
       </section>
+
+          <div class="posPrimaryActions">
+            <button class="primary posChargeBtn" id="posCharge">Enviar a cocina</button>
+          </div>
+        </aside>
+      </div>
+
     </section>
 
 
@@ -929,184 +548,6 @@ document.addEventListener('DOMContentLoaded', function(){
    </section>
 
    
-
-<section id="tab-reports" class="tab hidden mordiscoReportsTab">
-  <div class="tablesHeader">
-    <div>
-      <span class="eyebrow">CONTROL ADMINISTRATIVO</span>
-      <h2>Informes y cierre de caja</h2>
-      <p>Ventas por cajero, detalle de caja, ingresos, egresos y resultado del período.</p>
-    </div>
-    <div class="reportHeaderActions">
-      <button type="button" class="dark" id="refreshReportsBtn">↻ Actualizar</button>
-      <button type="button" class="primary" id="printReportsBtn">🖨 Imprimir / Guardar PDF</button>
-    </div>
-  </div>
-
-  <section class="panel reportFilters noPrint">
-    <label>Desde
-      <input id="reportDateFrom" type="date">
-    </label>
-    <label>Hasta
-      <input id="reportDateTo" type="date">
-    </label>
-    <label>Cajero
-      <select id="reportCashierFilter">
-        <option value="all">Todos los cajeros</option>
-      </select>
-    </label>
-    <button type="button" class="primary" id="applyReportFilters">Generar informe</button>
-  </section>
-
-  <div id="reportPrintHeader" class="reportPrintHeader">
-    <h1>MORDISCO FAST FOOD</h1>
-    <p>Informe administrativo de caja</p>
-    <small id="reportPeriodLabel"></small>
-  </div>
-
-  <div class="reportMetrics">
-    <article>
-      <span>Ventas cobradas</span>
-      <b id="reportSalesTotal">$0.00</b>
-      <small id="reportSalesCount">0 ventas</small>
-    </article>
-    <article>
-      <span>Otros ingresos</span>
-      <b id="reportOtherIncome">$0.00</b>
-      <small>Sin contar ventas</small>
-    </article>
-    <article>
-      <span>Egresos</span>
-      <b id="reportExpenses">$0.00</b>
-      <small>Gastos registrados</small>
-    </article>
-    <article>
-      <span>Resultado</span>
-      <b id="reportNetResult">$0.00</b>
-      <small>Ventas + ingresos − egresos</small>
-    </article>
-  </div>
-
-  <section class="panel reportSection">
-    <div class="panelTitle">
-      <div>
-        <h3>Detalle por forma de pago</h3>
-        <small>Solo ventas cobradas del período seleccionado.</small>
-      </div>
-    </div>
-    <div class="paymentReportGrid">
-      <div><span>Efectivo</span><strong id="reportPayCash">$0.00</strong></div>
-      <div><span>Deuna</span><strong id="reportPayDeuna">$0.00</strong></div>
-      <div><span>Ahorita</span><strong id="reportPayAhorita">$0.00</strong></div>
-      <div><span>Transferencia</span><strong id="reportPayTransfer">$0.00</strong></div>
-      <div><span>Tarjeta</span><strong id="reportPayCard">$0.00</strong></div>
-      <div><span>Otros</span><strong id="reportPayOther">$0.00</strong></div>
-    </div>
-  </section>
-
-  <section class="panel reportSection">
-    <div class="panelTitle">
-      <div>
-        <h3>Ventas por cajero</h3>
-        <small>Cuánto cobró cada cajero y por qué método.</small>
-      </div>
-    </div>
-    <div class="tableWrap">
-      <table class="dataTable reportTable">
-        <thead>
-          <tr>
-            <th>Cajero</th>
-            <th>Ventas</th>
-            <th>Efectivo</th>
-            <th>Deuna</th>
-            <th>Ahorita</th>
-            <th>Transfer.</th>
-            <th>Tarjeta</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody id="reportCashierBody"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="panel reportSection">
-    <div class="panelTitle">
-      <div>
-        <h3>Registro y cierre de caja por turno</h3>
-        <small>Fondo inicial, ventas en efectivo, efectivo esperado, contado y diferencia.</small>
-      </div>
-    </div>
-    <div class="tableWrap">
-      <table class="dataTable reportTable">
-        <thead>
-          <tr>
-            <th>Cajero</th>
-            <th>Apertura</th>
-            <th>Cierre</th>
-            <th>Inicial</th>
-            <th>Ventas efectivo</th>
-            <th>Efectivo esperado</th>
-            <th>Contado</th>
-            <th>Diferencia</th>
-            <th>Total ventas</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-        <tbody id="reportShiftBody"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="panel reportSection">
-    <div class="panelTitle">
-      <div>
-        <h3>Ingresos y egresos</h3>
-        <small>Movimientos de Contabilidad del período. Las ventas se identifican por separado.</small>
-      </div>
-    </div>
-    <div class="tableWrap">
-      <table class="dataTable reportTable">
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Tipo</th>
-            <th>Categoría</th>
-            <th>Descripción</th>
-            <th>Método</th>
-            <th>Responsable</th>
-            <th>Monto</th>
-          </tr>
-        </thead>
-        <tbody id="reportFinanceBody"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="panel reportSection">
-    <div class="panelTitle">
-      <div>
-        <h3>Detalle de ventas</h3>
-        <small>Pedidos pagados incluidos en este informe.</small>
-      </div>
-    </div>
-    <div class="tableWrap">
-      <table class="dataTable reportTable">
-        <thead>
-          <tr>
-            <th>Pedido</th>
-            <th>Fecha / hora</th>
-            <th>Cajero</th>
-            <th>Método</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody id="reportSalesBody"></tbody>
-      </table>
-    </div>
-  </section>
-</section>
-
 <section id="tab-finance" class="tab hidden v21Workspace">
   <div class="tablesHeader">
     <div><h2>Contabilidad</h2><p>Ingresos, egresos y resultado del negocio.</p></div>
@@ -1116,15 +557,8 @@ document.addEventListener('DOMContentLoaded', function(){
       <div><span>Resultado</span><strong id="financeBalance">$0.00</strong></div>
     </div>
   </div>
-  
-<div class="financeQuickActions">
-  <button type="button" data-finance-view="income"><span>＋</span><b>Nuevo ingreso</b></button>
-  <button type="button" data-finance-view="expense"><span>−</span><b>Nuevo egreso</b></button>
-  <button type="button" data-finance-view="movements"><span>⇄</span><b>Movimientos</b></button>
-  <button type="button" data-finance-view="accounts"><span>▣</span><b>Cuentas</b></button>
-</div>
-<div class="dashboardGrid financeGrid v21FinanceMain">
-    <form id="financeForm" class="panel formGrid financeSectionHidden"><button type="button" class="financeCloseBtn" data-finance-close>×</button>
+  <div class="dashboardGrid financeGrid v21FinanceMain">
+    <form id="financeForm" class="panel formGrid">
       <input type="hidden" id="financeId">
       <h3 class="wide">Nuevo movimiento</h3>
       <label>Tipo<select id="financeType"><option value="income">Ingreso</option><option value="expense">Egreso</option></select></label>
@@ -1140,7 +574,7 @@ document.addEventListener('DOMContentLoaded', function(){
       <label class="wide">Descripción<textarea id="financeDescription" required></textarea></label>
       <div class="wide"><button class="primary">Guardar movimiento</button><button type="button" class="dark" id="clearFinance">Limpiar</button></div>
     </form>
-    <section class="panel financeSectionHidden" id="financeMovementsPanel"><button type="button" class="financeCloseBtn" data-finance-close>×</button>
+    <section class="panel">
       <div class="panelTitle"><h3>Movimientos</h3><div><input id="financeMonth" type="month"><button class="dark" id="refreshFinance">Actualizar</button></div></div>
       <div class="tableWrap"><table class="dataTable">
         <thead><tr><th>Fecha</th><th>Tipo</th><th>Categoría</th><th>Descripción</th><th>Método</th><th>Monto</th><th></th></tr></thead>
@@ -1158,7 +592,7 @@ document.addEventListener('DOMContentLoaded', function(){
   </div>
 
   <div class="dashboardGrid accountsGrid v21AccountsMain">
-    <form id="financeAccountForm" class="panel formGrid financeSectionHidden"><button type="button" class="financeCloseBtn" data-finance-close>×</button>
+    <form id="financeAccountForm" class="panel formGrid">
       <input type="hidden" id="financeAccountId">
       <h3 class="wide">Nueva cuenta</h3>
       <label>Tipo
@@ -1721,82 +1155,9 @@ document.addEventListener('DOMContentLoaded', function(){
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=reports-final-1"></script>
+<script src="/admin-v18.js?v=v22-caja-visible"></script>
 
 
 
 <div id="v18VersionMarker">Mordisco OS V20</div>
-
-<script id="mobileAdminCompleteMenuScript">
-(function(){
-  const adminView=document.querySelector('#adminView');
-  const button=document.querySelector('#mobileAdminMenuBtn');
-  const backdrop=document.querySelector('#mobileAdminBackdrop');
-  const sidebar=adminView?.querySelector('.sidebar');
-
-  if(!adminView||!button||!backdrop||!sidebar)return;
-
-  function openMenu(){
-    adminView.classList.add('mobileMenuOpen');
-    backdrop.classList.remove('hidden');
-    document.body.classList.add('mobileAdminMenuLocked');
-    button.textContent='✕ Cerrar';
-    button.setAttribute('aria-label','Cerrar menú administrador');
-  }
-
-  function closeMenu(){
-    adminView.classList.remove('mobileMenuOpen');
-    backdrop.classList.add('hidden');
-    document.body.classList.remove('mobileAdminMenuLocked');
-    button.textContent='☰ Menú';
-    button.setAttribute('aria-label','Abrir menú administrador');
-  }
-
-  button.addEventListener('click',()=>{
-    adminView.classList.contains('mobileMenuOpen')?closeMenu():openMenu();
-  });
-
-  backdrop.addEventListener('click',closeMenu);
-
-  sidebar.querySelectorAll('button,a').forEach(item=>{
-    item.addEventListener('click',()=>{
-      if(window.innerWidth<=900)setTimeout(closeMenu,40);
-    });
-  });
-
-  document.addEventListener('keydown',event=>{
-    if(event.key==='Escape'&&adminView.classList.contains('mobileMenuOpen')){
-      closeMenu();
-    }
-  });
-
-  window.addEventListener('resize',()=>{
-    if(window.innerWidth>900)closeMenu();
-  });
-})();
-</script>
-
-
-<div id="pendingOrderEditModal" class="modal hidden" aria-hidden="true">
-  <div class="modalCard pendingOrderEditCard">
-    <button type="button" class="safeWindowClose" id="closePendingOrderEdit" aria-label="Cerrar">×</button>
-    <span class="eyebrow">CORREGIR ANTES DE COBRAR</span>
-    <h2 id="pendingEditTitle">Editar pedido</h2>
-
-    <div class="pendingEditFields">
-      <label>Cliente<input id="pendingEditCustomer"></label>
-      <label>Teléfono<input id="pendingEditPhone" type="tel"></label>
-      <label class="wide">Notas<textarea id="pendingEditNotes"></textarea></label>
-    </div>
-
-    <h3>Productos y cantidades</h3>
-    <div id="pendingEditItems" class="pendingEditItems"></div>
-
-    <div class="pendingEditFooter">
-      <button type="button" class="dark" id="cancelPendingOrderEdit">Cancelar</button>
-      <button type="button" class="primary" id="savePendingOrderEdit">Guardar cambios</button>
-    </div>
-  </div>
-</div>
-
 </body></html>

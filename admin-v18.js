@@ -492,31 +492,26 @@ function renderPosPendingOrders(){
   if($('#posPendingCount'))$('#posPendingCount').textContent=pending.length;
 
   $('#posPendingOrders').innerHTML=pending.length?pending.map(o=>`
-    <article class="posPendingCard posPendingCardPro">
-      <div class="posPendingNumber">
-        <small>PEDIDO</small>
-        <strong>#${o.order_number}</strong>
+    <article class="posPendingCard">
+      <div class="posPendingMain">
+        <div class="posPendingNumber">
+          <small>PEDIDO</small>
+          <strong>#${o.order_number}</strong>
+        </div>
+        <div class="posPendingInfo">
+          <h4>${esc(o.customer_name||'Consumidor final')}</h4>
+          <p>${o.order_items?.map(i=>`${i.quantity}× ${esc(i.product_name)}`).join(', ')||'Sin detalle'}</p>
+          <small>
+            ${o.restaurant_tables?.name?`🍽️ ${esc(o.restaurant_tables.name)} · `:''}
+            ${orderTypeLabel(o.order_type)} ·
+            ${new Date(o.created_at).toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'})}
+          </small>
+        </div>
       </div>
-
-      <div class="posPendingInfo">
-        <h4>${esc(o.customer_name||'Consumidor final')}</h4>
-        <p>${o.order_items?.map(i=>`${i.quantity}× ${esc(i.product_name)}`).join(', ')||'Sin detalle'}</p>
-        <small>
-          ${o.restaurant_tables?.name?`🍽️ ${esc(o.restaurant_tables.name)} · `:''}
-          ${orderTypeLabel(o.order_type)} ·
-          ${new Date(o.created_at).toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'})}
-        </small>
-      </div>
-
-      <div class="posPendingTotal">
+      <div class="posPendingPayment">
         <span>Pendiente</span>
         <strong>${money(o.total)}</strong>
-      </div>
-
-      <div class="posPendingActionsPro">
-        <button type="button" class="pendingEditBtn" data-pending-edit="${o.id}">✏ Editar</button>
-        <button type="button" class="primary pendingChargeBtn" data-pos-pay="${o.id}">💵 Cobrar</button>
-        <button type="button" class="danger pendingCancelBtn" data-pending-cancel="${o.id}">✕</button>
+        <button class="primary posPayNowBtn" data-pos-pay="${o.id}">Cobrar ahora</button>
       </div>
     </article>
   `).join(''):`<div class="posPendingEmpty">
@@ -527,118 +522,6 @@ function renderPosPendingOrders(){
   $$('[data-pos-pay]').forEach(button=>{
     button.onclick=()=>openChargeOrder(button.dataset.posPay);
   });
-
-  $$('[data-pending-edit]').forEach(button=>{
-    button.onclick=()=>openPendingOrderEditor(button.dataset.pendingEdit);
-  });
-
-  $$('[data-pending-cancel]').forEach(button=>{
-    button.onclick=()=>cancelPendingOrder(button.dataset.pendingCancel);
-  });
-}
-
-let pendingOrderEditId=null;
-
-function openPendingOrderEditor(id){
-  const order=orders.find(item=>String(item.id)===String(id));
-  if(!order)return toast('Pedido no encontrado');
-
-  pendingOrderEditId=order.id;
-  $('#pendingEditTitle').textContent=`Editar pedido #${order.order_number}`;
-  $('#pendingEditCustomer').value=order.customer_name||'';
-  $('#pendingEditPhone').value=order.customer_phone||'';
-  $('#pendingEditNotes').value=order.notes||'';
-
-  $('#pendingEditItems').innerHTML=(order.order_items||[]).map(item=>`
-    <div class="pendingEditItem" data-edit-item="${item.id}">
-      <div>
-        <b>${esc(item.product_name||'Producto')}</b>
-        <small>${money(item.unit_price||0)} c/u</small>
-      </div>
-      <div class="pendingEditQty">
-        <button type="button" data-edit-minus="${item.id}">−</button>
-        <input type="number" min="1" step="1" value="${Number(item.quantity||1)}"
-               data-edit-qty="${item.id}" data-unit-price="${Number(item.unit_price||0)}">
-        <button type="button" data-edit-plus="${item.id}">+</button>
-      </div>
-    </div>
-  `).join('')||'<div class="notice">Este pedido no tiene productos editables.</div>';
-
-  $$('[data-edit-minus]').forEach(button=>button.onclick=()=>{
-    const input=$(`[data-edit-qty="${button.dataset.editMinus}"]`);
-    input.value=Math.max(1,Number(input.value||1)-1);
-  });
-  $$('[data-edit-plus]').forEach(button=>button.onclick=()=>{
-    const input=$(`[data-edit-qty="${button.dataset.editPlus}"]`);
-    input.value=Number(input.value||1)+1;
-  });
-
-  $('#pendingOrderEditModal').classList.remove('hidden');
-}
-
-async function savePendingOrderEditor(){
-  const order=orders.find(item=>String(item.id)===String(pendingOrderEditId));
-  if(!order)return toast('Pedido no encontrado');
-
-  const customer_name=$('#pendingEditCustomer').value.trim()||'Consumidor final';
-  const customer_phone=$('#pendingEditPhone').value.trim();
-  const notes=$('#pendingEditNotes').value.trim();
-
-  const itemChanges=$$('[data-edit-qty]').map(input=>({
-    id:input.dataset.editQty,
-    quantity:Math.max(1,Number(input.value||1)),
-    unit_price:Number(input.dataset.unitPrice||0)
-  }));
-
-  const total=itemChanges.reduce((sum,item)=>sum+(item.quantity*item.unit_price),0);
-
-  const saveButton=$('#savePendingOrderEdit');
-  saveButton.disabled=true;
-  saveButton.textContent='Guardando...';
-
-  const {error:orderError}=await db.from('orders').update({
-    customer_name,
-    customer_phone,
-    notes,
-    subtotal:total,
-    total
-  }).eq('id',order.id);
-
-  if(orderError){
-    saveButton.disabled=false;
-    saveButton.textContent='Guardar cambios';
-    return toast('No se pudo editar: '+orderError.message);
-  }
-
-  for(const item of itemChanges){
-    const {error}=await db.from('order_items').update({
-      quantity:item.quantity,
-      subtotal:item.quantity*item.unit_price
-    }).eq('id',item.id);
-    if(error){
-      saveButton.disabled=false;
-      saveButton.textContent='Guardar cambios';
-      return toast('Pedido actualizado parcialmente: '+error.message);
-    }
-  }
-
-  saveButton.disabled=false;
-  saveButton.textContent='Guardar cambios';
-  $('#pendingOrderEditModal').classList.add('hidden');
-  toast('Pedido corregido');
-  await loadOrders();
-}
-
-async function cancelPendingOrder(id){
-  const order=orders.find(item=>String(item.id)===String(id));
-  if(!order)return;
-  if(!confirm(`¿Cancelar el pedido #${order.order_number}?`))return;
-
-  const {error}=await db.from('orders').update({status:'cancelled'}).eq('id',id);
-  if(error)return toast('No se pudo cancelar: '+error.message);
-
-  toast('Pedido cancelado');
-  await loadOrders();
 }
 
 if($('#refreshPosPending'))if(document.querySelector('#refreshPosPending'))document.querySelector('#refreshPosPending').onclick=async()=>{
@@ -907,7 +790,7 @@ async function loadOrders(){
   renderKitchen();
   renderPosPendingOrders();
 }
-const statusLabels={awaiting_confirmation:'Esperando confirmación',pending:'Pendiente',confirmed:'Confirmado',preparing:'Preparando',ready:'Listo',delivered:'Entregado',cancelled:'Cancelado'};
+const statusLabels={pending:'Pendiente',confirmed:'Confirmado',preparing:'Preparando',ready:'Listo',delivered:'Entregado',cancelled:'Cancelado'};
 function getFilteredOrders(){return orderStatusFilter==='all'?orders:orders.filter(o=>o.status===orderStatusFilter)}
 function renderOrders(){
   const list=getFilteredOrders();
@@ -920,14 +803,9 @@ function renderOrders(){
     <div class="orderPaymentStatus ${o.payment_status==='paid'?'paid':'unpaid'}">${o.payment_status==='paid'?'✓ Pagada':'⏳ Pendiente de pago'}</div>
     <strong>${money(o.total)}</strong>
     <p>${new Date(o.created_at).toLocaleString('es-EC')}</p>
-    ${o.status==='awaiting_confirmation'||String(o.notes||'').includes('[WEB_ESPERANDO_WHATSAPP]')?`
-      <div class="orderAwaitingWhatsApp">
-        <b>📱 Esperando confirmación por WhatsApp</b>
-        <small>Verifica el mensaje del cliente antes de enviarlo a Cocina.</small>
-        <button type="button" class="success" data-confirm-web-order="${o.id}">✓ Confirmado — Enviar a cocina</button>
-      </div>`:''}
     <div class="orderActions">
       <select data-status="${o.id}">${Object.entries(statusLabels).map(([value,label])=>`<option ${value===o.status?'selected':''} value="${value}">${label}</option>`).join('')}</select>
+      ${(isAdminSession||currentEmployee?.role==='cashier')&&o.payment_status!=='paid'?`<button class="primary chargeOrderBtn" data-charge-order="${o.id}">Cobrar</button>`:''}
       ${isAdminSession?`<button class="danger deleteSaleBtn" data-delete-order="${o.id}">Eliminar venta</button>`:''}
     </div>
   </article>`).join(''):'<div class="notice">No hay pedidos con ese estado.</div>';
@@ -938,37 +816,8 @@ function renderOrders(){
     else{toast('Estado actualizado');await loadOrders()}
   });
 
+  $$('[data-charge-order]').forEach(b=>b.onclick=()=>openChargeOrder(b.dataset.chargeOrder));
   $$('[data-delete-order]').forEach(b=>b.onclick=()=>deleteSale(b.dataset.deleteOrder));
-
-  $$('[data-confirm-web-order]').forEach(button=>button.onclick=async()=>{
-    const id=button.dataset.confirmWebOrder;
-    const order=orders.find(item=>String(item.id)===String(id));
-    if(!order)return toast('Pedido no encontrado');
-
-    if(!confirm(`¿Ya comprobaste en WhatsApp la confirmación del pedido #${order.order_number}?`))return;
-
-    button.disabled=true;
-    button.textContent='Enviando a cocina...';
-
-    const cleanedNotes=String(order.notes||'')
-      .replace('[WEB_ESPERANDO_WHATSAPP]','')
-      .replace(/^\s*Código\s+M\d+\.\s*/i,'')
-      .trim();
-
-    const {error}=await db.from('orders').update({
-      status:'confirmed',
-      notes:cleanedNotes
-    }).eq('id',id);
-
-    if(error){
-      button.disabled=false;
-      button.textContent='✓ Confirmado — Enviar a cocina';
-      return toast('No se pudo confirmar: '+error.message);
-    }
-
-    toast(`Pedido #${order.order_number} confirmado y enviado a Cocina`);
-    await loadOrders();
-  });
 }
 function elapsedLabel(createdAt){
   const mins=Math.max(0,Math.floor((Date.now()-new Date(createdAt).getTime())/60000));
@@ -1001,7 +850,7 @@ function kitchenCard(o){
   </article>`;
 }
 function renderKitchen(){
-  const pending=orders.filter(o=>['pending','confirmed'].includes(o.status)&&!String(o.notes||'').includes('[WEB_ESPERANDO_WHATSAPP]'));
+  const pending=orders.filter(o=>['pending','confirmed'].includes(o.status));
   const preparing=orders.filter(o=>o.status==='preparing');
   const ready=orders.filter(o=>o.status==='ready');
   $('#kitchenPendingCount').textContent=pending.length;
@@ -4262,574 +4111,44 @@ document.querySelector('#exitPosFocusBtn')?.addEventListener('click',event=>{
 
 
 /* ============================================================
-   CAMBIO MÍNIMO — VENTANAS CON SALIDA SEGURA
-   No modifica lógica de Caja, pagos, pedidos ni Supabase.
+   V22 — CAJA VISIBLE + MESAS COBRABLES
    ============================================================ */
-(function(){
-  const returnButton=document.querySelector('#safeReturnAdminBtn');
+async function syncTableAfterPaymentV22(order){
+  if(!order?.table_id)return;
+  const {error}=await db.from('restaurant_tables').update({
+    status:'free',
+    current_order_id:null,
+    staff_id:null,
+    updated_at:new Date().toISOString()
+  }).eq('id',order.table_id);
+  if(error)console.warn('No se pudo liberar la mesa después del cobro:',error);
+  if(typeof loadTables==='function')await loadTables();
+}
 
-  function isFocusMode(){
-    return document.body.classList.contains('posFocusMode')
-      || document.body.classList.contains('moduleFocusV21')
-      || document.body.classList.contains('customersFocusMode');
-  }
+// Cuando se abre Caja, refresca siempre pedidos pendientes, incluidos los enviados desde Mesas.
+document.addEventListener('click',event=>{
+  const tabButton=event.target.closest?.('[data-tab="pos"]');
+  if(tabButton)setTimeout(()=>loadOrders(),50);
+},true);
 
-  function syncReturnButton(){
-    if(!returnButton)return;
-    returnButton.classList.toggle('hidden',!isFocusMode());
-  }
-
-  function closeModal(modal){
-    if(!modal)return;
-    modal.classList.add('hidden');
-    modal.setAttribute('aria-hidden','true');
-    document.body.classList.remove('modal-open','no-scroll');
-  }
-
-  function visibleModals(){
-    return [...document.querySelectorAll('.modal:not(.hidden)')]
-      .filter(modal=>getComputedStyle(modal).display!=='none');
-  }
-
-  function installSafeCloseButtons(){
-    document.querySelectorAll('.modal .modalCard').forEach(card=>{
-      const modal=card.closest('.modal');
-      if(!modal||modal.id==='loginModal')return;
-
-      let close=card.querySelector(
-        ':scope > .close, :scope > [data-safe-window-close]'
-      );
-
-      if(!close){
-        close=document.createElement('button');
-        close.type='button';
-        close.textContent='×';
-        close.setAttribute('aria-label','Cerrar ventana');
-        close.dataset.safeWindowClose='1';
-        card.prepend(close);
-      }
-
-      close.classList.add('safeWindowClose');
-      close.setAttribute('aria-label','Cerrar ventana');
-    });
-  }
-
-  returnButton?.addEventListener('click',event=>{
-    event.preventDefault();
-    event.stopPropagation();
-
-    document.body.classList.remove(
-      'posFocusMode',
-      'moduleFocusV21',
-      'customersFocusMode'
-    );
-    document.documentElement.classList.remove(
-      'posFocusModeRoot',
-      'customersFocusModeRoot'
-    );
-    document.body.dataset.focusTab='';
-
-    const dashboard=document.querySelector(
-      '.sidebar [data-tab="dashboard"]'
-    );
-    if(dashboard)dashboard.click();
-
-    syncReturnButton();
-    window.scrollTo({top:0,left:0,behavior:'auto'});
+// Refuerzo visual: cualquier pedido de mesa no pagado siempre puede cobrarse desde Caja.
+const renderPosPendingOrdersV21=renderPosPendingOrders;
+renderPosPendingOrders=function(){
+  renderPosPendingOrdersV21();
+  const list=document.querySelector('#posPendingOrders');
+  if(!list)return;
+  list.querySelectorAll('.posPendingCard').forEach(card=>{
+    if(card.textContent.includes('🍽️'))card.classList.add('fromTable');
   });
+};
 
-  document.addEventListener('click',event=>{
-    const closeButton=event.target.closest(
-      '.safeWindowClose,[data-safe-window-close]'
-    );
-
-    if(closeButton){
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      closeModal(closeButton.closest('.modal'));
-      return;
-    }
-
-    const modal=event.target.classList?.contains('modal')
-      ?event.target
-      :null;
-
-    if(modal&&modal.id!=='loginModal'){
-      closeModal(modal);
-    }
-
-    setTimeout(syncReturnButton,0);
-  },true);
-
-  document.addEventListener('keydown',event=>{
-    if(event.key!=='Escape')return;
-
-    const modals=visibleModals();
-    const topModal=modals.at(-1);
-
-    if(topModal&&topModal.id!=='loginModal'){
-      event.preventDefault();
-      closeModal(topModal);
-      return;
-    }
-
-    if(isFocusMode()){
-      event.preventDefault();
-      returnButton?.click();
-    }
-  });
-
-  document.querySelectorAll(
-    '.sidebar [data-tab],#toggleModuleFocus,#exitPosFocusBtn'
-  ).forEach(node=>{
-    node.addEventListener('click',()=>setTimeout(syncReturnButton,0));
-  });
-
-  window.addEventListener('load',()=>{
-    installSafeCloseButtons();
-    syncReturnButton();
-  });
-
-  window.addEventListener('pageshow',()=>{
-    installSafeCloseButtons();
-    syncReturnButton();
-  });
-})();
-
-/* ===== PEDIDOS PENDIENTES: EDICIÓN SEGURA ===== */
-if(document.querySelector('#savePendingOrderEdit')){
-  document.querySelector('#savePendingOrderEdit').onclick=savePendingOrderEditor;
-}
-if(document.querySelector('#closePendingOrderEdit')){
-  document.querySelector('#closePendingOrderEdit').onclick=()=>{
-    document.querySelector('#pendingOrderEditModal').classList.add('hidden');
-  };
-}
-if(document.querySelector('#cancelPendingOrderEdit')){
-  document.querySelector('#cancelPendingOrderEdit').onclick=()=>{
-    document.querySelector('#pendingOrderEditModal').classList.add('hidden');
-  };
-}
-
-/* ===== CONTABILIDAD POR ACCESOS ===== */
-function setFinanceWorkspace(view){
-  const movementForm=document.querySelector('#financeForm');
-  const accountsForm=document.querySelector('#financeAccountForm');
-  const movements=document.querySelector('#financeMovementsPanel');
-  const accounts=document.querySelector('#financeAccountsPanel');
-
-  [movementForm,accountsForm,movements,accounts].forEach(node=>node?.classList.add('financeSectionHidden'));
-
-  if(view==='income'||view==='expense'){
-    movementForm?.classList.remove('financeSectionHidden');
-    const type=document.querySelector('#financeType');
-    if(type)type.value=view;
-    movementForm?.scrollIntoView({behavior:'smooth',block:'start'});
+// Después de un cobro confirmado, libera automáticamente la mesa asociada.
+const confirmChargeOrderV21Base=confirmChargeOrderV21;
+confirmChargeOrderV21=async function(){
+  const orderBefore=orders.find(item=>String(item.id)===String(paymentOrderId));
+  await confirmChargeOrderV21Base();
+  if(orderBefore){
+    const {data}=await db.from('orders').select('payment_status').eq('id',orderBefore.id).maybeSingle();
+    if(data?.payment_status==='paid')await syncTableAfterPaymentV22(orderBefore);
   }
-  if(view==='movements'){
-    movements?.classList.remove('financeSectionHidden');
-    loadFinance();
-  }
-  if(view==='accounts'){
-    accountsForm?.classList.remove('financeSectionHidden');
-    accounts?.classList.remove('financeSectionHidden');
-    if(typeof loadFinanceAccounts==='function')loadFinanceAccounts();
-  }
-}
-
-document.querySelectorAll('[data-finance-view]').forEach(button=>{
-  button.addEventListener('click',()=>setFinanceWorkspace(button.dataset.financeView));
-});
-document.querySelectorAll('[data-finance-close]').forEach(button=>{
-  button.addEventListener('click',()=>{
-    button.closest('#financeForm,#financeAccountForm,#financeMovementsPanel,#financeAccountsPanel')
-      ?.classList.add('financeSectionHidden');
-  });
-});
-
-
-
-/* ============================================================
-   INFORMES FINALES — CAJA, CAJEROS, INGRESOS Y EGRESOS
-   Solo lectura. No modifica pedidos, cobros ni contabilidad.
-   ============================================================ */
-let mordiscoReportOrders=[];
-let mordiscoReportMovements=[];
-let mordiscoReportShifts=[];
-let mordiscoReportStaffMap={};
-
-function reportLocalDate(value){
-  if(!value)return '';
-  try{
-    return new Date(value).toLocaleString('es-EC',{
-      timeZone:'America/Guayaquil',
-      year:'numeric',month:'2-digit',day:'2-digit',
-      hour:'2-digit',minute:'2-digit'
-    });
-  }catch{return String(value)}
-}
-
-function reportDateInputToday(){
-  const parts=new Intl.DateTimeFormat('en-CA',{
-    timeZone:'America/Guayaquil',
-    year:'numeric',month:'2-digit',day:'2-digit'
-  }).formatToParts(new Date());
-  const map=Object.fromEntries(parts.map(x=>[x.type,x.value]));
-  return `${map.year}-${map.month}-${map.day}`;
-}
-
-function reportMethodKey(value){
-  const method=String(value||'other').toLowerCase();
-  if(method==='cash'||method==='efectivo')return 'cash';
-  if(method==='deuna'||method==='de una')return 'deuna';
-  if(method==='ahorita')return 'ahorita';
-  if(method==='transfer'||method==='transferencia')return 'transfer';
-  if(method==='card'||method==='tarjeta')return 'card';
-  return 'other';
-}
-
-function reportMethodName(value){
-  const key=reportMethodKey(value);
-  return {
-    cash:'Efectivo',
-    deuna:'Deuna',
-    ahorita:'Ahorita',
-    transfer:'Transferencia',
-    card:'Tarjeta',
-    other:'Otro'
-  }[key]||'Otro';
-}
-
-function reportStaffName(id){
-  if(!id)return 'Administrador / sin asignar';
-  return mordiscoReportStaffMap[String(id)]?.name||'Empleado';
-}
-
-function reportSelectedCashier(){
-  return document.querySelector('#reportCashierFilter')?.value||'all';
-}
-
-function reportFilteredOrders(){
-  const cashier=reportSelectedCashier();
-  return mordiscoReportOrders.filter(order=>
-    cashier==='all'||String(order.cashier_id||'')===String(cashier)
-  );
-}
-
-function reportFilteredShifts(){
-  const cashier=reportSelectedCashier();
-  return mordiscoReportShifts.filter(shift=>
-    cashier==='all'||String(shift.staff_id||'')===String(cashier)
-  );
-}
-
-function reportFilteredMovements(){
-  const cashier=reportSelectedCashier();
-  if(cashier==='all')return mordiscoReportMovements;
-  return mordiscoReportMovements.filter(movement=>
-    !movement.staff_id||String(movement.staff_id)===String(cashier)
-  );
-}
-
-async function fillReportCashiers(){
-  const select=document.querySelector('#reportCashierFilter');
-  if(!select)return;
-
-  const {data,error}=await db
-    .from('staff')
-    .select('id,name,role,active')
-    .eq('active',true)
-    .order('name');
-
-  if(error){
-    console.warn('No se pudieron cargar cajeros para informes:',error);
-    return;
-  }
-
-  const staff=data||[];
-  staff.forEach(member=>mordiscoReportStaffMap[String(member.id)]=member);
-
-  const eligible=staff.filter(member=>['cashier','admin','administrator'].includes(String(member.role||'').toLowerCase()));
-  const current=select.value||'all';
-
-  select.innerHTML='<option value="all">Todos los cajeros</option>'+
-    eligible.map(member=>`<option value="${member.id}">${esc(member.name)}</option>`).join('');
-
-  if([...select.options].some(option=>option.value===current))select.value=current;
-}
-
-async function loadMordiscoReports(){
-  const from=document.querySelector('#reportDateFrom')?.value||reportDateInputToday();
-  const to=document.querySelector('#reportDateTo')?.value||from;
-
-  const startIso=`${from}T00:00:00-05:00`;
-  const endDate=new Date(`${to}T00:00:00-05:00`);
-  endDate.setDate(endDate.getDate()+1);
-  const endIso=endDate.toISOString();
-
-  const [ordersResult,movementsResult,shiftsResult,staffResult]=await Promise.all([
-    db.from('orders')
-      .select('id,order_number,total,subtotal,discount_amount,payment_status,payment_method,cashier_id,created_at')
-      .eq('payment_status','paid')
-      .gte('created_at',startIso)
-      .lt('created_at',endIso)
-      .order('created_at',{ascending:true}),
-
-    db.from('financial_movements')
-      .select('id,type,category,amount,payment_method,movement_date,reference,description,staff_id,created_at')
-      .gte('movement_date',from)
-      .lte('movement_date',to)
-      .order('movement_date',{ascending:true})
-      .order('created_at',{ascending:true}),
-
-    db.from('work_shifts')
-      .select('*,staff(name,role)')
-      .gte('started_at',startIso)
-      .lt('started_at',endIso)
-      .order('started_at',{ascending:true}),
-
-    db.from('staff')
-      .select('id,name,role,active')
-  ]);
-
-  const error=ordersResult.error||movementsResult.error||shiftsResult.error||staffResult.error;
-  if(error){
-    console.error('Informes:',error);
-    toast('No se pudo generar el informe: '+error.message);
-    return;
-  }
-
-  mordiscoReportOrders=ordersResult.data||[];
-  mordiscoReportMovements=movementsResult.data||[];
-  mordiscoReportShifts=shiftsResult.data||[];
-
-  mordiscoReportStaffMap={};
-  (staffResult.data||[]).forEach(member=>{
-    mordiscoReportStaffMap[String(member.id)]=member;
-  });
-
-  renderMordiscoReports();
-
-  const label=document.querySelector('#reportPeriodLabel');
-  if(label){
-    label.textContent=from===to
-      ?`Fecha: ${from}`
-      :`Período: ${from} al ${to}`;
-  }
-}
-
-function renderMordiscoReports(){
-  const orders=reportFilteredOrders();
-  const movements=reportFilteredMovements();
-  const shifts=reportFilteredShifts();
-
-  const salesTotal=orders.reduce((sum,order)=>sum+Number(order.total||0),0);
-  const salesCount=orders.length;
-
-  const salesMovement=movement=>{
-    const category=String(movement.category||'').toLowerCase();
-    const reference=String(movement.reference||'').toLowerCase();
-    const description=String(movement.description||'').toLowerCase();
-    return category==='ventas'||reference.startsWith('venta #')||description.startsWith('pago del pedido #');
-  };
-
-  const otherIncome=movements
-    .filter(m=>m.type==='income'&&!salesMovement(m))
-    .reduce((sum,m)=>sum+Number(m.amount||0),0);
-
-  const expenses=movements
-    .filter(m=>m.type==='expense')
-    .reduce((sum,m)=>sum+Number(m.amount||0),0);
-
-  const result=salesTotal+otherIncome-expenses;
-
-  $('#reportSalesTotal').textContent=money(salesTotal);
-  $('#reportSalesCount').textContent=`${salesCount} venta${salesCount===1?'':'s'}`;
-  $('#reportOtherIncome').textContent=money(otherIncome);
-  $('#reportExpenses').textContent=money(expenses);
-  $('#reportNetResult').textContent=money(result);
-
-  const methodTotals={cash:0,deuna:0,ahorita:0,transfer:0,card:0,other:0};
-  orders.forEach(order=>{
-    methodTotals[reportMethodKey(order.payment_method)]+=Number(order.total||0);
-  });
-
-  $('#reportPayCash').textContent=money(methodTotals.cash);
-  $('#reportPayDeuna').textContent=money(methodTotals.deuna);
-  $('#reportPayAhorita').textContent=money(methodTotals.ahorita);
-  $('#reportPayTransfer').textContent=money(methodTotals.transfer);
-  $('#reportPayCard').textContent=money(methodTotals.card);
-  $('#reportPayOther').textContent=money(methodTotals.other);
-
-  renderReportCashiers(orders);
-  renderReportShifts(shifts,orders);
-  renderReportFinance(movements);
-  renderReportSales(orders);
-}
-
-function renderReportCashiers(orders){
-  const body=$('#reportCashierBody');
-  if(!body)return;
-
-  const groups=new Map();
-
-  orders.forEach(order=>{
-    const id=String(order.cashier_id||'unassigned');
-    if(!groups.has(id)){
-      groups.set(id,{
-        id,
-        name:reportStaffName(order.cashier_id),
-        count:0,total:0,
-        cash:0,deuna:0,ahorita:0,transfer:0,card:0,other:0
-      });
-    }
-
-    const group=groups.get(id);
-    const amount=Number(order.total||0);
-    const key=reportMethodKey(order.payment_method);
-    group.count++;
-    group.total+=amount;
-    group[key]+=amount;
-  });
-
-  const rows=[...groups.values()].sort((a,b)=>b.total-a.total);
-
-  body.innerHTML=rows.length?rows.map(row=>`<tr>
-    <td><b>${esc(row.name)}</b></td>
-    <td>${row.count}</td>
-    <td>${money(row.cash)}</td>
-    <td>${money(row.deuna)}</td>
-    <td>${money(row.ahorita)}</td>
-    <td>${money(row.transfer)}</td>
-    <td>${money(row.card)}</td>
-    <td><b>${money(row.total)}</b></td>
-  </tr>`).join(''):'<tr><td colspan="8">No hay ventas cobradas en este período.</td></tr>';
-}
-
-function shiftCountedCash(shift){
-  const candidates=[
-    shift.closing_cash,
-    shift.counted_cash,
-    shift.cash_counted,
-    shift.final_cash,
-    shift.closed_cash
-  ];
-  const found=candidates.find(value=>value!==null&&value!==undefined&&value!=='');
-  return found===undefined?null:Number(found||0);
-}
-
-function renderReportShifts(shifts,orders){
-  const body=$('#reportShiftBody');
-  if(!body)return;
-
-  body.innerHTML=shifts.length?shifts.map(shift=>{
-    const started=new Date(shift.started_at).getTime();
-    const ended=shift.ended_at?new Date(shift.ended_at).getTime():Date.now();
-
-    const shiftOrders=orders.filter(order=>{
-      if(String(order.cashier_id||'')!==String(shift.staff_id||''))return false;
-      const created=new Date(order.created_at).getTime();
-      return created>=started&&created<=ended;
-    });
-
-    const cashSales=shiftOrders
-      .filter(order=>reportMethodKey(order.payment_method)==='cash')
-      .reduce((sum,order)=>sum+Number(order.total||0),0);
-
-    const totalSales=shiftOrders.reduce((sum,order)=>sum+Number(order.total||0),0);
-    const opening=Number(shift.opening_cash||0);
-    const expected=opening+cashSales;
-    const counted=shiftCountedCash(shift);
-    const difference=counted===null?null:counted-expected;
-
-    const diffClass=difference===null?'':difference>0.005
-      ?'reportDifferencePositive'
-      :difference<-0.005
-        ?'reportDifferenceNegative'
-        :'reportDifferenceZero';
-
-    return `<tr>
-      <td><b>${esc(shift.staff?.name||reportStaffName(shift.staff_id))}</b></td>
-      <td>${reportLocalDate(shift.started_at)}</td>
-      <td>${shift.ended_at?reportLocalDate(shift.ended_at):'—'}</td>
-      <td>${money(opening)}</td>
-      <td>${money(cashSales)}</td>
-      <td><b>${money(expected)}</b></td>
-      <td>${counted===null?'—':money(counted)}</td>
-      <td class="${diffClass}">${difference===null?'—':money(difference)}</td>
-      <td><b>${money(totalSales)}</b></td>
-      <td>${shift.status==='open'?'ABIERTO':'CERRADO'}</td>
-    </tr>`;
-  }).join(''):'<tr><td colspan="10">No hay turnos registrados en este período.</td></tr>';
-}
-
-function renderReportFinance(movements){
-  const body=$('#reportFinanceBody');
-  if(!body)return;
-
-  body.innerHTML=movements.length?movements.map(movement=>`<tr>
-    <td>${esc(movement.movement_date||'')}</td>
-    <td>${movement.type==='income'?'Ingreso':'Egreso'}</td>
-    <td>${esc(movement.category||'')}</td>
-    <td>${esc(movement.description||'')}${movement.reference?`<small> · ${esc(movement.reference)}</small>`:''}</td>
-    <td>${reportMethodName(movement.payment_method)}</td>
-    <td>${esc(reportStaffName(movement.staff_id))}</td>
-    <td class="${movement.type==='income'?'positiveAmount':'negativeAmount'}">
-      ${movement.type==='income'?'+':'−'}${money(movement.amount)}
-    </td>
-  </tr>`).join(''):'<tr><td colspan="7">No hay ingresos ni egresos en este período.</td></tr>';
-}
-
-function renderReportSales(orders){
-  const body=$('#reportSalesBody');
-  if(!body)return;
-
-  body.innerHTML=orders.length?orders.map(order=>`<tr>
-    <td>#${esc(String(order.order_number||''))}</td>
-    <td>${reportLocalDate(order.created_at)}</td>
-    <td>${esc(reportStaffName(order.cashier_id))}</td>
-    <td>${reportMethodName(order.payment_method)}</td>
-    <td><b>${money(order.total)}</b></td>
-  </tr>`).join(''):'<tr><td colspan="5">No hay ventas cobradas en este período.</td></tr>';
-}
-
-function initMordiscoReports(){
-  const from=$('#reportDateFrom');
-  const to=$('#reportDateTo');
-  if(!from||!to)return;
-
-  const today=reportDateInputToday();
-  if(!from.value)from.value=today;
-  if(!to.value)to.value=today;
-
-  fillReportCashiers();
-}
-
-$('#applyReportFilters')?.addEventListener('click',loadMordiscoReports);
-$('#refreshReportsBtn')?.addEventListener('click',loadMordiscoReports);
-$('#reportCashierFilter')?.addEventListener('change',renderMordiscoReports);
-$('#printReportsBtn')?.addEventListener('click',()=>{
-  const cashier=$('#reportCashierFilter')?.selectedOptions?.[0]?.textContent||'Todos los cajeros';
-  const period=$('#reportPeriodLabel')?.textContent||'';
-  const header=$('#reportPrintHeader p');
-  if(header)header.textContent=`Informe administrativo de caja · ${cashier}`;
-  window.print();
-});
-
-// This explicit navigation handler only covers the new module and does not
-// interfere with the existing tab system.
-document.querySelector('[data-tab="reports"]')?.addEventListener('click',event=>{
-  document.querySelectorAll('#adminView .tab').forEach(tab=>tab.classList.add('hidden'));
-  document.querySelector('#tab-reports')?.classList.remove('hidden');
-
-  document.querySelectorAll('.sidebar [data-tab]').forEach(button=>button.classList.remove('active'));
-  event.currentTarget.classList.add('active');
-
-  const title=document.querySelector('#adminTitle');
-  if(title)title.textContent='Informes';
-
-  initMordiscoReports();
-  loadMordiscoReports();
-});
-
-document.addEventListener('DOMContentLoaded',initMordiscoReports);
+};
