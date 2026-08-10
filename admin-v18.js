@@ -1,3 +1,4 @@
+console.info('MORDISCO OS V29 PUBLIC cargado');
 console.info('MORDISCO OS V21 estable cargado correctamente');
 window.addEventListener('error',event=>{
   console.error('Error global Mordisco OS:',event.error||event.message);

@@ -4170,3 +4170,6 @@ body.posFocusMode #tab-pos .posChargeBtn{min-height:52px!important;height:52px!i
 .cashReportTable{width:100%;border-collapse:collapse;margin:8px 0 22px}.cashReportTable th,.cashReportTable td{border-bottom:1px solid #ddd;padding:9px;text-align:left;font-size:.9rem}.cashReportTable th{background:#f6f1e7}
 @media(max-width:900px){body.posFocusMode #tab-pos .posLayout{display:flex!important;flex-direction:column!important}.cashReportTotals{grid-template-columns:1fr}.cashReportTable{font-size:.82rem}}
 @media print{body *{visibility:hidden!important}#cashReportModal,#cashReportModal *{visibility:visible!important}#cashReportModal{position:absolute!important;inset:0!important;background:#fff!important}.cashReportModalCard{box-shadow:none!important;border:0!important;max-width:none!important;width:100%!important}.cashReportModalCard>.close,.cashReportModalCard>.receiptActions{display:none!important}}
+
+/* V29 PUBLIC - marcador de archivo correcto */
+#v18VersionMarker{z-index:99999!important}

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#11100e">
 <title>Mordisco Fast Food</title>
-<link rel="stylesheet" href="/admin-v18.css?v=v27-scroll-egresos-visible">
+<link rel="stylesheet" href="/admin-v18.css?v=v29-public-scroll">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/admin-auth-v18.js?v=final-1" defer></script>
 
@@ -98,6 +98,32 @@ body.posFocusMode #tab-pos .posChargeBtn{position:static!important;min-height:54
  body.posFocusMode #tab-pos #posProducts{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
  .cashQuickActionsV27{grid-template-columns:1fr!important;}
 }
+</style>
+
+<style id="mordisco-v29-definitivo">
+/* V29: tamaño legible + scroll real. Esta regla es la ultima y manda sobre versiones anteriores. */
+html.posFocusModeRoot,body.posFocusMode{font-size:16px!important;zoom:1!important;height:auto!important;min-height:100%!important;overflow-y:auto!important;overflow-x:hidden!important}
+body.posFocusMode #tab-pos{display:block!important;height:auto!important;min-height:100vh!important;overflow:visible!important;padding:12px!important}
+body.posFocusMode #adminCashControl{height:auto!important;min-height:82px!important;margin-bottom:12px!important;padding:14px 18px!important}
+body.posFocusMode .posHeader{height:auto!important;min-height:105px!important;margin-bottom:12px!important;padding:14px 18px!important}
+body.posFocusMode #tab-pos .posLayout{display:grid!important;grid-template-columns:minmax(0,1fr) 440px!important;gap:14px!important;height:auto!important;min-height:0!important;overflow:visible!important;align-items:start!important}
+body.posFocusMode #tab-pos .posCatalog{height:690px!important;min-height:690px!important;max-height:690px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;padding:14px!important}
+body.posFocusMode #tab-pos #posProducts{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-auto-rows:178px!important;gap:11px!important;overflow-y:auto!important;overflow-x:hidden!important;align-content:start!important;padding-right:6px!important}
+body.posFocusMode #tab-pos #posProducts .posProduct{height:178px!important;min-height:178px!important;max-height:178px!important}
+body.posFocusMode #tab-pos #posProducts .posProduct img,body.posFocusMode #tab-pos #posProducts .posProductNoImage{height:88px!important;min-height:88px!important;max-height:88px!important}
+body.posFocusMode #tab-pos #posProducts .posProductInfo small{font-size:13px!important}
+body.posFocusMode #tab-pos #posProducts .posProductInfo b{font-size:15px!important;line-height:1.15!important;min-height:34px!important}
+body.posFocusMode #tab-pos #posProducts .posProductInfo strong{font-size:17px!important}
+body.posFocusMode #tab-pos .posTicket{height:auto!important;min-height:690px!important;max-height:none!important;overflow:visible!important;position:static!important;padding:15px!important;display:block!important}
+body.posFocusMode #tab-pos .cashQuickActionsV27{display:grid!important;grid-template-columns:1fr 1fr!important;gap:9px!important;margin:10px 0 12px!important}
+body.posFocusMode #tab-pos .cashExpenseBtnV27,body.posFocusMode #tab-pos .cashReportBtnV27{display:block!important;visibility:visible!important;opacity:1!important;min-height:50px!important;font-size:14px!important}
+body.posFocusMode #tab-pos .posPendingTopV23{height:auto!important;min-height:145px!important;max-height:none!important;overflow:visible!important;margin:10px 0!important}
+body.posFocusMode #tab-pos .posPendingTopV23 .posPendingOrders{max-height:230px!important;overflow-y:auto!important}
+body.posFocusMode #tab-pos .posCart{min-height:85px!important;max-height:190px!important;overflow-y:auto!important}
+body.posFocusMode #tab-pos .posPrimaryActions{position:static!important;margin-top:12px!important}
+body.posFocusMode #tab-pos .posChargeBtn{position:static!important;display:block!important;visibility:visible!important;opacity:1!important;min-height:54px!important;height:54px!important;font-size:17px!important}
+@media(max-width:1500px) and (min-width:901px){body.posFocusMode #tab-pos .posLayout{grid-template-columns:minmax(0,1fr) 410px!important}body.posFocusMode #tab-pos #posProducts{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:900px){body.posFocusMode #tab-pos .posLayout{display:flex!important;flex-direction:column!important}body.posFocusMode #tab-pos .posCatalog{width:100%!important;height:620px!important;min-height:620px!important;max-height:620px!important}body.posFocusMode #tab-pos .posTicket{width:100%!important;min-height:0!important}body.posFocusMode #tab-pos #posProducts{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 </style>
 </head>
 <body>
@@ -1302,5 +1328,5 @@ body.posFocusMode #tab-pos .posChargeBtn{position:static!important;min-height:54
 
 
 
-<div id="v18VersionMarker">Mordisco OS V26</div>
+<div id="v18VersionMarker">Mordisco OS V29</div>
 </body></html>
