@@ -255,6 +255,8 @@ body.posFocusMode #tab-pos .posChargeBtn{min-height:52px!important;font-size:16p
         <div class="cashControlActions">
           <span id="cashRegisterBadge" class="cashRegisterBadge">Consultando</span>
           <button id="openCashRegisterBtn" class="success" type="button">Abrir caja</button>
+          <button id="cashExpenseBtn" class="cashExpenseBtn" type="button">− Registrar egreso</button>
+          <button id="cashReportBtn" class="dark cashReportBtn" type="button">🧾 Informe de caja</button>
           <button id="closeCashRegisterBtn" class="danger" type="button">Cerrar caja</button>
         </div>
       </section>
@@ -1192,6 +1194,53 @@ body.posFocusMode #tab-pos .posChargeBtn{min-height:52px!important;font-size:16p
 </div>
 
 
+<div id="cashExpenseModal" class="modal hidden">
+  <div class="modalCard cashExpenseModalCard">
+    <button class="close" type="button" data-close="cashExpenseModal">×</button>
+    <span class="eyebrow">CAJA DEL LOCAL</span>
+    <h2>Registrar egreso</h2>
+    <p class="muted">El egreso quedará asignado al cajero y aparecerá en Contabilidad e Informe de caja.</p>
+    <label>Cajero
+      <select id="cashExpenseCashier"></select>
+    </label>
+    <label>Categoría
+      <select id="cashExpenseCategory">
+        <option>Compra de insumos</option><option>Proveedores</option><option>Servicios</option>
+        <option>Transporte</option><option>Mantenimiento</option><option>Publicidad</option>
+        <option>Sueldos</option><option>Otros</option>
+      </select>
+    </label>
+    <label>Monto
+      <input id="cashExpenseAmount" type="number" min="0.01" step="0.01" placeholder="0.00">
+    </label>
+    <label>Método
+      <select id="cashExpenseMethod">
+        <option value="cash">Efectivo</option><option value="transfer">Transferencia</option>
+        <option value="card">Tarjeta</option><option value="deuna">DeUna</option>
+        <option value="ahorita">Ahorita</option><option value="other">Otro</option>
+      </select>
+    </label>
+    <label>Referencia
+      <input id="cashExpenseReference" placeholder="Factura, recibo o comprobante">
+    </label>
+    <label>Descripción
+      <textarea id="cashExpenseDescription" placeholder="Ej. Compra urgente de pan" required></textarea>
+    </label>
+    <button id="saveCashExpenseBtn" class="danger full" type="button">Guardar egreso</button>
+  </div>
+</div>
+
+<div id="cashReportModal" class="modal hidden">
+  <div class="modalCard cashReportModalCard">
+    <button class="close" type="button" data-close="cashReportModal">×</button>
+    <div id="cashReportContent" class="cashReportPaper"></div>
+    <div class="receiptActions">
+      <button id="printCashReportBtn" class="dark" type="button">Imprimir informe</button>
+      <button class="primary" type="button" data-close="cashReportModal">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <div id="shiftPinModal" class="modal hidden">
   <div class="modalCard employeeLoginCard">
     <button class="close" data-close="shiftPinModal">×</button>
@@ -1205,9 +1254,9 @@ body.posFocusMode #tab-pos .posChargeBtn{min-height:52px!important;font-size:16p
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=v25-caja-grande"></script>
+<script src="/admin-v18.js?v=v26-scroll-egresos"></script>
 
 
 
-<div id="v18VersionMarker">Mordisco OS V20</div>
+<div id="v18VersionMarker">Mordisco OS V26</div>
 </body></html>

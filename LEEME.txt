@@ -1,12 +1,14 @@
-MORDISCO OS V25 — CAJA GRANDE Y LEGIBLE
+MORDISCO OS V26 — SCROLL + EGRESOS POR CAJERO
 
-Corrección principal:
-- Se eliminó la compresión visual del POS.
-- Los estilos críticos van dentro de admin.html para evitar que una caché antigua deje todo diminuto.
-- Productos en 3 columnas grandes (2 en pantallas más angostas).
-- Panel de cobro ancho a la derecha.
-- Pedidos por cobrar arriba con botón COBRAR AHORA grande y visible.
-- Se cambió la versión de caché de CSS/JS a v25-caja-grande.
+Cambios principales:
+1. POS en tamaño normal y legible. Ya no comprime la interfaz para hacerla caber.
+2. Catálogo con scroll vertical y tarjetas grandes.
+3. Pedidos por cobrar visibles y cobrables desde Caja.
+4. Botón "Registrar egreso" directamente en Caja.
+5. Cada egreso queda asociado a un cajero y se registra en Contabilidad.
+6. Botón "Informe de caja" con ventas cobradas, egresos y neto por cajero.
+7. Protección adicional para no crear un segundo ingreso contable de la misma Venta #.
+8. La vista de Contabilidad ignora duplicados históricos evidentes con la misma referencia Venta # (no borra datos).
 
-Reemplaza admin.html, admin-v18.css y admin-v18.js.
-Luego vuelve a publicar.
+Reemplaza admin.html, admin-v18.js y admin-v18.css en tu proyecto y vuelve a publicar.
+Después usa Ctrl+F5 una vez.

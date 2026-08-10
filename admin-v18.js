@@ -3958,11 +3958,26 @@ async function confirmChargeOrderV21(){
         staff_id:currentEmployee?.id||null
       };
 
-      const {error:financeError}=await db
-        .from('financial_movements')
-        .insert(financeRow);
+      let financeError=null;
+      let financeExists=false;
+      try{
+        const existing=await db.from('financial_movements')
+          .select('id')
+          .eq('type','income')
+          .eq('category','Ventas')
+          .eq('reference',financeRow.reference)
+          .limit(1);
+        financeExists=!existing.error&&(existing.data||[]).length>0;
+        if(existing.error)console.warn('No se pudo comprobar duplicado contable:',existing.error);
+      }catch(checkError){
+        console.warn('No se pudo comprobar duplicado contable:',checkError);
+      }
+      if(!financeExists){
+        const financeResult=await db.from('financial_movements').insert(financeRow);
+        financeError=financeResult.error||null;
+      }
 
-      // A duplicated or blocked accounting row must not undo the paid order.
+      // Un movimiento contable ya existente o bloqueado no debe deshacer el pedido pagado.
       if(financeError){
         console.warn('El pedido se pagó, pero no se creó el movimiento contable:',financeError);
       }
@@ -4152,3 +4167,161 @@ confirmChargeOrderV21=async function(){
     if(data?.payment_status==='paid')await syncTableAfterPaymentV22(orderBefore);
   }
 };
+
+
+/* ===== V26: CAJA LEGIBLE CON SCROLL + EGRESOS POR CAJERO + INFORME ===== */
+(function(){
+  const $v26=s=>document.querySelector(s);
+  const $$v26=s=>[...document.querySelectorAll(s)];
+  const todayV26=()=>new Date().toISOString().slice(0,10);
+
+  function closeV26Modal(id){$v26('#'+id)?.classList.add('hidden')}
+  $$v26('[data-close="cashExpenseModal"]').forEach(b=>b.addEventListener('click',()=>closeV26Modal('cashExpenseModal')));
+  $$v26('[data-close="cashReportModal"]').forEach(b=>b.addEventListener('click',()=>closeV26Modal('cashReportModal')));
+
+  function activeCashiersV26(){
+    return (staffMembers||[]).filter(s=>s.active!==false&&s.role==='cashier');
+  }
+
+  function fillExpenseCashiersV26(){
+    const select=$v26('#cashExpenseCashier');
+    if(!select)return;
+    const cashiers=activeCashiersV26();
+    select.innerHTML=cashiers.length
+      ? cashiers.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')
+      : '<option value="">No hay cajeros activos</option>';
+    if(currentEmployee?.role==='cashier'){
+      select.value=String(currentEmployee.id);
+      select.disabled=true;
+    }else{
+      select.disabled=false;
+      const selected=$v26('#posCashier')?.value;
+      if(selected&&[...select.options].some(o=>String(o.value)===String(selected)))select.value=selected;
+    }
+  }
+
+  $v26('#cashExpenseBtn')?.addEventListener('click',async()=>{
+    if(!cashRegisterState?.is_open)return toast('La caja debe estar abierta para registrar egresos');
+    if(currentEmployee?.role==='cashier'){
+      try{await refreshCurrentCashierShift()}catch(e){}
+      if(!currentShift)return toast('El cajero debe tener un turno abierto');
+    }
+    fillExpenseCashiersV26();
+    if($v26('#cashExpenseAmount'))$v26('#cashExpenseAmount').value='';
+    if($v26('#cashExpenseReference'))$v26('#cashExpenseReference').value='';
+    if($v26('#cashExpenseDescription'))$v26('#cashExpenseDescription').value='';
+    $v26('#cashExpenseModal')?.classList.remove('hidden');
+  });
+
+  $v26('#saveCashExpenseBtn')?.addEventListener('click',async()=>{
+    const btn=$v26('#saveCashExpenseBtn');
+    const staffId=$v26('#cashExpenseCashier')?.value||null;
+    const amount=Number($v26('#cashExpenseAmount')?.value||0);
+    const description=$v26('#cashExpenseDescription')?.value.trim()||'';
+    if(!staffId)return toast('Selecciona el cajero responsable');
+    if(!(amount>0))return toast('Ingresa un monto válido');
+    if(!description)return toast('Escribe la descripción del egreso');
+    btn.disabled=true;btn.textContent='Guardando...';
+    const row={
+      type:'expense',
+      category:$v26('#cashExpenseCategory')?.value||'Otros',
+      amount,
+      payment_method:$v26('#cashExpenseMethod')?.value||'cash',
+      movement_date:todayV26(),
+      reference:$v26('#cashExpenseReference')?.value.trim()||'',
+      description,
+      staff_id:staffId
+    };
+    const {error}=await db.from('financial_movements').insert(row);
+    btn.disabled=false;btn.textContent='Guardar egreso';
+    if(error)return toast('No se pudo guardar el egreso: '+error.message);
+    closeV26Modal('cashExpenseModal');
+    if(typeof loadFinance==='function')await loadFinance();
+    toast('Egreso registrado para el cajero');
+  });
+
+  async function getCashReportDataV26(){
+    const day=todayV26();
+    const start=day+'T00:00:00';
+    const end=new Date(new Date(start).getTime()+86400000).toISOString();
+    const [ordersRes,expensesRes]=await Promise.all([
+      db.from('orders').select('id,order_number,total,payment_method,payment_status,cashier_id,created_at').eq('payment_status','paid').gte('created_at',start).lt('created_at',end),
+      db.from('financial_movements').select('id,amount,payment_method,staff_id,category,description,movement_date,created_at').eq('type','expense').eq('movement_date',day)
+    ]);
+    if(ordersRes.error)throw ordersRes.error;
+    if(expensesRes.error)throw expensesRes.error;
+    return {orders:ordersRes.data||[],expenses:expensesRes.data||[]};
+  }
+
+  function buildCashReportV26(orders,expenses){
+    const staffMap=new Map((staffMembers||[]).map(s=>[String(s.id),s.name]));
+    const ids=new Set([...orders.map(o=>o.cashier_id),...expenses.map(e=>e.staff_id)].filter(Boolean).map(String));
+    const rows=[...ids].map(id=>{
+      const sales=orders.filter(o=>String(o.cashier_id||'')===id);
+      const exps=expenses.filter(e=>String(e.staff_id||'')===id);
+      const salesTotal=sales.reduce((a,o)=>a+Number(o.total||0),0);
+      const expenseTotal=exps.reduce((a,e)=>a+Number(e.amount||0),0);
+      return {id,name:staffMap.get(id)||'Cajero',salesCount:sales.length,salesTotal,expenseTotal,net:salesTotal-expenseTotal,exps};
+    }).sort((a,b)=>a.name.localeCompare(b.name));
+    const salesTotal=orders.reduce((a,o)=>a+Number(o.total||0),0);
+    const expenseTotal=expenses.reduce((a,e)=>a+Number(e.amount||0),0);
+    return `<div class="cashReportHeader"><span class="eyebrow">MORDISCO FAST FOOD</span><h2>Informe de caja</h2><p>${new Date().toLocaleDateString('es-EC',{dateStyle:'full'})}</p></div>
+      <div class="cashReportTotals">
+        <div><span>Ventas cobradas</span><strong>${money(salesTotal)}</strong></div>
+        <div><span>Egresos</span><strong>− ${money(expenseTotal)}</strong></div>
+        <div><span>Saldo neto</span><strong>${money(salesTotal-expenseTotal)}</strong></div>
+      </div>
+      <h3>Resumen por cajero</h3>
+      <table class="cashReportTable"><thead><tr><th>Cajero</th><th>Ventas</th><th>Cobrado</th><th>Egresos</th><th>Neto</th></tr></thead><tbody>
+      ${rows.length?rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${r.salesCount}</td><td>${money(r.salesTotal)}</td><td>− ${money(r.expenseTotal)}</td><td><b>${money(r.net)}</b></td></tr>`).join(''):'<tr><td colspan="5">No hay movimientos registrados hoy.</td></tr>'}
+      </tbody></table>
+      <h3>Detalle de egresos</h3>
+      <table class="cashReportTable"><thead><tr><th>Cajero</th><th>Categoría</th><th>Descripción</th><th>Método</th><th>Monto</th></tr></thead><tbody>
+      ${expenses.length?expenses.map(e=>`<tr><td>${esc(staffMap.get(String(e.staff_id))||'Cajero')}</td><td>${esc(e.category||'Otros')}</td><td>${esc(e.description||'')}</td><td>${methodLabel(e.payment_method)}</td><td>− ${money(e.amount)}</td></tr>`).join(''):'<tr><td colspan="5">Sin egresos.</td></tr>'}
+      </tbody></table>`;
+  }
+
+  $v26('#cashReportBtn')?.addEventListener('click',async()=>{
+    const btn=$v26('#cashReportBtn');btn.disabled=true;const old=btn.textContent;btn.textContent='Preparando...';
+    try{
+      const {orders,expenses}=await getCashReportDataV26();
+      $v26('#cashReportContent').innerHTML=buildCashReportV26(orders,expenses);
+      $v26('#cashReportModal')?.classList.remove('hidden');
+    }catch(error){toast('No se pudo preparar el informe: '+error.message)}
+    finally{btn.disabled=false;btn.textContent=old}
+  });
+
+  $v26('#printCashReportBtn')?.addEventListener('click',()=>window.print());
+
+  // Contabilidad: ocultar duplicados históricos evidentes de una misma venta en la vista y totales.
+  // No borra registros. Conserva un solo ingreso por referencia "Venta #...".
+  const originalRenderFinanceV26=typeof renderFinance==='function'?renderFinance:null;
+  if(originalRenderFinanceV26){
+    renderFinance=function(){
+      const seenSales=new Set();
+      const source=financeMovements||[];
+      const clean=[];
+      for(const x of source){
+        if(x.type==='income'&&String(x.category||'').toLowerCase()==='ventas'){
+          const ref=String(x.reference||'').trim().toLowerCase();
+          if(ref&&/^venta\s*#/.test(ref)){
+            if(seenSales.has(ref))continue;
+            seenSales.add(ref);
+          }
+        }
+        clean.push(x);
+      }
+      const saved=financeMovements;
+      financeMovements=clean;
+      try{return originalRenderFinanceV26()}finally{financeMovements=saved}
+    };
+  }
+
+  // Previene nuevos duplicados cuando entra el respaldo de cobro: si ya existe el ingreso de esa venta,
+  // el insert de respaldo se bloquea mediante una comprobación previa centralizada.
+  window.v26FinanceSaleExists=async function(orderNumber){
+    const ref=`Venta #${orderNumber}`;
+    const {data,error}=await db.from('financial_movements').select('id').eq('type','income').eq('category','Ventas').eq('reference',ref).limit(1);
+    return !error&&(data||[]).length>0;
+  };
+})();
