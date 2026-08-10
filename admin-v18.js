@@ -4305,9 +4305,13 @@ confirmChargeOrderV21=async function(){
       <table class="cashReportTable"><thead><tr><th>Cajero</th><th>Ventas</th><th>Cobrado</th><th>Egresos</th><th>Neto</th></tr></thead><tbody>
       ${rows.length?rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${r.salesCount}</td><td>${money(r.salesTotal)}</td><td>− ${money(r.expenseTotal)}</td><td><b>${money(r.net)}</b></td></tr>`).join(''):'<tr><td colspan="5">No hay movimientos registrados para este cajero.</td></tr>'}
       </tbody></table>
+      <h3>Detalle de ingresos</h3>
+      <table class="cashReportTable"><thead><tr><th>Hora</th><th>Cajero</th><th>Venta</th><th>Método</th><th>Monto</th><th class="v39AdminOnlyCol">Acción</th></tr></thead><tbody>
+      ${orders.length?orders.map(o=>`<tr><td>${new Date(o.created_at).toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'})}</td><td>${esc(staffMap.get(String(o.cashier_id))||'Sin asignar')}</td><td>#${esc(o.order_number||o.id)}</td><td>${methodLabel(o.payment_method)}</td><td>+ ${money(o.total)}</td><td class="v39AdminOnlyCol">${(!currentEmployee||currentEmployee.role==='admin')?`<button type="button" class="cashCorrectionBtnV39" data-kind="income" data-id="${esc(o.id)}">Corregir</button>`:''}</td></tr>`).join(''):'<tr><td colspan="6">Sin ingresos para este período.</td></tr>'}
+      </tbody></table>
       <h3>Detalle de egresos</h3>
-      <table class="cashReportTable"><thead><tr><th>Cajero</th><th>Categoría</th><th>Descripción</th><th>Método</th><th>Monto</th></tr></thead><tbody>
-      ${expenses.length?expenses.map(e=>`<tr><td>${esc(staffMap.get(String(e.staff_id))||'Cajero')}</td><td>${esc(e.category||'Otros')}</td><td>${esc(e.description||'')}</td><td>${methodLabel(e.payment_method)}</td><td>− ${money(e.amount)}</td></tr>`).join(''):'<tr><td colspan="5">Sin egresos para este período.</td></tr>'}
+      <table class="cashReportTable"><thead><tr><th>Cajero</th><th>Categoría</th><th>Descripción</th><th>Método</th><th>Monto</th><th class="v39AdminOnlyCol">Acción</th></tr></thead><tbody>
+      ${expenses.length?expenses.map(e=>`<tr><td>${esc(staffMap.get(String(e.staff_id))||'Cajero')}</td><td>${esc(e.category||'Otros')}</td><td>${esc(e.description||'')}</td><td>${methodLabel(e.payment_method)}</td><td>− ${money(e.amount)}</td><td class="v39AdminOnlyCol">${(!currentEmployee||currentEmployee.role==='admin')?`<button type="button" class="cashCorrectionBtnV39" data-kind="expense" data-id="${esc(e.id)}">Corregir</button>`:''}</td></tr>`).join(''):'<tr><td colspan="6">Sin egresos para este período.</td></tr>'}
       </tbody></table>`;
   }
 
@@ -4334,6 +4338,109 @@ confirmChargeOrderV21=async function(){
   $v26('#cashReportCashier')?.addEventListener('change',renderCashReportV38);
   $v26('#cashReportDate')?.addEventListener('change',renderCashReportV38);
   $v26('#printCashReportBtn')?.addEventListener('click',()=>window.print());
+
+
+  /* ===== V39 DETALLE DE INGRESOS + CORRECCION ADMINISTRATIVA CON CLAVE ===== */
+  let cashCorrectionStateV39=null;
+
+  function fillCorrectionCashiersV39(selected){
+    const select=$v26('#cashCorrectionCashier');
+    if(!select)return;
+    const cashiers=activeCashiersV26();
+    select.innerHTML='<option value="">Sin asignar</option>'+cashiers.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+    select.value=selected?String(selected):'';
+  }
+
+  async function verifyAdminPasswordV39(password){
+    if(!password)return false;
+    const {data:{session},error:sessionError}=await db.auth.getSession();
+    if(sessionError||!session?.user?.email)throw new Error('No hay una sesión de administrador activa');
+    const originalUserId=session.user.id;
+    const {data,error}=await db.auth.signInWithPassword({email:session.user.email,password});
+    if(error||!data?.user||data.user.id!==originalUserId)return false;
+    return true;
+  }
+
+  async function openCashCorrectionV39(kind,id){
+    if(currentEmployee&&currentEmployee.role!=='admin')return toast('Solo el administrador puede corregir movimientos');
+    cashCorrectionStateV39={kind,id};
+    const title=$v26('#cashCorrectionTitle');
+    const categoryWrap=$v26('#cashCorrectionCategoryWrap');
+    const descriptionWrap=$v26('#cashCorrectionDescriptionWrap');
+    const referenceWrap=$v26('#cashCorrectionReferenceWrap');
+    if(kind==='income'){
+      const {data,error}=await db.from('orders').select('id,order_number,total,payment_method,cashier_id,created_at').eq('id',id).single();
+      if(error||!data)return toast('No se pudo cargar la venta');
+      cashCorrectionStateV39.row=data;
+      if(title)title.textContent=`Corregir ingreso · Venta #${data.order_number||data.id}`;
+      fillCorrectionCashiersV39(data.cashier_id);
+      $v26('#cashCorrectionAmount').value=Number(data.total||0).toFixed(2);
+      $v26('#cashCorrectionMethod').value=data.payment_method||'cash';
+      categoryWrap?.classList.add('hidden');descriptionWrap?.classList.add('hidden');referenceWrap?.classList.add('hidden');
+    }else{
+      const {data,error}=await db.from('financial_movements').select('id,amount,payment_method,staff_id,category,description,reference,movement_date').eq('id',id).single();
+      if(error||!data)return toast('No se pudo cargar el egreso');
+      cashCorrectionStateV39.row=data;
+      if(title)title.textContent='Corregir egreso';
+      fillCorrectionCashiersV39(data.staff_id);
+      $v26('#cashCorrectionAmount').value=Number(data.amount||0).toFixed(2);
+      $v26('#cashCorrectionMethod').value=data.payment_method||'cash';
+      $v26('#cashCorrectionCategory').value=data.category||'Otros';
+      $v26('#cashCorrectionDescription').value=data.description||'';
+      $v26('#cashCorrectionReference').value=data.reference||'';
+      categoryWrap?.classList.remove('hidden');descriptionWrap?.classList.remove('hidden');referenceWrap?.classList.remove('hidden');
+    }
+    $v26('#cashCorrectionPassword').value='';
+    $v26('#cashCorrectionModal')?.classList.remove('hidden');
+  }
+
+  $v26('#cashReportContent')?.addEventListener('click',e=>{
+    const btn=e.target.closest?.('.cashCorrectionBtnV39');
+    if(!btn)return;
+    openCashCorrectionV39(btn.dataset.kind,btn.dataset.id);
+  });
+
+  $$v26('[data-close="cashCorrectionModal"]').forEach(b=>b.addEventListener('click',()=>closeV26Modal('cashCorrectionModal')));
+
+  $v26('#saveCashCorrectionBtn')?.addEventListener('click',async()=>{
+    if(!cashCorrectionStateV39)return;
+    const btn=$v26('#saveCashCorrectionBtn');
+    const amount=Number($v26('#cashCorrectionAmount')?.value||0);
+    const cashierId=$v26('#cashCorrectionCashier')?.value||null;
+    const method=$v26('#cashCorrectionMethod')?.value||'cash';
+    const password=$v26('#cashCorrectionPassword')?.value||'';
+    if(!(amount>0))return toast('Ingresa un monto válido');
+    btn.disabled=true;btn.textContent='Verificando...';
+    try{
+      const ok=await verifyAdminPasswordV39(password);
+      if(!ok)return toast('Clave de administrador incorrecta');
+      btn.textContent='Guardando...';
+      if(cashCorrectionStateV39.kind==='income'){
+        const {error}=await db.from('orders').update({total:amount,payment_method:method,cashier_id:cashierId}).eq('id',cashCorrectionStateV39.id);
+        if(error)throw error;
+      }else{
+        const previous=cashCorrectionStateV39.row||{};
+        const description=($v26('#cashCorrectionDescription')?.value||'').trim();
+        const reference=($v26('#cashCorrectionReference')?.value||'').trim();
+        const marker=`[Corregido admin ${new Date().toLocaleString('es-EC')}]`;
+        const updatedDescription=description.includes('[Corregido admin')?description:`${description}${description?' · ':''}${marker}`;
+        const {error}=await db.from('financial_movements').update({
+          amount,
+          payment_method:method,
+          staff_id:cashierId,
+          category:$v26('#cashCorrectionCategory')?.value||previous.category||'Otros',
+          description:updatedDescription,
+          reference
+        }).eq('id',cashCorrectionStateV39.id);
+        if(error)throw error;
+      }
+      closeV26Modal('cashCorrectionModal');
+      await renderCashReportV38();
+      if(typeof loadFinance==='function')await loadFinance();
+      toast('Corrección guardada por administrador');
+    }catch(error){toast('No se pudo guardar la corrección: '+(error?.message||error))}
+    finally{btn.disabled=false;btn.textContent='Guardar corrección'}
+  });
 
   // Contabilidad: ocultar duplicados históricos evidentes de una misma venta en la vista y totales.
   // No borra registros. Conserva un solo ingreso por referencia "Venta #...".

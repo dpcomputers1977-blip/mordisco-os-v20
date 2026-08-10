@@ -57,6 +57,18 @@ body.posFocusMode #tab-pos .posEssentialData label{font-size:13px!important;}
 body.posFocusMode #tab-pos .posEssentialData input,body.posFocusMode #tab-pos .posEssentialData select{min-height:38px!important;font-size:14px!important;}
 body.posFocusMode #tab-pos .posChargeBtn{min-height:52px!important;font-size:16px!important;}
 @media(max-width:900px){body.posFocusMode #tab-pos .posLayout{grid-template-columns:minmax(0,1fr) 340px!important;}body.posFocusMode #tab-pos #posProducts{grid-template-columns:repeat(2,minmax(0,1fr))!important;}}
+
+/* ===== V39 DETALLE DE INGRESOS + CORRECCION ADMIN ===== */
+.cashCorrectionBtnV39{border:1px solid #d9c9a9;background:#fff7df;color:#221a0f;border-radius:9px;padding:6px 10px;font-weight:900;cursor:pointer}
+.cashCorrectionBtnV39:hover{background:#ffc400;color:#111}
+#cashCorrectionModal{z-index:10050!important}
+.cashCorrectionCardV39{max-width:560px!important}
+.cashCorrectionGridV39{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cashCorrectionGridV39 label{display:flex;flex-direction:column;gap:6px;font-weight:800}
+.cashCorrectionGridV39 input,.cashCorrectionGridV39 select,.cashCorrectionGridV39 textarea{width:100%;box-sizing:border-box}
+.cashCorrectionGridV39 .fullV39{grid-column:1/-1}
+@media(max-width:700px){.cashCorrectionGridV39{grid-template-columns:1fr}.cashCorrectionGridV39 .fullV39{grid-column:auto}}
+@media print{.v39AdminOnlyCol,.cashCorrectionBtnV39{display:none!important}}
 </style>
 
 <style id="mordisco-v27-final-pos">
@@ -1321,6 +1333,28 @@ body.posFocusMode #tab-pos .posChargeBtn{position:static!important;display:block
   </div>
 </div>
 
+
+<div id="cashCorrectionModal" class="modal hidden">
+  <div class="modalCard cashCorrectionCardV39">
+    <button class="close" type="button" data-close="cashCorrectionModal">×</button>
+    <span class="eyebrow">CONTROL ADMINISTRATIVO</span>
+    <h2 id="cashCorrectionTitle">Corregir movimiento</h2>
+    <p class="muted">Solo el administrador puede guardar cambios. Ingresa la clave de la cuenta administradora para confirmar.</p>
+    <div class="cashCorrectionGridV39">
+      <label>Cajero<select id="cashCorrectionCashier"></select></label>
+      <label>Monto<input id="cashCorrectionAmount" type="number" min="0.01" step="0.01"></label>
+      <label>Método<select id="cashCorrectionMethod">
+        <option value="cash">Efectivo</option><option value="deuna">DeUna</option><option value="ahorita">Ahorita</option><option value="transfer">Transferencia</option><option value="card">Tarjeta</option><option value="other">Otros</option>
+      </select></label>
+      <label id="cashCorrectionCategoryWrap">Categoría<input id="cashCorrectionCategory" placeholder="Categoría"></label>
+      <label id="cashCorrectionReferenceWrap" class="fullV39">Referencia<input id="cashCorrectionReference" placeholder="Factura, recibo o comprobante"></label>
+      <label id="cashCorrectionDescriptionWrap" class="fullV39">Descripción<textarea id="cashCorrectionDescription" rows="3"></textarea></label>
+      <label class="fullV39">Clave del administrador<input id="cashCorrectionPassword" type="password" autocomplete="current-password" placeholder="Ingresa la clave para autorizar"></label>
+      <button id="saveCashCorrectionBtn" class="primary full fullV39" type="button">Guardar corrección</button>
+    </div>
+  </div>
+</div>
+
 <div id="shiftPinModal" class="modal hidden">
   <div class="modalCard employeeLoginCard">
     <button class="close" data-close="shiftPinModal">×</button>
@@ -1334,9 +1368,9 @@ body.posFocusMode #tab-pos .posChargeBtn{position:static!important;display:block
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=v27-scroll-egresos-visible"></script>
+<script src="/admin-v18.js?v=v39-ingresos-correccion-admin"></script>
 
 
 
-<div id="v18VersionMarker">Mordisco OS V38</div>
+<div id="v18VersionMarker">Mordisco OS V39</div>
 </body></html>
