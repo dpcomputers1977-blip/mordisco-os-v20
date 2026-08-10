@@ -1,0 +1,10 @@
+MORDISCO OS V30 — CAJA SIN MENÚ LATERAL
+
+Cambio único y seguro:
+- Al entrar como cajero, el menú lateral administrativo se oculta completamente.
+- El POS ocupa todo el ancho disponible.
+- No se modifica Contabilidad.
+- No se modifica Informes.
+- No se modifica ninguna tabla ni dato de Supabase.
+
+Verificación: al publicar debe mostrarse "Mordisco OS V30".

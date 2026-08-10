@@ -4173,3 +4173,35 @@ body.posFocusMode #tab-pos .posChargeBtn{min-height:52px!important;height:52px!i
 
 /* V29 PUBLIC - marcador de archivo correcto */
 #v18VersionMarker{z-index:99999!important}
+
+
+/* ===== V35 CAJERO LIMPIO SIN TOCAR PANTALLA AMPLIA ===== */
+body.employeeMode[data-employee-role="cashier"] #adminView.adminShell{
+  grid-template-columns:minmax(0,1fr)!important;
+}
+body.employeeMode[data-employee-role="cashier"] #adminView>.sidebar,
+body.employeeMode[data-employee-role="cashier"] #adminView .adminTop{
+  display:none!important;
+}
+body.employeeMode[data-employee-role="cashier"] #adminView .adminContent{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:18px clamp(16px,2.2vw,30px) 30px!important;
+}
+body.employeeMode[data-employee-role="cashier"] #tab-pos{
+  width:100%!important;
+}
+body.employeeMode[data-employee-role="cashier"] .posHeader{
+  margin-top:0!important;
+}
+body.employeeMode[data-employee-role="cashier"] #exitPosFocusBtn{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  white-space:nowrap!important;
+}
+@media(max-width:760px){
+  body.employeeMode[data-employee-role="cashier"] #adminView .adminContent{padding:10px!important;}
+}

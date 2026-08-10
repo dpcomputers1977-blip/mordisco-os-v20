@@ -4414,3 +4414,32 @@ confirmChargeOrderV21=async function(){
   };
 })();
 
+
+
+/* ===== V35 SALIDA DE CAJA AISLADA ===== */
+(function(){
+  function isCashierV35(){
+    return document.body.classList.contains('employeeMode') &&
+      document.body.dataset.employeeRole==='cashier';
+  }
+  function prepareCashierExitV35(){
+    if(!isCashierV35())return;
+    const btn=document.querySelector('#exitPosFocusBtn');
+    if(btn){
+      btn.innerHTML='<span>←</span> Salir de Caja';
+      btn.title='Cerrar sesión del cajero';
+      btn.setAttribute('aria-label','Salir de Caja');
+    }
+  }
+  document.addEventListener('click',function(event){
+    const btn=event.target.closest?.('#exitPosFocusBtn');
+    if(!btn || !isCashierV35())return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    try{localStorage.removeItem('mordisco_employee')}catch{}
+    location.href='/staff';
+  },true);
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(prepareCashierExitV35,0));
+  window.addEventListener('pageshow',()=>setTimeout(prepareCashierExitV35,0));
+  setTimeout(prepareCashierExitV35,400);
+})();
