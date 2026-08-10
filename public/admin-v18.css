@@ -4253,3 +4253,52 @@ body.moduleFocusV21 #adminView.adminV21 .adminContent{
 body.moduleFocusV21 #adminView.adminV21 .tab:not(.hidden){
   min-height:calc(100vh - 72px)!important;
 }
+
+
+/* ===== V38 INFORME DE CAJA POR CAJERO + EGRESOS VISIBLES ===== */
+.cashQuickActionsV27{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:10px!important;
+  margin:10px 0 12px!important;
+}
+.cashExpenseBtnV27,.cashReportBtnV27{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  min-height:48px!important;
+  border:0!important;
+  border-radius:12px!important;
+  font-weight:900!important;
+  font-size:14px!important;
+  padding:10px 12px!important;
+}
+.cashExpenseBtnV27{background:#c9362b!important;color:#fff!important}
+.cashReportBtnV27{background:#11100e!important;color:#fff!important}
+.cashReportControlsV38{
+  display:grid;
+  grid-template-columns:minmax(230px,1fr) 150px minmax(190px,240px) auto;
+  gap:12px;
+  align-items:end;
+  padding:18px 20px;
+  border-bottom:1px solid #e7dfd2;
+  background:#fffaf0;
+}
+.cashReportControlsV38 h2{margin:3px 0 2px;font-size:1.45rem}
+.cashReportControlsV38 p{margin:0}
+.cashReportControlsV38 label{font-weight:800;font-size:.86rem}
+.cashReportControlsV38 input,.cashReportControlsV38 select{width:100%;margin-top:5px;min-height:42px}
+.cashReportControlsV38 button{min-height:42px;white-space:nowrap}
+.cashReportSubtitleV38{text-align:center;margin:-6px 0 14px;color:#555;font-weight:700}
+.cashReportPaymentGridV38{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin:10px 0 20px}
+.cashReportPaymentGridV38>div{border:1px solid #e6dfd3;border-radius:10px;padding:9px;background:#faf7f0}
+.cashReportPaymentGridV38 span{display:block;font-size:.75rem;color:#666}
+.cashReportPaymentGridV38 strong{font-size:1rem}
+@media(max-width:850px){
+  .cashQuickActionsV27{grid-template-columns:1fr!important}
+  .cashReportControlsV38{grid-template-columns:1fr!important}
+  .cashReportPaymentGridV38{grid-template-columns:repeat(2,1fr)}
+}
+@media print{
+  .cashReportControlsV38{display:none!important}
+}

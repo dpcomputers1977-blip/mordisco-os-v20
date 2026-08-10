@@ -4241,22 +4241,43 @@ confirmChargeOrderV21=async function(){
     toast('Egreso registrado para el cajero');
   });
 
-  async function getCashReportDataV26(){
-    const day=todayV26();
+  function fillCashReportCashiersV38(){
+    const select=$v26('#cashReportCashier');
+    if(!select)return;
+    const cashiers=activeCashiersV26();
+    select.innerHTML='<option value="">Todos los cajeros</option>'+cashiers.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+    if(currentEmployee?.role==='cashier'){
+      select.value=String(currentEmployee.id);
+      select.disabled=true;
+    }else{
+      select.disabled=false;
+    }
+  }
+
+  async function getCashReportDataV26(day){
+    day=day||todayV26();
     const start=day+'T00:00:00';
-    const end=new Date(new Date(start).getTime()+86400000).toISOString();
+    const endDate=new Date(start);
+    endDate.setDate(endDate.getDate()+1);
+    const end=endDate.toISOString();
     const [ordersRes,expensesRes]=await Promise.all([
       db.from('orders').select('id,order_number,total,payment_method,payment_status,cashier_id,created_at').eq('payment_status','paid').gte('created_at',start).lt('created_at',end),
-      db.from('financial_movements').select('id,amount,payment_method,staff_id,category,description,movement_date,created_at').eq('type','expense').eq('movement_date',day)
+      db.from('financial_movements').select('id,amount,payment_method,staff_id,category,description,reference,movement_date,created_at').eq('type','expense').eq('movement_date',day)
     ]);
     if(ordersRes.error)throw ordersRes.error;
     if(expensesRes.error)throw expensesRes.error;
     return {orders:ordersRes.data||[],expenses:expensesRes.data||[]};
   }
 
-  function buildCashReportV26(orders,expenses){
+  function buildCashReportV26(orders,expenses,cashierId='',day=todayV26()){
     const staffMap=new Map((staffMembers||[]).map(s=>[String(s.id),s.name]));
+    const selectedId=String(cashierId||'');
+    if(selectedId){
+      orders=orders.filter(o=>String(o.cashier_id||'')===selectedId);
+      expenses=expenses.filter(e=>String(e.staff_id||'')===selectedId);
+    }
     const ids=new Set([...orders.map(o=>o.cashier_id),...expenses.map(e=>e.staff_id)].filter(Boolean).map(String));
+    if(selectedId)ids.add(selectedId);
     const rows=[...ids].map(id=>{
       const sales=orders.filter(o=>String(o.cashier_id||'')===id);
       const exps=expenses.filter(e=>String(e.staff_id||'')===id);
@@ -4266,32 +4287,52 @@ confirmChargeOrderV21=async function(){
     }).sort((a,b)=>a.name.localeCompare(b.name));
     const salesTotal=orders.reduce((a,o)=>a+Number(o.total||0),0);
     const expenseTotal=expenses.reduce((a,e)=>a+Number(e.amount||0),0);
-    return `<div class="cashReportHeader"><span class="eyebrow">MORDISCO FAST FOOD</span><h2>Informe de caja</h2><p>${new Date().toLocaleDateString('es-EC',{dateStyle:'full'})}</p></div>
+    const methods=['cash','deuna','ahorita','transfer','card','other'];
+    const methodNames={cash:'Efectivo',deuna:'DeUna',ahorita:'Ahorita',transfer:'Transferencia',card:'Tarjeta',other:'Otros'};
+    const methodTotals=Object.fromEntries(methods.map(m=>[m,orders.filter(o=>String(o.payment_method||'other')===m).reduce((a,o)=>a+Number(o.total||0),0)]));
+    const cashierName=selectedId?(staffMap.get(selectedId)||'Cajero'):'Todos los cajeros';
+    const labelDate=new Date(day+'T12:00:00').toLocaleDateString('es-EC',{dateStyle:'long'});
+    return `<div class="cashReportHeader"><span class="eyebrow">MORDISCO FAST FOOD</span><h2>Informe de caja</h2><p>${esc(labelDate)}</p></div>
+      <div class="cashReportSubtitleV38">${esc(cashierName)}</div>
       <div class="cashReportTotals">
-        <div><span>Ventas cobradas</span><strong>${money(salesTotal)}</strong></div>
-        <div><span>Egresos</span><strong>− ${money(expenseTotal)}</strong></div>
-        <div><span>Saldo neto</span><strong>${money(salesTotal-expenseTotal)}</strong></div>
+        <div><span>Ventas cobradas</span><strong>${money(salesTotal)}</strong><small>${orders.length} ventas</small></div>
+        <div><span>Egresos</span><strong>− ${money(expenseTotal)}</strong><small>Pagos registrados</small></div>
+        <div><span>Saldo neto</span><strong>${money(salesTotal-expenseTotal)}</strong><small>Ventas − egresos</small></div>
       </div>
-      <h3>Resumen por cajero</h3>
+      <h3>Detalle por forma de pago</h3>
+      <div class="cashReportPaymentGridV38">${methods.map(m=>`<div><span>${methodNames[m]}</span><strong>${money(methodTotals[m])}</strong></div>`).join('')}</div>
+      <h3>Ventas por cajero</h3>
       <table class="cashReportTable"><thead><tr><th>Cajero</th><th>Ventas</th><th>Cobrado</th><th>Egresos</th><th>Neto</th></tr></thead><tbody>
-      ${rows.length?rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${r.salesCount}</td><td>${money(r.salesTotal)}</td><td>− ${money(r.expenseTotal)}</td><td><b>${money(r.net)}</b></td></tr>`).join(''):'<tr><td colspan="5">No hay movimientos registrados hoy.</td></tr>'}
+      ${rows.length?rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${r.salesCount}</td><td>${money(r.salesTotal)}</td><td>− ${money(r.expenseTotal)}</td><td><b>${money(r.net)}</b></td></tr>`).join(''):'<tr><td colspan="5">No hay movimientos registrados para este cajero.</td></tr>'}
       </tbody></table>
       <h3>Detalle de egresos</h3>
       <table class="cashReportTable"><thead><tr><th>Cajero</th><th>Categoría</th><th>Descripción</th><th>Método</th><th>Monto</th></tr></thead><tbody>
-      ${expenses.length?expenses.map(e=>`<tr><td>${esc(staffMap.get(String(e.staff_id))||'Cajero')}</td><td>${esc(e.category||'Otros')}</td><td>${esc(e.description||'')}</td><td>${methodLabel(e.payment_method)}</td><td>− ${money(e.amount)}</td></tr>`).join(''):'<tr><td colspan="5">Sin egresos.</td></tr>'}
+      ${expenses.length?expenses.map(e=>`<tr><td>${esc(staffMap.get(String(e.staff_id))||'Cajero')}</td><td>${esc(e.category||'Otros')}</td><td>${esc(e.description||'')}</td><td>${methodLabel(e.payment_method)}</td><td>− ${money(e.amount)}</td></tr>`).join(''):'<tr><td colspan="5">Sin egresos para este período.</td></tr>'}
       </tbody></table>`;
   }
 
-  $v26('#cashReportBtn')?.addEventListener('click',async()=>{
-    const btn=$v26('#cashReportBtn');btn.disabled=true;const old=btn.textContent;btn.textContent='Preparando...';
+  async function renderCashReportV38(){
+    const day=$v26('#cashReportDate')?.value||todayV26();
+    const cashierId=$v26('#cashReportCashier')?.value||'';
+    const refresh=$v26('#refreshCashReportBtn');
+    if(refresh){refresh.disabled=true;refresh.textContent='Generando...'}
     try{
-      const {orders,expenses}=await getCashReportDataV26();
-      $v26('#cashReportContent').innerHTML=buildCashReportV26(orders,expenses);
-      $v26('#cashReportModal')?.classList.remove('hidden');
+      const {orders,expenses}=await getCashReportDataV26(day);
+      $v26('#cashReportContent').innerHTML=buildCashReportV26(orders,expenses,cashierId,day);
     }catch(error){toast('No se pudo preparar el informe: '+error.message)}
-    finally{btn.disabled=false;btn.textContent=old}
+    finally{if(refresh){refresh.disabled=false;refresh.textContent='Generar informe'}}
+  }
+
+  $v26('#cashReportBtn')?.addEventListener('click',async()=>{
+    fillCashReportCashiersV38();
+    if($v26('#cashReportDate'))$v26('#cashReportDate').value=todayV26();
+    $v26('#cashReportModal')?.classList.remove('hidden');
+    await renderCashReportV38();
   });
 
+  $v26('#refreshCashReportBtn')?.addEventListener('click',renderCashReportV38);
+  $v26('#cashReportCashier')?.addEventListener('change',renderCashReportV38);
+  $v26('#cashReportDate')?.addEventListener('change',renderCashReportV38);
   $v26('#printCashReportBtn')?.addEventListener('click',()=>window.print());
 
   // Contabilidad: ocultar duplicados históricos evidentes de una misma venta en la vista y totales.
