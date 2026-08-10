@@ -4325,3 +4325,35 @@ confirmChargeOrderV21=async function(){
     return !error&&(data||[]).length>0;
   };
 })();
+
+/* ===== V27 CONTABILIDAD: DESDUPLICACION ROBUSTA ===== */
+(function(){
+  function saleKey(x){
+    if(!x || x.type!=='income') return null;
+    const cat=String(x.category||'').trim().toLowerCase();
+    if(cat!=='ventas') return null;
+    const ref=String(x.reference||'').trim().toLowerCase();
+    const m=ref.match(/venta\s*#\s*([^\s]+)/i);
+    return m ? 'sale:'+m[1] : (ref ? 'ref:'+ref : null);
+  }
+  window.dedupeFinanceRowsV27=function(rows){
+    const seen=new Set(), out=[];
+    for(const x of (rows||[])){
+      const k=saleKey(x);
+      if(k){ if(seen.has(k)) continue; seen.add(k); }
+      out.push(x);
+    }
+    return out;
+  };
+  const oldLoad=typeof loadFinance==='function'?loadFinance:null;
+  if(oldLoad){
+    loadFinance=async function(){
+      const start=$('#financeStart')?.value||new Date().toISOString().slice(0,10);
+      const end=$('#financeEnd')?.value||new Date().toISOString().slice(0,10);
+      const {data,error}=await db.from('financial_movements').select('*,staff(name)').gte('movement_date',start).lt('movement_date',end).order('movement_date',{ascending:false}).order('created_at',{ascending:false});
+      if(error)return toast(error.message);
+      financeMovements=window.dedupeFinanceRowsV27(data||[]);
+      renderFinance();
+    };
+  }
+})();
