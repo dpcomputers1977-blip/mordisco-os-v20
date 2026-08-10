@@ -3996,3 +3996,128 @@ body.posFocusMode #tab-pos .posPendingTopV23 .posPendingHeader p{display:none!im
   body.posFocusMode #tab-pos .posDetailsToggle{display:none!important}
   body.posFocusMode #tab-pos .posOptionalDetails{display:none!important}
 }
+
+/* ============================================================
+   V24 — CAJA LEGIBLE: TAMAÑO NORMAL + SCROLL DONDE CORRESPONDE
+   ============================================================ */
+body.posFocusMode{
+  font-size:16px!important;
+}
+body.posFocusMode #tab-pos{
+  padding:8px!important;
+  gap:8px!important;
+}
+body.posFocusMode #adminCashControl{
+  flex:0 0 72px!important;
+  min-height:72px!important;
+  padding:10px 16px!important;
+}
+body.posFocusMode #adminCashControl .eyebrow{font-size:.72rem!important}
+body.posFocusMode #adminCashControl h3{font-size:1rem!important;margin:2px 0!important}
+body.posFocusMode #adminCashControl p{font-size:.78rem!important;margin:2px 0!important}
+body.posFocusMode .posHeader{
+  flex:0 0 96px!important;
+  min-height:96px!important;
+  padding:10px 14px!important;
+}
+body.posFocusMode .posFocusLogo{width:52px!important;height:52px!important;flex-basis:52px!important}
+body.posFocusMode .posHeader .eyebrow{font-size:.75rem!important}
+body.posFocusMode .posHeader h2{font-size:1.45rem!important;margin:2px 0 4px!important}
+body.posFocusMode .posHeader p{font-size:.82rem!important}
+body.posFocusMode .posHeaderStats{min-width:175px!important;padding:9px 12px!important}
+body.posFocusMode .posHeaderStats span{font-size:.78rem!important}
+body.posFocusMode .posHeaderStats b{font-size:.9rem!important}
+body.posFocusMode .posHeaderStats strong{font-size:1.35rem!important}
+body.posFocusMode #tab-pos .posLayout{
+  grid-template-columns:minmax(0,1fr) minmax(360px,38vw)!important;
+  gap:10px!important;
+}
+body.posFocusMode #tab-pos .posCatalog{padding:10px!important}
+body.posFocusMode #tab-pos .posCatalogTop input{height:42px!important;font-size:.95rem!important;padding:8px 12px!important}
+body.posFocusMode #tab-pos .categoryChips button{font-size:.84rem!important;min-height:38px!important;padding:7px 13px!important}
+body.posFocusMode #tab-pos #posProducts{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  grid-auto-rows:172px!important;
+  gap:10px!important;
+  overflow-y:auto!important;
+  align-content:start!important;
+}
+body.posFocusMode #tab-pos #posProducts .posProduct{
+  height:172px!important;
+  min-height:172px!important;
+  max-height:172px!important;
+}
+body.posFocusMode #tab-pos #posProducts .posProduct img,
+body.posFocusMode #tab-pos #posProducts .posProductNoImage{
+  height:88px!important;
+  min-height:88px!important;
+  max-height:88px!important;
+  flex-basis:88px!important;
+}
+body.posFocusMode #tab-pos #posProducts .posProductInfo{padding:7px 9px!important}
+body.posFocusMode #tab-pos #posProducts .posProductInfo small{font-size:.72rem!important;margin-bottom:2px!important}
+body.posFocusMode #tab-pos #posProducts .posProductInfo b{
+  min-height:31px!important;
+  max-height:31px!important;
+  font-size:.88rem!important;
+  line-height:1.08!important;
+  overflow:hidden!important;
+}
+body.posFocusMode #tab-pos #posProducts .posProductInfo strong{font-size:1rem!important;margin-top:5px!important}
+
+body.posFocusMode #tab-pos .posTicket{
+  padding:11px 12px!important;
+  gap:7px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+}
+body.posFocusMode #tab-pos .posTicketTitle h3{font-size:1.45rem!important}
+body.posFocusMode #tab-pos .posTicketTitle .eyebrow{font-size:.72rem!important}
+body.posFocusMode #tab-pos .posClearBtn{font-size:.85rem!important;padding:8px 10px!important}
+body.posFocusMode #tab-pos .posPendingTopV23{
+  min-height:138px!important;
+  max-height:158px!important;
+  padding:9px 10px!important;
+  overflow:hidden!important;
+}
+body.posFocusMode #tab-pos .posPendingTopV23 .posPendingHeader h3{font-size:1rem!important}
+body.posFocusMode #tab-pos .posPendingTopV23 .pendingCount{font-size:.78rem!important}
+body.posFocusMode #tab-pos .posPendingTopV23 .posPendingOrders{max-height:104px!important;gap:8px!important}
+body.posFocusMode #tab-pos .posPendingTopV23 .posPendingCard{
+  min-height:92px!important;
+  max-height:100px!important;
+  padding:8px 9px!important;
+}
+body.posFocusMode #tab-pos .posPendingTopV23 .posPendingInfo h4{font-size:.95rem!important}
+body.posFocusMode #tab-pos .posPendingTopV23 .posPendingInfo p{font-size:.78rem!important;max-width:175px!important}
+body.posFocusMode #tab-pos .posPendingTopV23 .posPendingInfo small{font-size:.72rem!important}
+body.posFocusMode #tab-pos .posPendingTopV23 .posPendingPayment strong{font-size:1.15rem!important}
+body.posFocusMode #tab-pos .posPendingTopV23 .posPayNowBtn{
+  min-width:145px!important;
+  min-height:42px!important;
+  height:42px!important;
+  font-size:.9rem!important;
+  padding:7px 12px!important;
+}
+body.posFocusMode #tab-pos .posCart{min-height:56px!important;max-height:95px!important;font-size:.84rem!important}
+body.posFocusMode #tab-pos .posTotals{font-size:.9rem!important;padding:7px 0!important}
+body.posFocusMode #tab-pos .posTotals strong{font-size:1.35rem!important}
+body.posFocusMode #tab-pos .preDiscountBox{font-size:.82rem!important;padding:7px!important}
+body.posFocusMode #tab-pos .quickDiscounts button{font-size:.82rem!important;min-height:36px!important}
+body.posFocusMode #tab-pos .posEssentialData label{font-size:.78rem!important}
+body.posFocusMode #tab-pos .posEssentialData input,
+body.posFocusMode #tab-pos .posEssentialData select{height:36px!important;min-height:36px!important;font-size:.82rem!important}
+body.posFocusMode #tab-pos .posChargeBtn{min-height:48px!important;height:48px!important;font-size:1rem!important}
+
+@media(max-width:1100px) and (min-width:821px){
+  body.posFocusMode #tab-pos .posLayout{grid-template-columns:minmax(0,1fr) 350px!important}
+  body.posFocusMode #tab-pos #posProducts{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media(max-height:700px) and (min-width:821px){
+  body.posFocusMode #adminCashControl{flex-basis:64px!important;min-height:64px!important}
+  body.posFocusMode .posHeader{flex-basis:84px!important;min-height:84px!important}
+  body.posFocusMode #tab-pos #posProducts{grid-auto-rows:160px!important}
+  body.posFocusMode #tab-pos #posProducts .posProduct{height:160px!important;min-height:160px!important;max-height:160px!important}
+  body.posFocusMode #tab-pos #posProducts .posProduct img,
+  body.posFocusMode #tab-pos #posProducts .posProductNoImage{height:78px!important;min-height:78px!important;max-height:78px!important}
+}

@@ -1,15 +1,12 @@
-MORDISCO OS V22 — CAJA VISIBLE
+MORDISCO OS V24 — CAJA LEGIBLE
 
 Cambios:
-- POS ajustado a la altura real de la pantalla.
-- Pedidos pendientes de cobro visibles dentro del panel derecho.
-- Pedidos enviados desde Mesas aparecen en Caja con botón COBRAR AHORA.
-- Al cobrar un pedido de mesa, la mesa se libera automáticamente.
-- El botón ENVIAR A COCINA queda siempre accesible.
+- Se eliminó el diseño excesivamente pequeño del POS.
+- Catálogo en 3 columnas con tarjetas y texto más grandes.
+- Los productos usan scroll vertical en lugar de reducirse para intentar mostrar todo de una vez.
+- Panel derecho más ancho y legible.
+- Pedidos por cobrar de mesas arriba con botón COBRAR AHORA grande.
+- La caja conserva scroll interno para que todos los controles sigan siendo utilizables.
 
-Reemplaza estos tres archivos en el proyecto publicado:
-  admin.html
-  admin-v18.js
-  admin-v18.css
-
-Después publica y pulsa Ctrl+F5 en el navegador.
+Reemplaza admin.html, admin-v18.js y admin-v18.css en tu proyecto y vuelve a publicar.
+Después usa Ctrl+F5. Si el navegador quedó con zoom cambiado, usa también Ctrl+0 una sola vez para volver a 100%.
