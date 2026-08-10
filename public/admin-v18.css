@@ -4174,29 +4174,27 @@ body.posFocusMode #tab-pos .posChargeBtn{min-height:52px!important;height:52px!i
 /* V29 PUBLIC - marcador de archivo correcto */
 #v18VersionMarker{z-index:99999!important}
 
-/* ============================================================
-   V30 — CAJERO: POS LIMPIO SIN MENÚ ADMINISTRATIVO
-   No afecta administrador, contabilidad, informes ni datos.
-   ============================================================ */
-body.employeeMode[data-employee-role="cashier"] .sidebar,
-body.employeeMode[data-employee-role="cashier"] .topbar{
-  display:none !important;
+/* ===== V31: CAJA DE EMPLEADO LIMPIA =====
+   En modo cajero se muestra únicamente el POS.
+   No altera ventas, informes, contabilidad ni Supabase. */
+body.employeeMode[data-employee-role="cashier"] #adminView.adminShell{
+  grid-template-columns:minmax(0,1fr)!important;
 }
-body.employeeMode[data-employee-role="cashier"] .adminShell{
-  display:block !important;
-  grid-template-columns:1fr !important;
-  width:100% !important;
-  max-width:none !important;
+body.employeeMode[data-employee-role="cashier"] #adminView .sidebar,
+body.employeeMode[data-employee-role="cashier"] #adminView .adminTop,
+body.employeeMode[data-employee-role="cashier"] #exitPosFocusBtn,
+body.employeeMode[data-employee-role="cashier"] #toggleModuleFocus{
+  display:none!important;
 }
-body.employeeMode[data-employee-role="cashier"] .adminMain,
-body.employeeMode[data-employee-role="cashier"] .mainContent,
-body.employeeMode[data-employee-role="cashier"] .dashboardMain,
-body.employeeMode[data-employee-role="cashier"] main{
-  margin-left:0 !important;
-  width:100% !important;
-  max-width:none !important;
+body.employeeMode[data-employee-role="cashier"] #adminView .adminContent{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:18px clamp(14px,2vw,26px) 32px!important;
 }
 body.employeeMode[data-employee-role="cashier"] #tab-pos{
-  width:100% !important;
-  max-width:none !important;
+  margin:0!important;
+}
+body.employeeMode[data-employee-role="cashier"].posFocusMode #tab-pos{
+  padding-top:0!important;
 }
