@@ -4327,72 +4327,119 @@ confirmChargeOrderV21=async function(){
   };
 })();
 
-/* ===== V33 CONTABILIDAD: CONSERVAR CARGA ORIGINAL + OCULTAR DUPLICADOS EN PANTALLA ===== */
+/* ===== V28 CONTABILIDAD: UNA SOLA FILA POR NUMERO DE VENTA ===== */
 (function(){
-  function saleNumberV33(row){
-    if(!row || row.type!=='income')return null;
-    if(String(row.category||'').trim().toLowerCase()!=='ventas')return null;
-    const text=[row.description,row.reference].filter(Boolean).join(' ');
+  function normalizeSaleNumberV28(value){
+    const text=String(value||'').trim();
     const match=text.match(/venta\s*#\s*([0-9a-z_-]+)/i);
-    return match?String(match[1]).toLowerCase():null;
+    return match ? String(match[1]).toLowerCase() : null;
   }
 
-  function dedupeFinanceForDisplayV33(rows){
+  function saleKeyV28(x){
+    if(!x || x.type!=='income')return null;
+    if(String(x.category||'').trim().toLowerCase()!=='ventas')return null;
+
+    // En Mordisco OS el numero de venta puede venir en description (ej. "Venta #33")
+    // o en reference, dependiendo de la version del RPC/trigger instalada.
+    const number=
+      normalizeSaleNumberV28(x.description)||
+      normalizeSaleNumberV28(x.reference);
+
+    if(number)return 'sale:'+number;
+
+    // Respaldo solo para ingresos de venta antiguos sin numero visible.
+    return [
+      'legacy-sale',
+      String(x.movement_date||''),
+      Number(x.amount||0).toFixed(2),
+      String(x.payment_method||''),
+      String(x.staff_id||x.staff?.id||''),
+      String(x.description||'').trim().toLowerCase(),
+      String(x.reference||'').trim().toLowerCase()
+    ].join('|');
+  }
+
+  window.dedupeFinanceRowsV28=function(rows){
     const seen=new Set();
-    return (rows||[]).filter(row=>{
-      const number=saleNumberV33(row);
-      if(!number)return true;
-      if(seen.has(number))return false;
-      seen.add(number);
-      return true;
-    });
-  }
+    const clean=[];
+    let hidden=0;
+    for(const row of (rows||[])){
+      const key=saleKeyV28(row);
+      if(key){
+        if(seen.has(key)){hidden++;continue;}
+        seen.add(key);
+      }
+      clean.push(row);
+    }
+    window.mordiscoFinanceDuplicatesHidden=hidden;
+    return clean;
+  };
 
-  const originalRenderFinanceV33=renderFinance;
+  // Reemplaza la carga de Contabilidad para que los totales y la tabla usen
+  // exactamente una sola fila por numero de venta.
+  loadFinance=async function(){
+    let start,end;
+    if($('#financeStart') && $('#financeEnd')){
+      start=$('#financeStart').value||new Date().toISOString().slice(0,10);
+      const endSelected=$('#financeEnd').value||start;
+      const d=new Date(endSelected+'T00:00:00');
+      d.setDate(d.getDate()+1);
+      end=d.toISOString().slice(0,10);
+    }else{
+      const month=$('#financeMonth')?.value||new Date().toISOString().slice(0,7);
+      start=month+'-01';
+      end=new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),1).toISOString().slice(0,10);
+    }
+
+    const {data,error}=await db.from('financial_movements')
+      .select('*,staff(name)')
+      .gte('movement_date',start)
+      .lt('movement_date',end)
+      .order('movement_date',{ascending:false})
+      .order('created_at',{ascending:false});
+
+    if(error)return toast('Error cargando contabilidad: '+error.message);
+    financeMovements=window.dedupeFinanceRowsV28(data||[]);
+    renderFinance();
+  };
+
+  // Refuerzo extra: incluso si otra funcion vuelve a llenar financeMovements,
+  // renderFinance nunca sumara dos veces el mismo numero de venta.
+  const renderFinanceBaseV28=renderFinance;
   renderFinance=function(){
-    const originalRows=financeMovements;
-    financeMovements=dedupeFinanceForDisplayV33(originalRows);
-    try{return originalRenderFinanceV33();}
-    finally{financeMovements=originalRows;}
+    const saved=financeMovements;
+    financeMovements=window.dedupeFinanceRowsV28(saved||[]);
+    try{return renderFinanceBaseV28();}
+    finally{financeMovements=saved;}
   };
 })();
 
 
-/* ============================================================
-   V33 — SALIDA REAL DE CAJA PARA CAJERO
-   No toca caja administrativa, ventas, informes ni Supabase.
-   ============================================================ */
+
+/* ===== V35 SALIDA DE CAJA AISLADA ===== */
 (function(){
-  function isCashierEmployeeMode(){
+  function isCashierV35(){
     return document.body.classList.contains('employeeMode') &&
       document.body.dataset.employeeRole==='cashier';
   }
-
-  function applyCashierPosV33(){
-    if(!isCashierEmployeeMode())return;
-    document.body.classList.remove('posFocusMode','moduleFocusV21');
-    document.documentElement.classList.remove('posFocusModeRoot');
-    document.body.classList.add('cashierPosV33');
-    document.documentElement.classList.add('cashierPosV33Root');
+  function prepareCashierExitV35(){
+    if(!isCashierV35())return;
     const btn=document.querySelector('#exitPosFocusBtn');
     if(btn){
       btn.innerHTML='<span>←</span> Salir de Caja';
-      btn.setAttribute('title','Cerrar sesión del cajero');
+      btn.title='Cerrar sesión del cajero';
       btn.setAttribute('aria-label','Salir de Caja');
     }
   }
-
   document.addEventListener('click',function(event){
     const btn=event.target.closest?.('#exitPosFocusBtn');
-    if(!btn || !isCashierEmployeeMode())return;
+    if(!btn || !isCashierV35())return;
     event.preventDefault();
     event.stopImmediatePropagation();
-    try{ localStorage.removeItem('mordisco_employee'); }catch{}
-    window.location.replace('/staff');
+    try{localStorage.removeItem('mordisco_employee')}catch{}
+    location.href='/staff';
   },true);
-
-  window.addEventListener('load',()=>setTimeout(applyCashierPosV33,0));
-  window.addEventListener('pageshow',()=>setTimeout(applyCashierPosV33,0));
-  document.addEventListener('DOMContentLoaded',()=>setTimeout(applyCashierPosV33,0));
-  setTimeout(applyCashierPosV33,350);
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(prepareCashierExitV35,0));
+  window.addEventListener('pageshow',()=>setTimeout(prepareCashierExitV35,0));
+  setTimeout(prepareCashierExitV35,400);
 })();
