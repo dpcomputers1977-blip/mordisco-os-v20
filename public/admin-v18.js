@@ -198,12 +198,6 @@ async function init(){
     const targetButton=$(`.sidebar [data-tab="${target}"]`);
     if(targetButton)targetButton.click();
 
-    if(savedEmployee.role==='cashier'){
-      setPosFocusMode(true);
-      const exitBtn=$('#exitPosFocusBtn');
-      if(exitBtn)exitBtn.innerHTML='<span>←</span> Salir de Caja';
-    }
-
     subscribeOrdersRealtime();
     return;
   }
@@ -4119,15 +4113,6 @@ document.querySelector('#exitPosFocusBtn')?.addEventListener('click',event=>{
   event.preventDefault();
   event.stopImmediatePropagation();
 
-  // En modo cajero, este es el único botón de salida: cierra la sesión local
-  // del empleado y vuelve al acceso de personal. No toca caja, ventas ni Supabase.
-  if(document.body.classList.contains('employeeMode') && currentEmployee?.role==='cashier'){
-    localStorage.removeItem('mordisco_employee');
-    localStorage.removeItem('mordisco_employee_session');
-    window.location.assign('/staff');
-    return;
-  }
-
   if(typeof exitPosToAdministratorV21==='function'){
     exitPosToAdministratorV21();
     return;
@@ -4318,13 +4303,11 @@ confirmChargeOrderV21=async function(){
       const source=financeMovements||[];
       const clean=[];
       for(const x of source){
-        if(x.type==='income'&&String(x.category||'').trim().toLowerCase()==='ventas'){
-          const saleText=`${x.description||''} ${x.reference||''}`;
-          const match=saleText.match(/venta\s*#\s*([0-9a-z_-]+)/i);
-          if(match){
-            const key='venta#'+String(match[1]).toLowerCase();
-            if(seenSales.has(key))continue;
-            seenSales.add(key);
+        if(x.type==='income'&&String(x.category||'').toLowerCase()==='ventas'){
+          const ref=String(x.reference||'').trim().toLowerCase();
+          if(ref&&/^venta\s*#/.test(ref)){
+            if(seenSales.has(ref))continue;
+            seenSales.add(ref);
           }
         }
         clean.push(x);
@@ -4344,3 +4327,72 @@ confirmChargeOrderV21=async function(){
   };
 })();
 
+/* ===== V33 CONTABILIDAD: CONSERVAR CARGA ORIGINAL + OCULTAR DUPLICADOS EN PANTALLA ===== */
+(function(){
+  function saleNumberV33(row){
+    if(!row || row.type!=='income')return null;
+    if(String(row.category||'').trim().toLowerCase()!=='ventas')return null;
+    const text=[row.description,row.reference].filter(Boolean).join(' ');
+    const match=text.match(/venta\s*#\s*([0-9a-z_-]+)/i);
+    return match?String(match[1]).toLowerCase():null;
+  }
+
+  function dedupeFinanceForDisplayV33(rows){
+    const seen=new Set();
+    return (rows||[]).filter(row=>{
+      const number=saleNumberV33(row);
+      if(!number)return true;
+      if(seen.has(number))return false;
+      seen.add(number);
+      return true;
+    });
+  }
+
+  const originalRenderFinanceV33=renderFinance;
+  renderFinance=function(){
+    const originalRows=financeMovements;
+    financeMovements=dedupeFinanceForDisplayV33(originalRows);
+    try{return originalRenderFinanceV33();}
+    finally{financeMovements=originalRows;}
+  };
+})();
+
+
+/* ============================================================
+   V33 — SALIDA REAL DE CAJA PARA CAJERO
+   No toca caja administrativa, ventas, informes ni Supabase.
+   ============================================================ */
+(function(){
+  function isCashierEmployeeMode(){
+    return document.body.classList.contains('employeeMode') &&
+      document.body.dataset.employeeRole==='cashier';
+  }
+
+  function applyCashierPosV33(){
+    if(!isCashierEmployeeMode())return;
+    document.body.classList.remove('posFocusMode','moduleFocusV21');
+    document.documentElement.classList.remove('posFocusModeRoot');
+    document.body.classList.add('cashierPosV33');
+    document.documentElement.classList.add('cashierPosV33Root');
+    const btn=document.querySelector('#exitPosFocusBtn');
+    if(btn){
+      btn.innerHTML='<span>←</span> Salir de Caja';
+      btn.setAttribute('title','Cerrar sesión del cajero');
+      btn.setAttribute('aria-label','Salir de Caja');
+    }
+  }
+
+  document.addEventListener('click',function(event){
+    const btn=event.target.closest?.('#exitPosFocusBtn');
+    if(!btn || !isCashierEmployeeMode())return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    try{ localStorage.removeItem('mordisco_employee'); }catch{}
+    window.location.replace('/staff');
+  },true);
+
+  window.addEventListener('load',()=>setTimeout(applyCashierPosV33,0));
+  window.addEventListener('pageshow',()=>setTimeout(applyCashierPosV33,0));
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(applyCashierPosV33,0));
+  setTimeout(applyCashierPosV33,350);
+})();

@@ -4175,29 +4175,114 @@ body.posFocusMode #tab-pos .posChargeBtn{min-height:52px!important;height:52px!i
 #v18VersionMarker{z-index:99999!important}
 
 
-/* ===== V32 CAJA LIMPIA + SALIDA FUNCIONAL ===== */
+/* ============================================================
+   V33 — CAJA DE EMPLEADO LIMPIA Y ESTABLE
+   Solo presentación. No modifica ventas, informes ni contabilidad.
+   ============================================================ */
 body.employeeMode[data-employee-role="cashier"] .sidebar,
-body.employeeMode[data-employee-role="cashier"] .topbar{
+body.employeeMode[data-employee-role="cashier"] .adminTop,
+body.employeeMode[data-employee-role="cashier"] #adminCashControl,
+body.employeeMode[data-employee-role="cashier"] #toggleAdminSidebar,
+body.employeeMode[data-employee-role="cashier"] #toggleModuleFocus{
   display:none!important;
 }
+
 body.employeeMode[data-employee-role="cashier"] .adminShell{
   display:block!important;
   min-height:100vh!important;
 }
-body.employeeMode[data-employee-role="cashier"] .adminMain{
+
+body.employeeMode[data-employee-role="cashier"] .adminContent,
+body.employeeMode[data-employee-role="cashier"] .adminMain,
+body.employeeMode[data-employee-role="cashier"] main{
   width:100%!important;
   max-width:none!important;
   margin:0!important;
+  padding:0!important;
 }
+
 body.employeeMode[data-employee-role="cashier"] #tab-pos{
+  display:flex!important;
+  flex-direction:column!important;
   width:100%!important;
-  max-width:none!important;
+  min-height:100vh!important;
+  padding:14px!important;
+  background:#eee8de!important;
 }
-body.employeeMode[data-employee-role="cashier"] #exitPosFocusBtn{
-  display:inline-flex!important;
-  visibility:visible!important;
-  opacity:1!important;
-  align-items:center!important;
-  gap:7px!important;
-  white-space:nowrap!important;
+
+body.employeeMode[data-employee-role="cashier"] #tab-pos.hidden{
+  display:none!important;
 }
+
+body.employeeMode[data-employee-role="cashier"] .posHeader{
+  margin:0 0 10px!important;
+}
+
+body.employeeMode[data-employee-role="cashier"] .posExitBtn{
+  background:#fff!important;
+  color:#17130e!important;
+  border:1px solid #d8cbb8!important;
+  border-radius:12px!important;
+  padding:10px 14px!important;
+  min-height:42px!important;
+  font-weight:900!important;
+  box-shadow:none!important;
+}
+
+body.employeeMode[data-employee-role="cashier"] .posExitBtn:hover{
+  background:#fff8e6!important;
+  border-color:#f2b500!important;
+}
+
+body.employeeMode[data-employee-role="cashier"] .posExitBtn span{
+  margin-right:5px!important;
+}
+
+/* Evita que reglas antiguas vuelvan a comprimir o desplazar la caja del cajero. */
+body.employeeMode[data-employee-role="cashier"].posFocusMode #tab-pos{
+  position:relative!important;
+  inset:auto!important;
+  height:auto!important;
+  min-height:100vh!important;
+  overflow:visible!important;
+}
+
+body.employeeMode[data-employee-role="cashier"].posFocusMode .adminMain,
+body.employeeMode[data-employee-role="cashier"].posFocusMode main{
+  height:auto!important;
+  min-height:100vh!important;
+  overflow:visible!important;
+}
+
+html.posFocusModeRoot:has(body.employeeMode[data-employee-role="cashier"]),
+body.employeeMode[data-employee-role="cashier"].posFocusMode{
+  height:auto!important;
+  min-height:100%!important;
+  overflow:auto!important;
+}
+
+
+/* V33 FINAL — CAJERO SIN PANEL ADMINISTRATIVO, SIN COMPRESIÓN */
+html.cashierPosV33Root,
+body.cashierPosV33{
+  height:auto!important;
+  min-height:100%!important;
+  overflow:auto!important;
+}
+body.cashierPosV33 .sidebar,
+body.cashierPosV33 .adminTop,
+body.cashierPosV33 #adminCashControl,
+body.cashierPosV33 #toggleAdminSidebar,
+body.cashierPosV33 #toggleModuleFocus{display:none!important;}
+body.cashierPosV33 .adminShell{display:block!important;min-height:100vh!important;}
+body.cashierPosV33 .adminContent,
+body.cashierPosV33 .adminMain,
+body.cashierPosV33 main{width:100%!important;max-width:none!important;margin:0!important;padding:0!important;height:auto!important;min-height:100vh!important;overflow:visible!important;}
+body.cashierPosV33 #tab-pos{position:relative!important;inset:auto!important;z-index:auto!important;display:flex!important;flex-direction:column!important;width:100%!important;height:auto!important;min-height:100vh!important;padding:14px!important;overflow:visible!important;background:#eee8de!important;}
+body.cashierPosV33 #tab-pos.hidden{display:none!important;}
+body.cashierPosV33 #tab-pos .posLayout{height:auto!important;min-height:0!important;overflow:visible!important;}
+body.cashierPosV33 #tab-pos .posCatalog{height:auto!important;min-height:0!important;}
+body.cashierPosV33 #tab-pos #posProducts{max-height:620px!important;overflow-y:auto!important;}
+body.cashierPosV33 #tab-pos .posTicket{height:auto!important;max-height:none!important;overflow:visible!important;}
+body.cashierPosV33 .posExitBtn{background:#fff!important;color:#17130e!important;border:1px solid #d8cbb8!important;border-radius:12px!important;padding:10px 14px!important;min-height:42px!important;font-weight:900!important;box-shadow:none!important;}
+body.cashierPosV33 .posExitBtn:hover{background:#fff8e6!important;border-color:#f2b500!important;}
