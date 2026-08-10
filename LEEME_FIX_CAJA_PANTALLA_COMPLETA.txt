@@ -1,0 +1,22 @@
+MORDISCO — FIX CAJA PANTALLA COMPLETA + COBRO DE MESAS
+
+Esta actualización corrige SOLO la visualización de Caja/POS.
+
+- La pantalla de Caja usa toda la altura disponible.
+- La sección CAJA DEL LOCAL queda visible.
+- Editar / Cobrar / Cancelar quedan completos y clicables.
+- Los pedidos de Mesas enviados a cocina aparecen en esa misma lista de cobro.
+- No se modifica la lógica de cobro ni la base de datos.
+- No ejecutar SQL.
+
+PROTECCIÓN:
+Los archivos de juegos fueron comparados byte por byte (SHA-256) antes y después.
+No se modificó ninguno.
+
+PUBLICACIÓN:
+1. Copia el contenido sobre tu proyecto actual.
+2. Commit: Corregir pantalla completa de caja y cobro de mesas
+3. Push origin.
+4. Espera Vercel Ready.
+5. Abre /admin?employee=1&tab=pos
+6. Ctrl+Shift+R.
