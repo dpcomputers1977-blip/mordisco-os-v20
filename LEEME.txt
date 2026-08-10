@@ -1,12 +1,12 @@
-MORDISCO OS V24 — CAJA LEGIBLE
+MORDISCO OS V25 — CAJA GRANDE Y LEGIBLE
 
-Cambios:
-- Se eliminó el diseño excesivamente pequeño del POS.
-- Catálogo en 3 columnas con tarjetas y texto más grandes.
-- Los productos usan scroll vertical en lugar de reducirse para intentar mostrar todo de una vez.
-- Panel derecho más ancho y legible.
-- Pedidos por cobrar de mesas arriba con botón COBRAR AHORA grande.
-- La caja conserva scroll interno para que todos los controles sigan siendo utilizables.
+Corrección principal:
+- Se eliminó la compresión visual del POS.
+- Los estilos críticos van dentro de admin.html para evitar que una caché antigua deje todo diminuto.
+- Productos en 3 columnas grandes (2 en pantallas más angostas).
+- Panel de cobro ancho a la derecha.
+- Pedidos por cobrar arriba con botón COBRAR AHORA grande y visible.
+- Se cambió la versión de caché de CSS/JS a v25-caja-grande.
 
-Reemplaza admin.html, admin-v18.js y admin-v18.css en tu proyecto y vuelve a publicar.
-Después usa Ctrl+F5. Si el navegador quedó con zoom cambiado, usa también Ctrl+0 una sola vez para volver a 100%.
+Reemplaza admin.html, admin-v18.css y admin-v18.js.
+Luego vuelve a publicar.
