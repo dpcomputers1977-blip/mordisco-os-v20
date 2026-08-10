@@ -1,17 +1,10 @@
-MORDISCO OS V27 — POS CON SCROLL + EGRESOS VISIBLES
+MORDISCO OS V28 - CONTABILIDAD CORREGIDA
 
-CAMBIOS:
-1. POS sin compresion: tamaño normal y legible.
-2. Catálogo con scroll interno, sin achicar productos.
-3. En resoluciones medias usa 2 columnas para que los productos se lean bien.
-4. REGISTRAR EGRESO e INFORME DE CAJA aparecen dentro del panel derecho de Caja, arriba y visibles.
-5. Egreso queda asociado al cajero activo y se registra en Contabilidad.
-6. Contabilidad elimina de la vista/totales ingresos duplicados de una misma Venta #.
-7. Cache-busting V27 en CSS y JS.
+Correccion principal:
+- Contabilidad identifica cada venta por el texto "Venta #..." tanto en DESCRIPCION como en REFERENCIA.
+- Una misma Venta # se suma y muestra una sola vez aunque la base tenga filas historicas duplicadas.
+- Corrige tambien el rango de fechas cuando se usa Desde/Hasta para incluir el dia Hasta.
+- Mantiene las mejoras V27: POS con scroll y egresos/informe de caja.
 
-REEMPLAZAR:
-- admin.html
-- admin-v18.css
-- admin-v18.js
-
-Luego publicar y abrir de nuevo la página.
+Reemplazar admin.html, admin-v18.css y admin-v18.js y publicar de nuevo.
+Luego Ctrl+F5.

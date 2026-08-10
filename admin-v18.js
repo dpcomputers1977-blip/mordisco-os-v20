@@ -4326,34 +4326,90 @@ confirmChargeOrderV21=async function(){
   };
 })();
 
-/* ===== V27 CONTABILIDAD: DESDUPLICACION ROBUSTA ===== */
+/* ===== V28 CONTABILIDAD: UNA SOLA FILA POR NUMERO DE VENTA ===== */
 (function(){
-  function saleKey(x){
-    if(!x || x.type!=='income') return null;
-    const cat=String(x.category||'').trim().toLowerCase();
-    if(cat!=='ventas') return null;
-    const ref=String(x.reference||'').trim().toLowerCase();
-    const m=ref.match(/venta\s*#\s*([^\s]+)/i);
-    return m ? 'sale:'+m[1] : (ref ? 'ref:'+ref : null);
+  function normalizeSaleNumberV28(value){
+    const text=String(value||'').trim();
+    const match=text.match(/venta\s*#\s*([0-9a-z_-]+)/i);
+    return match ? String(match[1]).toLowerCase() : null;
   }
-  window.dedupeFinanceRowsV27=function(rows){
-    const seen=new Set(), out=[];
-    for(const x of (rows||[])){
-      const k=saleKey(x);
-      if(k){ if(seen.has(k)) continue; seen.add(k); }
-      out.push(x);
+
+  function saleKeyV28(x){
+    if(!x || x.type!=='income')return null;
+    if(String(x.category||'').trim().toLowerCase()!=='ventas')return null;
+
+    // En Mordisco OS el numero de venta puede venir en description (ej. "Venta #33")
+    // o en reference, dependiendo de la version del RPC/trigger instalada.
+    const number=
+      normalizeSaleNumberV28(x.description)||
+      normalizeSaleNumberV28(x.reference);
+
+    if(number)return 'sale:'+number;
+
+    // Respaldo solo para ingresos de venta antiguos sin numero visible.
+    return [
+      'legacy-sale',
+      String(x.movement_date||''),
+      Number(x.amount||0).toFixed(2),
+      String(x.payment_method||''),
+      String(x.staff_id||x.staff?.id||''),
+      String(x.description||'').trim().toLowerCase(),
+      String(x.reference||'').trim().toLowerCase()
+    ].join('|');
+  }
+
+  window.dedupeFinanceRowsV28=function(rows){
+    const seen=new Set();
+    const clean=[];
+    let hidden=0;
+    for(const row of (rows||[])){
+      const key=saleKeyV28(row);
+      if(key){
+        if(seen.has(key)){hidden++;continue;}
+        seen.add(key);
+      }
+      clean.push(row);
     }
-    return out;
+    window.mordiscoFinanceDuplicatesHidden=hidden;
+    return clean;
   };
-  const oldLoad=typeof loadFinance==='function'?loadFinance:null;
-  if(oldLoad){
-    loadFinance=async function(){
-      const start=$('#financeStart')?.value||new Date().toISOString().slice(0,10);
-      const end=$('#financeEnd')?.value||new Date().toISOString().slice(0,10);
-      const {data,error}=await db.from('financial_movements').select('*,staff(name)').gte('movement_date',start).lt('movement_date',end).order('movement_date',{ascending:false}).order('created_at',{ascending:false});
-      if(error)return toast(error.message);
-      financeMovements=window.dedupeFinanceRowsV27(data||[]);
-      renderFinance();
-    };
-  }
+
+  // Reemplaza la carga de Contabilidad para que los totales y la tabla usen
+  // exactamente una sola fila por numero de venta.
+  loadFinance=async function(){
+    let start,end;
+    if($('#financeStart') && $('#financeEnd')){
+      start=$('#financeStart').value||new Date().toISOString().slice(0,10);
+      const endSelected=$('#financeEnd').value||start;
+      const d=new Date(endSelected+'T00:00:00');
+      d.setDate(d.getDate()+1);
+      end=d.toISOString().slice(0,10);
+    }else{
+      const month=$('#financeMonth')?.value||new Date().toISOString().slice(0,7);
+      start=month+'-01';
+      end=new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),1).toISOString().slice(0,10);
+    }
+
+    const {data,error}=await db.from('financial_movements')
+      .select('*,staff(name)')
+      .gte('movement_date',start)
+      .lt('movement_date',end)
+      .order('movement_date',{ascending:false})
+      .order('created_at',{ascending:false});
+
+    if(error)return toast('Error cargando contabilidad: '+error.message);
+    financeMovements=window.dedupeFinanceRowsV28(data||[]);
+    renderFinance();
+  };
+
+  // Refuerzo extra: incluso si otra funcion vuelve a llenar financeMovements,
+  // renderFinance nunca sumara dos veces el mismo numero de venta.
+  const renderFinanceBaseV28=renderFinance;
+  renderFinance=function(){
+    const saved=financeMovements;
+    financeMovements=window.dedupeFinanceRowsV28(saved||[]);
+    try{return renderFinanceBaseV28();}
+    finally{financeMovements=saved;}
+  };
 })();
+
