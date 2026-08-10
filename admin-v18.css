@@ -3915,3 +3915,84 @@ body.posFocusMode #tab-pos .posChargeBtn{position:relative!important;bottom:auto
   body.posFocusMode #tab-pos .posPendingInsideTicket{max-height:none!important}
   body.posFocusMode #tab-pos .posPrimaryActions{position:sticky!important;bottom:0!important}
 }
+
+
+/* ============================================================
+   V23 — PEDIDOS POR COBRAR ARRIBA Y BOTÓN SIEMPRE VISIBLE
+   ============================================================ */
+body.posFocusMode #tab-pos .posTicket{
+  overflow:hidden!important;
+}
+body.posFocusMode #tab-pos .posPendingTopV23{
+  order:1!important;
+  flex:0 0 auto!important;
+  min-height:108px!important;
+  max-height:142px!important;
+  margin:0 0 4px!important;
+  padding:7px!important;
+  overflow:hidden!important;
+  border:2px solid #f4b000!important;
+  background:#fff9e8!important;
+}
+body.posFocusMode #tab-pos .posTicketTitle{order:0!important;flex:0 0 auto!important}
+body.posFocusMode #tab-pos .posCart{order:2!important;flex:0 1 62px!important;max-height:62px!important;min-height:30px!important;overflow:auto!important}
+body.posFocusMode #tab-pos .posTotals{order:3!important;flex:0 0 auto!important}
+body.posFocusMode #tab-pos .preDiscountBox{order:4!important}
+body.posFocusMode #tab-pos .posEssentialData{order:5!important}
+body.posFocusMode #tab-pos .posDetailsToggle{order:6!important}
+body.posFocusMode #tab-pos .posOptionalDetails{order:7!important}
+body.posFocusMode #tab-pos .compactPaymentNotice{order:8!important}
+body.posFocusMode #tab-pos .posPrimaryActions{order:9!important;margin-top:auto!important}
+body.posFocusMode #tab-pos .posPendingTopV23 .posPendingOrders{
+  display:flex!important;
+  gap:6px!important;
+  max-height:78px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+}
+body.posFocusMode #tab-pos .posPendingTopV23 .posPendingCard{
+  flex:0 0 100%!important;
+  min-height:68px!important;
+  max-height:76px!important;
+  padding:6px 7px!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+}
+body.posFocusMode #tab-pos .posPendingTopV23 .posPendingPayment{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-end!important;
+  justify-content:center!important;
+  gap:2px!important;
+}
+body.posFocusMode #tab-pos .posPendingTopV23 .posPayNowBtn{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  min-width:132px!important;
+  min-height:34px!important;
+  height:34px!important;
+  padding:4px 10px!important;
+  font-size:.78rem!important;
+  font-weight:900!important;
+  white-space:nowrap!important;
+}
+body.posFocusMode #tab-pos .posPendingTopV23 .posPendingInfo h4,
+body.posFocusMode #tab-pos .posPendingTopV23 .posPendingInfo p,
+body.posFocusMode #tab-pos .posPendingTopV23 .posPendingInfo small{margin:0!important;line-height:1.15!important}
+body.posFocusMode #tab-pos .posPendingTopV23 .posPendingHeader{margin-bottom:3px!important}
+body.posFocusMode #tab-pos .posPendingTopV23 .posPendingHeader h3{font-size:.95rem!important}
+body.posFocusMode #tab-pos .posPendingTopV23 .posPendingHeader p{display:none!important}
+
+@media(max-height:680px) and (min-width:821px){
+  body.posFocusMode #adminCashControl{flex-basis:54px!important;min-height:54px!important;padding:5px 10px!important}
+  body.posFocusMode .posHeader{flex-basis:72px!important;min-height:72px!important;padding:5px 8px!important}
+  body.posFocusMode #tab-pos .posPendingTopV23{min-height:100px!important;max-height:112px!important}
+  body.posFocusMode #tab-pos .posPendingTopV23 .posPendingOrders{max-height:66px!important}
+  body.posFocusMode #tab-pos .posCart{max-height:42px!important;min-height:24px!important}
+  body.posFocusMode #tab-pos .posTotals{padding:3px 0!important;gap:2px!important}
+  body.posFocusMode #tab-pos .preDiscountBox{padding:3px!important}
+  body.posFocusMode #tab-pos .compactPaymentNotice{display:none!important}
+  body.posFocusMode #tab-pos .posDetailsToggle{display:none!important}
+  body.posFocusMode #tab-pos .posOptionalDetails{display:none!important}
+}

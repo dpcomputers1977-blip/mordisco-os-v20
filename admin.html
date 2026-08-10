@@ -252,6 +252,23 @@
             <button class="danger posClearBtn" id="posClear">Vaciar</button>
           </div>
 
+          <section class="panel posPendingPanel posPendingInsideTicket posPendingTopV23">
+            <div class="panelTitle posPendingHeader">
+              <div>
+                <span class="eyebrow">CAJA DEL LOCAL</span>
+                <h3>Pedidos por cobrar</h3>
+                <p>Mesas y mostrador pendientes de pago.</p>
+              </div>
+              <div class="posPendingActions">
+                <span class="pendingCount"><b id="posPendingCount">0</b> pendientes</span>
+                <button class="dark" id="refreshPosPending" type="button">Actualizar</button>
+              </div>
+            </div>
+            <div id="posPendingOrders" class="posPendingOrders">
+              <div class="notice">Cargando pedidos pendientes...</div>
+            </div>
+          </section>
+
           <div id="posCart" class="posCart"></div>
 
           <div class="posTotals">
@@ -317,23 +334,6 @@
             <b>Pago pendiente</b>
             <span>Envía a cocina y cobra desde la lista inferior cuando el cliente esté listo.</span>
           </div>
-
-          <section class="panel posPendingPanel posPendingInsideTicket">
-        <div class="panelTitle posPendingHeader">
-          <div>
-            <span class="eyebrow">CAJA DEL LOCAL</span>
-            <h3>Pedidos por cobrar</h3>
-            <p>Incluye pedidos de mesas y mostrador.</p>
-          </div>
-          <div class="posPendingActions">
-            <span class="pendingCount"><b id="posPendingCount">0</b> pendientes</span>
-            <button class="dark" id="refreshPosPending" type="button">Actualizar</button>
-          </div>
-        </div>
-        <div id="posPendingOrders" class="posPendingOrders">
-          <div class="notice">Cargando pedidos pendientes...</div>
-        </div>
-      </section>
 
           <div class="posPrimaryActions">
             <button class="primary posChargeBtn" id="posCharge">Enviar a cocina</button>

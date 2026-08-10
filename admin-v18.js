@@ -511,7 +511,7 @@ function renderPosPendingOrders(){
       <div class="posPendingPayment">
         <span>Pendiente</span>
         <strong>${money(o.total)}</strong>
-        <button class="primary posPayNowBtn" data-pos-pay="${o.id}">Cobrar ahora</button>
+        <button class="primary posPayNowBtn" data-pos-pay="${o.id}">💳 COBRAR AHORA</button>
       </div>
     </article>
   `).join(''):`<div class="posPendingEmpty">
@@ -3542,7 +3542,7 @@ function setPosFocusMode(enabled){
   document.body.classList.toggle('posFocusMode',Boolean(enabled));
 
   if(enabled){
-    document.documentElement.classList.remove('posFocusModeRoot');
+    document.documentElement.classList.add('posFocusModeRoot');
     requestAnimationFrame(()=>window.scrollTo({top:0,left:0,behavior:'auto'}));
   }else{
     document.documentElement.classList.remove('posFocusModeRoot');
