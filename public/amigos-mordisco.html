@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080808">
+<title>Amigos Mordisco · Conoce, conecta y comparte</title>
+<link rel="icon" href="/mordisco-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/amigos-mordisco.css?v=41.0.0">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="checker top-checker"></div>
+<header class="am-header">
+  <a class="am-brand" href="/"><img src="/mordisco-logo.png" alt="Mordisco Fast Food"><span>AMIGOS <b>MORDISCO</b></span></a>
+  <button class="nav-toggle" id="navToggle" aria-label="Abrir menú">☰</button>
+  <nav id="amNav">
+    <a class="active" href="#inicio">Inicio</a><a href="#personas">Conoce personas</a><a href="#matches">Mis Matches</a><a href="#match">Match Perfecto</a><a href="#cita">Primera cita</a><a href="#eventos">Eventos</a>
+  </nav>
+  <button class="profile-pill" id="accountBtn">❤ Entrar</button>
+</header>
+
+<main>
+<section class="hero" id="inicio">
+ <div class="hero-copy">
+  <span class="kicker">CLUB SOCIAL DE MORDISCO · V41 REAL</span>
+  <h1>AMIGOS<br><strong>MORDISCO</strong><span>♡</span></h1>
+  <p class="hero-tagline">Conoce. Conecta. Comparte un Mordisco.</p>
+  <p class="hero-text">Perfiles reales, match por interés mutuo, conversación privada y una primera cita en Mordisco sin publicar tu teléfono.</p>
+  <div class="hero-actions"><button class="primary" id="mainAction">CREAR MI CUENTA</button><a class="secondary" href="#personas">CONOCER PERSONAS</a></div>
+  <div class="trust-row"><span>✓ Solo +18</span><span>✓ Match mutuo</span><span>✓ Chat solo entre Matches</span><span>✓ Reporta y bloquea</span></div>
+  <div class="session-note" id="sessionNote">Inicia sesión para descubrir perfiles reales.</div>
+ </div>
+ <div class="hero-scene">
+   <div class="big-heart">♡</div>
+   <div class="date-card date-a"><div class="demo-photo demo-a">♡</div><b>Conecta</b><small>Intereses · conversación · respeto</small></div>
+   <div class="date-card date-b"><div class="demo-photo demo-b">❤</div><b>Haz Match</b><small>Solo cuando ambos se interesan</small></div>
+   <div class="match-badge">❤ MATCH</div>
+ </div>
+</section>
+
+<section class="how strip">
+ <article><b>1</b><div><strong>Crea tu perfil</strong><span>Cuenta +18 y foto</span></div></article><i>→</i>
+ <article><b>2</b><div><strong>Descubre personas</strong><span>Perfiles reales</span></div></article><i>→</i>
+ <article><b>3</b><div><strong>Haz Match</strong><span>Solo si ambos quieren</span></div></article><i>→</i>
+ <article><b>4</b><div><strong>Conversa y conózcanse</strong><span>Chat privado + cita Mordisco</span></div></article>
+</section>
+
+<section class="section" id="personas">
+ <div class="section-head"><div><span class="kicker">DESCUBRE</span><h2>Personas para conocer</h2></div><div class="filters"><button class="filter active" data-filter="all">Todos</button><button class="filter" data-filter="amistad">Amistad</button><button class="filter" data-filter="citas">Citas</button><button class="filter" data-filter="ambos">Ambos</button></div></div>
+ <div class="people-grid" id="peopleGrid"></div>
+ <div class="empty-state hidden" id="peopleEmpty"><b>No hay más perfiles por ahora</b><span>Vuelve más tarde o amplía el filtro.</span><button class="secondary-btn" id="refreshPeople">Actualizar</button></div>
+</section>
+
+<section class="section matches-section" id="matches">
+ <div class="section-head"><div><span class="kicker">CONEXIONES REALES</span><h2>Mis Matches</h2><p class="section-copy">Aquí solo aparecen personas con interés mutuo.</p></div><button class="secondary-btn" id="refreshMatches">Actualizar</button></div>
+ <div class="matches-grid" id="matchesGrid"></div>
+ <div class="empty-state" id="matchesEmpty"><b>Aún no tienes Matches</b><span>Cuando el interés sea mutuo aparecerán aquí.</span></div>
+</section>
+
+<section class="match-section" id="match">
+ <div class="match-copy"><span class="kicker">MATCH PERFECTO</span><h2>Descubre tu estilo de conexión</h2><p>Un test recreativo para hablar de intereses, planes y personalidad. No altera quién puede hacer Match contigo.</p><button class="primary" id="startQuiz">HACER EL TEST</button></div>
+ <div class="compat-card"><div class="mini-profile"><span id="quizAvatar">❤</span></div><div class="compat-heart"><b id="compatPct">?</b><small>%</small></div><div><strong id="compatName">Tu estilo de Match</strong><span id="compatText">Completa el test y descubre tu afinidad social.</span></div></div>
+</section>
+
+<section class="date-section" id="cita">
+ <div><span class="kicker">DE LA PANTALLA A LA MESA</span><h2>Tu primera cita<br><strong>EN MORDISCO</strong></h2><p>Después de hacer Match pueden proponer día y hora sin publicar teléfono ni dirección privada.</p><div class="date-benefits"><span>🍔 Combo para dos</span><span>📅 Día y hora</span><span>❤ Mesa Mordisco</span><span>🔒 Datos privados</span></div><button class="primary" id="dateDemo">VER CÓMO FUNCIONA</button></div>
+ <div class="date-ticket"><small>AMIGOS MORDISCO</small><h3>PRIMERA CITA</h3><div class="ticket-pair"><span>❤</span><b>UN MATCH REAL<br>SE CONOCE EN PERSONA</b></div><hr><p>📍 Mordisco Fast Food</p><p>🍔 Combo Primera Cita</p><p>🔒 Sin publicar tu teléfono</p></div>
+</section>
+
+<section class="section" id="eventos">
+ <div class="section-head"><div><span class="kicker">PLANES PARA CONECTAR</span><h2>Próximos eventos</h2></div></div>
+ <div class="events-grid">
+  <article><div class="event-art pink">❤</div><span>PRÓXIMAMENTE</span><h3>Noche de Match</h3><p>Dinámicas rápidas para conocer gente nueva en un ambiente relajado.</p><button data-event="Noche de Match">ME INTERESA</button></article>
+  <article><div class="event-art orange">⚡</div><span>PRÓXIMAMENTE</span><h3>Speed Mordisco</h3><p>Conversaciones cortas, buena música y un Mordisco entre rondas.</p><button data-event="Speed Mordisco">ME INTERESA</button></article>
+  <article><div class="event-art red">?</div><span>PRÓXIMAMENTE</span><h3>Cita a Ciegas</h3><p>Una experiencia divertida para personas abiertas a conocer a alguien nuevo.</p><button data-event="Cita a Ciegas">ME INTERESA</button></article>
+ </div>
+</section>
+
+<section class="safety"><div>🛡️</div><div><b>Tu seguridad primero</b><span>Solo mayores de 18 · No publicamos teléfono · Puedes reportar y bloquear · No compartas dinero, claves ni documentos</span></div><button id="safetyBtn">VER CONSEJOS</button></section>
+</main>
+
+<footer><img src="/mordisco-logo.png" alt=""><div><b>AMIGOS MORDISCO</b><span>Conoce. Conecta. Comparte un Mordisco.</span></div><a href="/">Volver a Mordisco →</a></footer>
+<div class="checker bottom-checker"></div>
+
+<div class="modal" id="authModal" aria-hidden="true"><div class="modal-card auth-card"><button class="close" data-close>×</button><span class="kicker">AMIGOS MORDISCO</span><h2 id="authTitle">Entrar</h2><div class="auth-tabs"><button class="active" data-auth-tab="login">ENTRAR</button><button data-auth-tab="signup">CREAR CUENTA</button></div><form id="authForm"><label>Correo<input id="authEmail" type="email" required autocomplete="email" placeholder="tu@correo.com"></label><label>Contraseña<input id="authPassword" type="password" required minlength="6" autocomplete="current-password" placeholder="Mínimo 6 caracteres"></label><button class="primary full" id="authSubmit" type="submit">ENTRAR</button><p class="form-note">Tu cuenta Amigos Mordisco usa una sesión independiente del panel administrativo.</p></form></div></div>
+
+<div class="modal" id="profileModal" aria-hidden="true"><div class="modal-card"><button class="close" data-close>×</button><span class="kicker">TU PERFIL REAL</span><h2>Mi perfil Amigos Mordisco</h2><form id="profileForm"><div class="photo-editor"><div class="photo-preview" id="photoPreview">❤</div><label class="upload-label">Foto de perfil<input id="pPhoto" type="file" accept="image/jpeg,image/png,image/webp"></label></div><div class="two"><label>Nombre visible<input id="pName" required maxlength="40" placeholder="Tu nombre"></label><label>Fecha de nacimiento<input id="pBirth" required type="date"></label></div><div class="two"><label>¿Qué buscas?<select id="pLooking"><option value="amistad">Nuevas amistades</option><option value="citas">Conocer a alguien para citas</option><option value="ambos">Amistad y citas</option></select></label><label>Ciudad<input id="pCity" value="Machala" maxlength="40"></label></div><label>Sobre mí<textarea id="pBio" maxlength="300" placeholder="Cuéntanos un poco sobre ti..."></textarea></label><fieldset><legend>Elige al menos 3 intereses</legend><div class="interest-list" id="interestList"></div></fieldset><label class="check"><input id="pAdult" type="checkbox" required> Confirmo que tengo 18 años o más y que participaré respetuosamente.</label><button class="primary full" type="submit">GUARDAR MI PERFIL</button><button class="danger-outline full" id="logoutBtn" type="button">CERRAR SESIÓN</button></form></div></div>
+
+<div class="modal" id="matchModal"><div class="modal-card small celebration"><button class="close" data-close>×</button><div class="celebration-heart">❤</div><span class="kicker">¡MATCH!</span><h2 id="matchModalTitle">Se gustan mutuamente</h2><p id="matchModalText">Ya pueden conversar.</p><button class="primary full" id="goMatches">VER MIS MATCHES</button></div></div>
+
+<div class="modal" id="chatModal"><div class="modal-card chat-card"><button class="close" data-close>×</button><span class="kicker">CHAT PRIVADO</span><h2 id="chatTitle">Conversación</h2><div class="chat-messages" id="chatMessages"></div><form class="chat-form" id="chatForm"><input id="chatInput" maxlength="600" autocomplete="off" placeholder="Escribe un mensaje respetuoso…"><button class="primary" type="submit">ENVIAR</button></form><div class="chat-tools"><button id="chatDate">❤ Proponer cita</button><button id="chatReport">⚑ Reportar</button><button class="danger-text" id="chatBlock">⊘ Bloquear</button></div></div></div>
+
+<div class="modal" id="dateModal"><div class="modal-card small"><button class="close" data-close>×</button><span class="kicker">PRIMERA CITA EN MORDISCO</span><h2 id="dateTitle">Proponer una cita</h2><form id="dateForm"><label>Día<input type="date" id="dateDay" required></label><label>Hora<input type="time" id="dateTime" required value="19:00"></label><label>Mensaje opcional<textarea id="dateMessage" maxlength="180" placeholder="¿Qué tal un combo para dos?"></textarea></label><button class="primary full" type="submit">ENVIAR PROPUESTA</button></form></div></div>
+
+<div class="modal" id="quizModal"><div class="modal-card"><button class="close" data-close>×</button><span class="kicker">MATCH PERFECTO</span><h2 id="quizTitle">Pregunta 1 de 4</h2><p id="quizQuestion"></p><div id="quizOptions" class="quiz-options"></div></div></div>
+<div class="modal" id="infoModal"><div class="modal-card small"><button class="close" data-close>×</button><div id="infoContent"></div></div></div>
+<div class="toast" id="toast"></div>
+<script src="/amigos-mordisco.js?v=41.0.0"></script>
+</body></html>

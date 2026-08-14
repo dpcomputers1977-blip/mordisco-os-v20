@@ -1,0 +1,36 @@
+MORDISCO OS V41 · AMIGOS MORDISCO REAL
+
+QUÉ CAMBIA
+- Registro e inicio de sesión por correo y contraseña.
+- Sesión aislada del panel administrativo de Mordisco.
+- Perfil real +18 con foto, ciudad, intereses, bio y objetivo (amistad/citas/ambos).
+- Descubrimiento de perfiles reales desde Supabase sin exponer correo, teléfono ni fecha de nacimiento exacta.
+- Me interesa / Pasar.
+- Match únicamente cuando ambos dan Me interesa.
+- Sección Mis Matches.
+- Chat privado únicamente entre Matches activos.
+- Bloquear y reportar.
+- Primera cita en Mordisco con día, hora y mensaje opcional.
+- Test Match Perfecto recreativo y eventos conservados.
+
+INSTALACIÓN
+1. Copiar en /public:
+   amigos-mordisco.html
+   amigos-mordisco.css
+   amigos-mordisco.js
+   mordisco-logo.png (solo si tu proyecto aún no lo tiene)
+2. Ejecutar 25_V41_AMIGOS_MORDISCO_REAL.sql en Supabase SQL Editor.
+3. En Supabase > Authentication > URL Configuration, confirmar que tu dominio está incluido en Site URL / Redirect URLs.
+4. Publicar y probar /amigos-mordisco.
+
+IMPORTANTE
+- NO reemplaza admin.html, admin-v18.js, admin-v18.css, Caja ni Contabilidad.
+- El script usa la clave publicable de Supabase, nunca una service_role.
+- Los perfiles son únicamente +18.
+- El directorio público se entrega mediante funciones SECURITY DEFINER que no retornan correo ni datos privados.
+- Las fotos tienen máximo 5 MB y se guardan en el bucket amigos-profile-photos.
+- El chat solo funciona si existe Match mutuo y no hay bloqueo.
+
+ACCESO DESDE LA PORTADA
+Si tu index.html ya tiene el botón Amigos Mordisco de V40, no necesitas modificarlo.
+Si todavía no lo tiene, agrega un enlace a /amigos-mordisco. Evita reemplazar todo index.html solo para añadir el botón.

@@ -1,0 +1,10 @@
+SOLO SI /amigos-mordisco NO ABRE Y /amigos-mordisco.html SÍ ABRE:
+
+Agrega dentro de la lista "rewrites" de tu vercel.json esta regla, sin reemplazar las demás:
+
+{
+  "source": "/amigos-mordisco",
+  "destination": "/amigos-mordisco.html"
+}
+
+Si ya tienes esa regla, no cambies nada.
