@@ -4254,22 +4254,25 @@ confirmChargeOrderV21=async function(){
     }
   }
 
-  async function getCashReportDataV26(day){
-    day=day||todayV26();
-    const start=day+'T00:00:00';
-    const endDate=new Date(start);
+  async function getCashReportDataV26(dateFrom,dateTo){
+    dateFrom=dateFrom||todayV26();
+    dateTo=dateTo||dateFrom;
+    if(dateTo<dateFrom)[dateFrom,dateTo]=[dateTo,dateFrom];
+    const startDate=new Date(dateFrom+'T00:00:00');
+    const endDate=new Date(dateTo+'T00:00:00');
     endDate.setDate(endDate.getDate()+1);
+    const start=startDate.toISOString();
     const end=endDate.toISOString();
     const [ordersRes,expensesRes]=await Promise.all([
-      db.from('orders').select('id,order_number,total,payment_method,payment_status,cashier_id,created_at').eq('payment_status','paid').gte('created_at',start).lt('created_at',end),
-      db.from('financial_movements').select('id,amount,payment_method,staff_id,category,description,reference,movement_date,created_at').eq('type','expense').eq('movement_date',day)
+      db.from('orders').select('id,order_number,total,payment_method,payment_status,cashier_id,created_at').eq('payment_status','paid').gte('created_at',start).lt('created_at',end).order('created_at',{ascending:true}),
+      db.from('financial_movements').select('id,amount,payment_method,staff_id,category,description,reference,movement_date,created_at').eq('type','expense').gte('movement_date',dateFrom).lte('movement_date',dateTo).order('movement_date',{ascending:true})
     ]);
     if(ordersRes.error)throw ordersRes.error;
     if(expensesRes.error)throw expensesRes.error;
-    return {orders:ordersRes.data||[],expenses:expensesRes.data||[]};
+    return {orders:ordersRes.data||[],expenses:expensesRes.data||[],dateFrom,dateTo};
   }
 
-  function buildCashReportV26(orders,expenses,cashierId='',day=todayV26()){
+  function buildCashReportV26(orders,expenses,cashierId='',dateFrom=todayV26(),dateTo=dateFrom){
     const staffMap=new Map((staffMembers||[]).map(s=>[String(s.id),s.name]));
     const selectedId=String(cashierId||'');
     if(selectedId){
@@ -4291,7 +4294,9 @@ confirmChargeOrderV21=async function(){
     const methodNames={cash:'Efectivo',deuna:'DeUna',ahorita:'Ahorita',transfer:'Transferencia',card:'Tarjeta',other:'Otros'};
     const methodTotals=Object.fromEntries(methods.map(m=>[m,orders.filter(o=>String(o.payment_method||'other')===m).reduce((a,o)=>a+Number(o.total||0),0)]));
     const cashierName=selectedId?(staffMap.get(selectedId)||'Cajero'):'Todos los cajeros';
-    const labelDate=new Date(day+'T12:00:00').toLocaleDateString('es-EC',{dateStyle:'long'});
+    const fromLabel=new Date(dateFrom+'T12:00:00').toLocaleDateString('es-EC',{dateStyle:'long'});
+    const toLabel=new Date(dateTo+'T12:00:00').toLocaleDateString('es-EC',{dateStyle:'long'});
+    const labelDate=dateFrom===dateTo?fromLabel:`Del ${fromLabel} al ${toLabel}`;
     return `<div class="cashReportHeader"><span class="eyebrow">MORDISCO FAST FOOD</span><h2>Informe de caja</h2><p>${esc(labelDate)}</p></div>
       <div class="cashReportSubtitleV38">${esc(cashierName)}</div>
       <div class="cashReportTotals">
@@ -4306,37 +4311,47 @@ confirmChargeOrderV21=async function(){
       ${rows.length?rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${r.salesCount}</td><td>${money(r.salesTotal)}</td><td>− ${money(r.expenseTotal)}</td><td><b>${money(r.net)}</b></td></tr>`).join(''):'<tr><td colspan="5">No hay movimientos registrados para este cajero.</td></tr>'}
       </tbody></table>
       <h3>Detalle de ingresos</h3>
-      <table class="cashReportTable"><thead><tr><th>Hora</th><th>Cajero</th><th>Venta</th><th>Método</th><th>Monto</th><th class="v39AdminOnlyCol">Acción</th></tr></thead><tbody>
-      ${orders.length?orders.map(o=>`<tr><td>${new Date(o.created_at).toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'})}</td><td>${esc(staffMap.get(String(o.cashier_id))||'Sin asignar')}</td><td>#${esc(o.order_number||o.id)}</td><td>${methodLabel(o.payment_method)}</td><td>+ ${money(o.total)}</td><td class="v39AdminOnlyCol">${(!currentEmployee||currentEmployee.role==='admin')?`<button type="button" class="cashCorrectionBtnV39" data-kind="income" data-id="${esc(o.id)}">Corregir</button>`:''}</td></tr>`).join(''):'<tr><td colspan="6">Sin ingresos para este período.</td></tr>'}
+      <table class="cashReportTable"><thead><tr><th>Fecha / hora</th><th>Cajero</th><th>Venta</th><th>Método</th><th>Monto</th><th class="v39AdminOnlyCol">Acción</th></tr></thead><tbody>
+      ${orders.length?orders.map(o=>`<tr><td>${new Date(o.created_at).toLocaleString('es-EC',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</td><td>${esc(staffMap.get(String(o.cashier_id))||'Sin asignar')}</td><td>#${esc(o.order_number||o.id)}</td><td>${methodLabel(o.payment_method)}</td><td>+ ${money(o.total)}</td><td class="v39AdminOnlyCol">${(!currentEmployee||currentEmployee.role==='admin')?`<button type="button" class="cashCorrectionBtnV39" data-kind="income" data-id="${esc(o.id)}">Corregir</button>`:''}</td></tr>`).join(''):'<tr><td colspan="6">Sin ingresos para este período.</td></tr>'}
       </tbody></table>
       <h3>Detalle de egresos</h3>
-      <table class="cashReportTable"><thead><tr><th>Cajero</th><th>Categoría</th><th>Descripción</th><th>Método</th><th>Monto</th><th class="v39AdminOnlyCol">Acción</th></tr></thead><tbody>
-      ${expenses.length?expenses.map(e=>`<tr><td>${esc(staffMap.get(String(e.staff_id))||'Cajero')}</td><td>${esc(e.category||'Otros')}</td><td>${esc(e.description||'')}</td><td>${methodLabel(e.payment_method)}</td><td>− ${money(e.amount)}</td><td class="v39AdminOnlyCol">${(!currentEmployee||currentEmployee.role==='admin')?`<button type="button" class="cashCorrectionBtnV39" data-kind="expense" data-id="${esc(e.id)}">Corregir</button>`:''}</td></tr>`).join(''):'<tr><td colspan="6">Sin egresos para este período.</td></tr>'}
+      <table class="cashReportTable"><thead><tr><th>Fecha</th><th>Cajero</th><th>Categoría</th><th>Descripción</th><th>Método</th><th>Monto</th><th class="v39AdminOnlyCol">Acción</th></tr></thead><tbody>
+      ${expenses.length?expenses.map(e=>`<tr><td>${esc(e.movement_date||new Date(e.created_at).toLocaleDateString('es-EC'))}</td><td>${esc(staffMap.get(String(e.staff_id))||'Cajero')}</td><td>${esc(e.category||'Otros')}</td><td>${esc(e.description||'')}</td><td>${methodLabel(e.payment_method)}</td><td>− ${money(e.amount)}</td><td class="v39AdminOnlyCol">${(!currentEmployee||currentEmployee.role==='admin')?`<button type="button" class="cashCorrectionBtnV39" data-kind="expense" data-id="${esc(e.id)}">Corregir</button>`:''}</td></tr>`).join(''):'<tr><td colspan="7">Sin egresos para este período.</td></tr>'}
       </tbody></table>`;
   }
 
   async function renderCashReportV38(){
-    const day=$v26('#cashReportDate')?.value||todayV26();
+    let dateFrom=$v26('#cashReportDateFrom')?.value||todayV26();
+    let dateTo=$v26('#cashReportDateTo')?.value||dateFrom;
+    if(dateTo<dateFrom){
+      [dateFrom,dateTo]=[dateTo,dateFrom];
+      if($v26('#cashReportDateFrom'))$v26('#cashReportDateFrom').value=dateFrom;
+      if($v26('#cashReportDateTo'))$v26('#cashReportDateTo').value=dateTo;
+    }
     const cashierId=$v26('#cashReportCashier')?.value||'';
     const refresh=$v26('#refreshCashReportBtn');
     if(refresh){refresh.disabled=true;refresh.textContent='Generando...'}
     try{
-      const {orders,expenses}=await getCashReportDataV26(day);
-      $v26('#cashReportContent').innerHTML=buildCashReportV26(orders,expenses,cashierId,day);
+      const {orders,expenses}=await getCashReportDataV26(dateFrom,dateTo);
+      $v26('#cashReportContent').innerHTML=buildCashReportV26(orders,expenses,cashierId,dateFrom,dateTo);
     }catch(error){toast('No se pudo preparar el informe: '+error.message)}
     finally{if(refresh){refresh.disabled=false;refresh.textContent='Generar informe'}}
   }
 
   $v26('#cashReportBtn')?.addEventListener('click',async()=>{
     fillCashReportCashiersV38();
-    if($v26('#cashReportDate'))$v26('#cashReportDate').value=todayV26();
+    const today=todayV26();
+    const firstDay=today.slice(0,8)+'01';
+    if($v26('#cashReportDateFrom'))$v26('#cashReportDateFrom').value=firstDay;
+    if($v26('#cashReportDateTo'))$v26('#cashReportDateTo').value=today;
     $v26('#cashReportModal')?.classList.remove('hidden');
     await renderCashReportV38();
   });
 
   $v26('#refreshCashReportBtn')?.addEventListener('click',renderCashReportV38);
   $v26('#cashReportCashier')?.addEventListener('change',renderCashReportV38);
-  $v26('#cashReportDate')?.addEventListener('change',renderCashReportV38);
+  $v26('#cashReportDateFrom')?.addEventListener('change',renderCashReportV38);
+  $v26('#cashReportDateTo')?.addEventListener('change',renderCashReportV38);
   $v26('#printCashReportBtn')?.addEventListener('click',()=>window.print());
 
 

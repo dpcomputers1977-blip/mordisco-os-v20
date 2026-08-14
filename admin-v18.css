@@ -4302,3 +4302,7 @@ body.moduleFocusV21 #adminView.adminV21 .tab:not(.hidden){
 @media print{
   .cashReportControlsV38{display:none!important}
 }
+
+
+/* ===== V40 INFORME POR PERIODO ===== */
+.cashReportControlsV38 label{min-width:150px}

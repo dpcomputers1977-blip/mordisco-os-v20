@@ -59,6 +59,7 @@ body.posFocusMode #tab-pos .posChargeBtn{min-height:52px!important;font-size:16p
 @media(max-width:900px){body.posFocusMode #tab-pos .posLayout{grid-template-columns:minmax(0,1fr) 340px!important;}body.posFocusMode #tab-pos #posProducts{grid-template-columns:repeat(2,minmax(0,1fr))!important;}}
 
 /* ===== V39 DETALLE DE INGRESOS + CORRECCION ADMIN ===== */
+/* ===== V40 INFORME POR PERIODO DESDE / HASTA ===== */
 .cashCorrectionBtnV39{border:1px solid #d9c9a9;background:#fff7df;color:#221a0f;border-radius:9px;padding:6px 10px;font-weight:900;cursor:pointer}
 .cashCorrectionBtnV39:hover{background:#ffc400;color:#111}
 #cashCorrectionModal{z-index:10050!important}
@@ -1319,9 +1320,10 @@ body.posFocusMode #tab-pos .posChargeBtn{position:static!important;display:block
       <div>
         <span class="eyebrow">CAJA DEL LOCAL</span>
         <h2>Informe de caja</h2>
-        <p class="muted">Selecciona fecha y cajero. Puedes imprimir un informe individual o el consolidado.</p>
+        <p class="muted">Selecciona un período y cajero. Puedes imprimir el consolidado completo o el informe de un cajero.</p>
       </div>
-      <label>Fecha<input id="cashReportDate" type="date"></label>
+      <label>Desde<input id="cashReportDateFrom" type="date"></label>
+      <label>Hasta<input id="cashReportDateTo" type="date"></label>
       <label>Cajero<select id="cashReportCashier"><option value="">Todos los cajeros</option></select></label>
       <button id="refreshCashReportBtn" class="primary" type="button">Generar informe</button>
     </div>
@@ -1368,9 +1370,9 @@ body.posFocusMode #tab-pos .posChargeBtn{position:static!important;display:block
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=v39-ingresos-correccion-admin"></script>
+<script src="/admin-v18.js?v=v40-informe-periodo"></script>
 
 
 
-<div id="v18VersionMarker">Mordisco OS V39</div>
+<div id="v18VersionMarker">Mordisco OS V40</div>
 </body></html>
