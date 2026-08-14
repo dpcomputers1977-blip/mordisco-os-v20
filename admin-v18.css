@@ -4306,3 +4306,9 @@ body.moduleFocusV21 #adminView.adminV21 .tab:not(.hidden){
 
 /* ===== V40 INFORME POR PERIODO ===== */
 .cashReportControlsV38 label{min-width:150px}
+
+
+/* V42 — Fondo inicial / sueltos al abrir caja */
+#openCashRegisterModal{z-index:10020!important;}
+#openCashRegisterModal .modalCard{max-width:440px!important;}
+#cashRegisterOpeningCash{font-size:1.35rem!important;font-weight:900!important;text-align:center!important;}

@@ -2971,8 +2971,9 @@ function renderCashRegisterState(){
   }
 
   if($('#cashRegisterMessage')){
+    const openingCash=Number(cashRegisterState?.opening_cash||0);
     $('#cashRegisterMessage').textContent=isOpen
-      ? `Abierta${cashRegisterState.opened_at?' desde '+new Date(cashRegisterState.opened_at).toLocaleString('es-EC'):''}.`
+      ? `Abierta${cashRegisterState.opened_at?' desde '+new Date(cashRegisterState.opened_at).toLocaleString('es-EC'):''}. Fondo inicial: ${money(openingCash)}.`
       : `Cerrada${cashRegisterState.closed_at?' desde '+new Date(cashRegisterState.closed_at).toLocaleString('es-EC'):''}.`;
   }
 
@@ -2987,7 +2988,7 @@ function renderCashRegisterState(){
   });
 }
 
-async function setCashRegisterState(isOpen){
+async function setCashRegisterState(isOpen,openingCash=null){
   if(!isAdminSession)return toast('Solo el administrador puede abrir o cerrar la caja');
   const {data:{user}}=await db.auth.getUser();
   const row={
@@ -2998,13 +2999,40 @@ async function setCashRegisterState(isOpen){
     changed_by:user?.id||null,
     updated_at:new Date().toISOString()
   };
+  if(isOpen)row.opening_cash=Math.max(Number(openingCash||0),0);
   const {error}=await db.from('cash_register_state').upsert(row);
   if(error)return toast(error.message);
-  toast(isOpen?'Caja abierta correctamente':'Caja cerrada correctamente');
+  toast(isOpen?`Caja abierta con ${money(row.opening_cash||0)} de fondo inicial`:'Caja cerrada correctamente');
   await loadCashRegisterState();
 }
 
-$('#openCashRegisterBtn')?.addEventListener('click',()=>setCashRegisterState(true));
+function openCashRegisterOpeningModal(){
+  if(!isAdminSession)return toast('Solo el administrador puede abrir la caja');
+  const input=$('#cashRegisterOpeningCash');
+  if(input)input.value='0.00';
+  $('#openCashRegisterModal')?.classList.remove('hidden');
+  setTimeout(()=>input?.focus?.(),50);
+}
+
+function closeCashRegisterOpeningModal(){
+  $('#openCashRegisterModal')?.classList.add('hidden');
+}
+
+$('#openCashRegisterBtn')?.addEventListener('click',openCashRegisterOpeningModal);
+$('#confirmOpenCashRegisterBtn')?.addEventListener('click',async()=>{
+  const amount=Number($('#cashRegisterOpeningCash')?.value||0);
+  if(!Number.isFinite(amount)||amount<0)return toast('Ingresa un fondo inicial válido');
+  const button=$('#confirmOpenCashRegisterBtn');
+  if(button){button.disabled=true;button.textContent='Abriendo…';}
+  try{
+    await setCashRegisterState(true,amount);
+    closeCashRegisterOpeningModal();
+  }finally{
+    if(button){button.disabled=false;button.textContent='Abrir caja';}
+  }
+});
+$$('[data-close="openCashRegisterModal"]').forEach(btn=>btn.addEventListener('click',closeCashRegisterOpeningModal));
+
 $('#closeCashRegisterBtn')?.addEventListener('click',()=>{
   if(confirm('¿Cerrar la caja? Los cajeros no podrán registrar ni cobrar ventas.'))setCashRegisterState(false);
 });

@@ -1277,6 +1277,19 @@ body.posFocusMode #tab-pos .posChargeBtn{position:static!important;display:block
 </div>
 
 
+<div id="openCashRegisterModal" class="modal hidden">
+  <div class="modalCard employeeLoginCard">
+    <button class="close" type="button" data-close="openCashRegisterModal">×</button>
+    <span class="eyebrow">APERTURA DE CAJA</span>
+    <h2>Fondo inicial / sueltos</h2>
+    <p class="muted">Registra cuánto efectivo queda en caja al iniciar. Este valor no cuenta como venta.</p>
+    <label>Monto inicial
+      <input id="cashRegisterOpeningCash" type="number" min="0" step="0.01" value="0" inputmode="decimal" placeholder="0.00">
+    </label>
+    <button id="confirmOpenCashRegisterBtn" class="success full" type="button">Abrir caja</button>
+  </div>
+</div>
+
 <div id="cashExpenseModal" class="modal hidden">
   <div class="modalCard cashExpenseModalCard">
     <button class="close" type="button" data-close="cashExpenseModal">×</button>
@@ -1370,9 +1383,9 @@ body.posFocusMode #tab-pos .posChargeBtn{position:static!important;display:block
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<script src="/admin-v18.js?v=v40-informe-periodo"></script>
+<script src="/admin-v18.js?v=v42-fondo-inicial-caja"></script>
 
 
 
-<div id="v18VersionMarker">Mordisco OS V40</div>
+<div id="v18VersionMarker">Mordisco OS V42</div>
 </body></html>
