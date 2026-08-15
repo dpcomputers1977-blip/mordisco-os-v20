@@ -791,10 +791,16 @@ async function loadOrders(){
   renderKitchen();
   renderPosPendingOrders();
 }
-const statusLabels={pending:'Pendiente',confirmed:'Confirmado',preparing:'Preparando',ready:'Listo',delivered:'Entregado',cancelled:'Cancelado'};
+const statusLabels={pending:'Pendiente',awaiting_confirmation:'Esperando WhatsApp',confirmed:'Confirmado',preparing:'Preparando',ready:'Listo',delivered:'Entregado',cancelled:'Cancelado'};
 function getFilteredOrders(){return orderStatusFilter==='all'?orders:orders.filter(o=>o.status===orderStatusFilter)}
+function isWebOrder(order){
+  const notes=String(order?.notes||'').trim();
+  return /^\[WEB(?:\]|_)/i.test(notes);
+}
 function renderOrders(){
-  const list=getFilteredOrders();
+  // La pestaña Pedidos web debe mostrar SOLO pedidos originados en la web.
+  // Caja, mesas y comandas siguen en orders para Cocina/Informes, pero no aparecen aquí.
+  const list=getFilteredOrders().filter(isWebOrder);
   $('#adminOrders').innerHTML=list.length?list.map(o=>`<article class="orderCard">
     <small>Pedido #${o.order_number}</small>
     <h3>${esc(o.customer_name)}</h3>

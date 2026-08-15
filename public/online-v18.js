@@ -326,7 +326,7 @@ document.querySelector("#onlineType").onchange=event=>{
 
 
 let pendingWebConfirmation=null;
-let whatsappConfirmationOpened=false;
+let webOrderSubmitting=false;
 
 function buildWebConfirmationData(){
   if(!cart.length)throw new Error("Agrega productos al pedido");
@@ -374,7 +374,7 @@ function buildWebConfirmationData(){
 
   return {
     name,rawPhone,type,address,notes,paymentMethod,
-    selectedItems,selectedExtraRows,total,confirmationCode
+    selectedItems,selectedExtraRows,total,confirmationCode,orderNumber:null
   };
 }
 
@@ -384,8 +384,8 @@ function webConfirmationMessage(data){
   const extras=data.selectedExtraRows.map(item=>`${item.quantity} x ${item.name} - ${money(item.subtotal)}`).join("\n");
 
   return [
-    "🍔 *CONFIRMACIÓN DE PEDIDO - MORDISCO*",
-    "",
+    "🍔 *PEDIDO WEB - MORDISCO*",
+    data.orderNumber?`Pedido: *#${data.orderNumber}*`:"",
     `Código: *${data.confirmationCode}*`,
     `Cliente: ${data.name}`,
     `Teléfono: ${data.rawPhone}`,
@@ -402,8 +402,7 @@ function webConfirmationMessage(data){
     `Método de pago: ${PAYMENT_LABELS[data.paymentMethod]||data.paymentMethod}`,
     data.notes?`Notas: ${data.notes}`:"",
     "",
-    "✅ *CONFIRMO QUE DESEO REALIZAR ESTE PEDIDO.*",
-    `Código de confirmación: ${data.confirmationCode}`
+    "✅ *PEDIDO REGISTRADO EN MORDISCO Y ENVIADO A COCINA.*"
   ].filter(Boolean).join("\n");
 }
 
@@ -413,47 +412,30 @@ function buildNativeWhatsAppHref(data){
   const ua=navigator.userAgent||"";
 
   if(/Android/i.test(ua)){
-    // Native Android intent. No web fallback here: the goal is to open the app.
     return `intent://send?phone=593959005534&text=${encoded}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
   }
-
   if(/iPhone|iPad|iPod/i.test(ua)){
     return `whatsapp://send?phone=593959005534&text=${encoded}`;
   }
-
   return `https://web.whatsapp.com/send?phone=593959005534&text=${encoded}`;
 }
 
 function prepareNativeWhatsAppLink(data){
   const link=document.querySelector("#webOpenWhatsApp");
   if(!link)return;
-
   link.href=buildNativeWhatsAppHref(data);
   link.target="";
   link.dataset.ready="1";
 }
 
-function markWhatsAppConfirmationOpened(){
-  whatsappConfirmationOpened=true;
-  const register=document.querySelector("#webRegisterAfterWhatsApp");
-  if(register){
-    register.disabled=false;
-    register.textContent="Ya confirmé por WhatsApp — Registrar pedido";
-  }
-}
-
 function openWebConfirmationModal(data){
   pendingWebConfirmation=data;
-  whatsappConfirmationOpened=false;
-  const register=document.querySelector("#webRegisterAfterWhatsApp");
-  register.disabled=true;
-  register.textContent="Primero confirma por WhatsApp";
-
   const extras=data.selectedExtraRows.length
     ?`<p><b>Extras:</b> ${data.selectedExtraRows.map(x=>`${x.quantity}× ${esc(x.name)}`).join(", ")}</p>`
     :"";
 
   document.querySelector("#webConfirmSummary").innerHTML=`
+    ${data.orderNumber?`<p><b>Pedido:</b> #${esc(data.orderNumber)}</p>`:""}
     <p><b>Cliente:</b> ${esc(data.name)}</p>
     <p><b>Productos:</b> ${data.selectedItems.map(x=>`${x.quantity}× ${esc(x.name)}`).join(", ")}</p>
     ${extras}
@@ -465,78 +447,39 @@ function openWebConfirmationModal(data){
   document.querySelector("#webConfirmModal").setAttribute("aria-hidden","false");
 }
 
-document.querySelector("#onlineOrderForm").onsubmit=event=>{
+async function registerWebOrder(data){
+  const notesWithOrigin=`[WEB_WHATSAPP] Código ${data.confirmationCode}. `+(data.notes||"");
+  const {data:rpcData,error}=await db.rpc("create_web_order",{
+    p_customer_name:data.name,
+    p_customer_phone:data.rawPhone,
+    p_customer_address:data.address,
+    p_order_type:data.type,
+    p_notes:notesWithOrigin,
+    p_items:data.selectedItems.map(item=>({product_id:item.product_id,quantity:item.quantity})),
+    p_payment_method:data.paymentMethod,
+    p_extras:data.selectedExtraRows
+  });
+  if(error)throw error;
+  const result=Array.isArray(rpcData)?rpcData[0]:rpcData;
+  return result?.order_number ?? result?.number ?? (typeof rpcData==="number"||typeof rpcData==="string"?rpcData:null);
+}
+
+document.querySelector("#onlineOrderForm").onsubmit=async event=>{
   event.preventDefault();
+  if(webOrderSubmitting)return;
+  if(!storeIsOpen){toast("El restaurante está cerrado en este momento");return;}
 
-  if(!storeIsOpen){
-    toast("El restaurante está cerrado en este momento");
-    return;
-  }
-
+  const button=document.querySelector("#sendOnlineOrder");
   try{
-    openWebConfirmationModal(buildWebConfirmationData());
-  }catch(error){
-    toast(error.message||"Revisa los datos del pedido");
-  }
-};
+    const data=buildWebConfirmationData();
+    webOrderSubmitting=true;
+    if(button){button.disabled=true;button.textContent="Enviando pedido a Cocina...";}
 
-document.querySelector("#webOpenWhatsApp")?.addEventListener("click",event=>{
-  if(!pendingWebConfirmation){
-    event.preventDefault();
-    return;
-  }
+    const orderNumber=await registerWebOrder(data);
+    data.orderNumber=orderNumber;
 
-  // IMPORTANT: do not preventDefault. The <a> navigation itself is the native gesture.
-  markWhatsAppConfirmationOpened();
-});
-
-document.querySelector("#webConfirmClose")?.addEventListener("click",()=>{
-  document.querySelector("#webConfirmModal")?.classList.add("hidden");
-});
-
-document.querySelector("#webRegisterAfterWhatsApp")?.addEventListener("click",async()=>{
-  if(!pendingWebConfirmation||!whatsappConfirmationOpened){
-    return toast("Primero confirma el pedido por WhatsApp");
-  }
-
-  const data=pendingWebConfirmation;
-  const button=document.querySelector("#webRegisterAfterWhatsApp");
-  button.disabled=true;
-  button.textContent="Registrando solicitud...";
-
-  try{
-    const notesWithConfirmation=
-      `[WEB_ESPERANDO_WHATSAPP] Código ${data.confirmationCode}. `+(data.notes||"");
-
-    const {data:rpcData,error}=await db.rpc("create_web_order",{
-      p_customer_name:data.name,
-      p_customer_phone:data.rawPhone,
-      p_customer_address:data.address,
-      p_order_type:data.type,
-      p_notes:notesWithConfirmation,
-      p_items:data.selectedItems.map(item=>({
-        product_id:item.product_id,
-        quantity:item.quantity
-      })),
-      p_payment_method:data.paymentMethod,
-      p_extras:data.selectedExtraRows
-    });
-
-    if(error)throw error;
-
-    const result=Array.isArray(rpcData)?rpcData[0]:rpcData;
-    const orderNumber=
-      result?.order_number ??
-      result?.number ??
-      (typeof rpcData==="number"||typeof rpcData==="string"?rpcData:null);
-
-    if(orderNumber){
-      const {error:updateError}=await db
-        .from("orders")
-        .update({status:"awaiting_confirmation"})
-        .eq("order_number",orderNumber);
-      if(updateError)console.warn("Estado de confirmación:",updateError);
-    }
+    // El pedido YA está en Supabase con status=pending, por lo que Pedidos web y Cocina lo reciben al instante.
+    openWebConfirmationModal(data);
 
     cart=[];
     selectedExtras=[];
@@ -544,18 +487,23 @@ document.querySelector("#webRegisterAfterWhatsApp")?.addEventListener("click",as
     renderCart();
     document.querySelector("#onlineOrderForm").reset();
     document.querySelector("#onlineAddressWrap").classList.add("hidden");
-    document.querySelector("#webConfirmModal").classList.add("hidden");
-
-    pendingWebConfirmation=null;
-    whatsappConfirmationOpened=false;
-
-    toast(`Solicitud #${orderNumber||""} recibida. Mordisco verificará tu WhatsApp antes de enviarla a Cocina.`);
+    toast(`Pedido #${orderNumber||""} enviado a Cocina. Confirma ahora por WhatsApp.`);
   }catch(error){
-    console.error("Registro tras WhatsApp:",error);
+    console.error("Registro pedido web:",error);
     toast("No se pudo registrar: "+(error?.message||"Error desconocido"));
-    button.disabled=false;
-    button.textContent="Ya confirmé por WhatsApp — Registrar pedido";
+  }finally{
+    webOrderSubmitting=false;
+    if(button){button.disabled=false;button.textContent="Confirmar pedido por WhatsApp";}
   }
+};
+
+document.querySelector("#webOpenWhatsApp")?.addEventListener("click",event=>{
+  if(!pendingWebConfirmation){event.preventDefault();return;}
+});
+
+document.querySelector("#webConfirmClose")?.addEventListener("click",()=>{
+  document.querySelector("#webConfirmModal")?.classList.add("hidden");
+  pendingWebConfirmation=null;
 });
 
 document.querySelector("#floatingCartButton")?.addEventListener("click",()=>{

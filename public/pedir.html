@@ -348,19 +348,19 @@ body.storeClosed [data-add]{
 <div id="webConfirmModal" class="webConfirmModal hidden" aria-hidden="true">
   <div class="webConfirmCard">
     <button type="button" id="webConfirmClose" class="webConfirmClose" aria-label="Cerrar">×</button>
-    <span class="webConfirmEyebrow">CONFIRMACIÓN OBLIGATORIA</span>
-    <h2>Confirma antes de enviar tu pedido</h2>
+    <span class="webConfirmEyebrow">PEDIDO REGISTRADO</span>
+    <h2>Tu pedido ya llegó a Mordisco</h2>
     <p class="webConfirmIntro">
-      Tu pedido <b>no llegará a Cocina</b> hasta que Mordisco compruebe tu confirmación por WhatsApp.
+      El pedido ya fue enviado a <b>Pedidos web y Cocina</b>. Ahora confirma por WhatsApp para que podamos contactarte si hace falta.
     </p>
 
     <div id="webConfirmSummary" class="webConfirmSummary"></div>
 
     <div class="webConfirmStep">
-      <span>1</span>
+      <span>✓</span>
       <div>
-        <b>Confirma por WhatsApp</b>
-        <small>Se abrirá WhatsApp con tu pedido listo. Pulsa Enviar.</small>
+        <b>Pedido recibido por Mordisco</b>
+        <small>Ya aparece en el sistema y en Cocina.</small>
       </div>
     </div>
     <a id="webOpenWhatsApp" class="webWhatsAppButton" href="#" rel="external">
@@ -368,24 +368,13 @@ body.storeClosed [data-add]{
       <b>Confirmar mi pedido</b>
     </a>
 
-    <div class="webConfirmStep">
-      <span>2</span>
-      <div>
-        <b>Regresa a esta pantalla</b>
-        <small>Después de enviar el mensaje, vuelve y registra tu solicitud.</small>
-      </div>
-    </div>
-    <button type="button" id="webRegisterAfterWhatsApp" class="webRegisterButton" disabled>
-      Ya confirmé por WhatsApp — Registrar pedido
-    </button>
-
     <p class="webConfirmFoot">
-      Mordisco verificará tu mensaje y recién entonces enviará el pedido a Cocina.
+      WhatsApp es solo la confirmación de contacto. Cerrar esta ventana no elimina el pedido.
     </p>
   </div>
 </div>
 
 <div id="onlineToast" class="onlineToast"></div>
-<script src="/online-v18.js?v=whatsapp-native-android-2"></script>
+<script src="/online-v18.js?v=v44-web-kitchen"></script>
 </body>
 </html>
